@@ -1,7 +1,7 @@
 export const onShare = async () => {
-    const title = 'TikTok clone by api.video'
+    const title = 'FlowTok by FlowMe'
     const url = window.document.location.href
-    const text = 'Take a look at how quick it is to build a tiktok clone using pwa'
+    const text = 'The AiGen Social Platform'
 
     if (navigator.share) {
         try {
