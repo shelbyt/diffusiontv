@@ -2,6 +2,11 @@
     height: 100vh;
     width: 100vw;
 }
+.app__videos > div {
+    height: calc(100vh - 50px);  /* Adjust as needed */
+    width: 100%;
+}
+
 
 .app__videos {
     height: calc(100% - 50px);

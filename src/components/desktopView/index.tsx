@@ -7,7 +7,7 @@ const DesktopView: React.FC = () => {
   return (
     <div className="min-h-screen flex justify-center items-center">
         <QRCode
-          value="https://21f1-108-65-6-128.ngrok-free.app"
+          value={""}
           size={200}
           className="border rounded-md"
         />
