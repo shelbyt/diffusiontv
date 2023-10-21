@@ -3,13 +3,13 @@
     width: 100vw;
 }
 .app__videos > div {
-    height: calc(100vh - 50px);  /* Adjust as needed */
+    height: calc(100vh - 80px);  /* Adjust as needed */
     width: 100%;
 }
 
 
 .app__videos {
-    height: calc(100% - 50px);
+    height: calc(100vh - 80px);
     width: 100%;
     scroll-snap-type: y mandatory;
     overflow-y: scroll;
