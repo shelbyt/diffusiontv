@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaHome, FaUser } from 'react-icons/fa';
 import { RiAddFill } from 'react-icons/ri';
+import {GiBowlSpiral} from 'react-icons/gi'
 
 const Navbar: React.FC = () => {
     return (
@@ -10,7 +11,7 @@ const Navbar: React.FC = () => {
                 <p className="text-xs mt-1">Home</p>
             </div>
             <div className="flex flex-col items-center text-white">
-                <RiAddFill size={24} />
+                <GiBowlSpiral size={36} />
             </div>
             <div className="flex flex-col items-center text-white">
                 <FaUser size={24} />
