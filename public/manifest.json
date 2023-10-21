@@ -4,9 +4,9 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "TikTok Clone",
-    "short_name": "TitTok_Clone_PWA_Next.js",
-    "description": "Rebuilding TikTok with api.video and Next.js",
+    "name": "FlowTok",
+    "short_name": "FlowTok",
+    "description": "Remix GenAI Videos",
     "icons": [
         {
             "src": "/icon-192x192.png",
