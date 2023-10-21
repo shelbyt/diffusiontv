@@ -8,6 +8,7 @@ import DesktopView from '../components/desktopView'
 import Upload from '../components/upload'
 import VideoComponent from '../components/video/index'
 import styles from './index.module.css'
+import Navbar from '../components/navbar'
 
 const Home: NextPage = () => {
     const [videos, setVideos] = useState<Video[]>([])
@@ -80,7 +81,8 @@ const Home: NextPage = () => {
                 })}
             </div>
 
-            <Upload mutate={mutate} />
+            {/* <Upload mutate={mutate} /> */}
+            <Navbar />
         </div>
     )
 }
