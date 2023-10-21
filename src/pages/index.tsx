@@ -8,12 +8,16 @@ import DesktopView from '../components/desktopView'
 import VideoComponent from '../components/video/index'
 import styles from './index.module.css'
 import Navbar from '../components/navbar'
+import { useSession, signIn, signOut } from "next-auth/react"
+
 
 const Home: NextPage = () => {
     const [videos, setVideos] = useState<Video[]>([])
     const observerRef = useRef(null)
     const [currentPage, setCurrentPage] = useState(1)
     const { data, mutate } = useSWR<VideosListResponse>(() => `api/videos?method=get&currentPage=${currentPage}`)
+    const { data: session, status } = useSession()
+
 
 
     useEffect(() => {
