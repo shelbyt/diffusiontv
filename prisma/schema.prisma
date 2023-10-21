@@ -1,0 +1,26 @@
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String
+  name         String?
+  socialLogins SocialLogin[]
+}
+
+model SocialLogin {
+  id         Int    @id @default(autoincrement())
+  userId     Int
+  provider   String
+  providerId String
+  user       User   @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
