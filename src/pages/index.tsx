@@ -100,7 +100,7 @@ const Home: NextPage = () => {
                     )
                 })}
             </div>
-            <Navbar />
+            {/* <Navbar /> */}
         </div>
     )
 }
