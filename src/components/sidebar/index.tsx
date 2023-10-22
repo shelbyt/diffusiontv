@@ -1,5 +1,5 @@
-import { MdFavorite, MdOutlineBookmark } from 'react-icons/md'
-import { RiShareForwardFill } from 'react-icons/ri'
+import {MdOutlineBookmark } from 'react-icons/md'
+import { ShareFat, Heart, SpeakerSimpleHigh, SpeakerSimpleSlash} from "@phosphor-icons/react";
 import styles from './sidebar.module.css'
 import Image from 'next/image'
 import Logo from '../../../public/icon-192x192.png'
@@ -9,7 +9,6 @@ import Video from '@api.video/nodejs-client/lib/model/Video'
 import 'animate.css'
 import { getSocialResults } from '../../utils/socialResults'
 import Metadata from '@api.video/nodejs-client/lib/model/Metadata'
-import { MdVolumeOff, MdVolumeUp } from 'react-icons/md';
 
 export interface ISidebarProps {
     video: Video
@@ -80,11 +79,15 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
                     )
                 }
             >
-                <MdFavorite
+                <Heart
                     size={40}
                     color={clickedLikes ? '#D65076' : '#fff'}
                     className={clickedLikes ? 'animate__animated animate__heartBeat' : ''}
+                    weight="fill"
                 />
+
+
+
                 <p>{likes}</p>
             </div>
             <div
@@ -108,13 +111,10 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
                 <p>{bookmarks}</p>
             </div>
             <div className={styles.sidebar__button} onClick={toggleMute}>
-                {isMuted ? <MdVolumeOff size={40} /> : <MdVolumeUp size={40} />}
+                {isMuted ? <SpeakerSimpleSlash size={40} weight='fill' /> : <SpeakerSimpleHigh size={40} weight='fill' />}
             </div>
-
-
-
             <div className={styles.sidebar__button} onClick={onShare}>
-                <RiShareForwardFill size={40} />
+                <ShareFat size={40} color="#fff" weight="fill" />
             </div>
         </div>
     )

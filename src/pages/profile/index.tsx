@@ -1,6 +1,6 @@
 // pages/profile.js
 import React, { useState } from 'react';
-import { RiShareForwardFill } from 'react-icons/ri'
+import { ShareFat } from '@phosphor-icons/react'
 
 const Profile = () => {
 	const [activeTab, setActiveTab] = useState(0);  // Using index for DaisyUI tabs
@@ -11,7 +11,7 @@ const Profile = () => {
 			<div className="p-4 bg-white flex justify-between items-center">
 				<div></div>  {/* This is a placeholder for potential future items like a back button */}
 				<button className="btn">
-					<RiShareForwardFill size={24} />
+					<ShareFat size={24} color='#000' weight="fill" />
 				</button>
 			</div>
 
