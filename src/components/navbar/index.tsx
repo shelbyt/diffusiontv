@@ -25,7 +25,7 @@ const Navbar: React.FC = () => {
                 <p className="text-xs mt-1">Home</p>
             </div>
             <div className="flex flex-col items-center text-white">
-                <PaintBrushHousehold size={36} color="#fff" weight="fill" onClick={handleLogout}/>
+                <PaintBrushHousehold size={32} color="#fff" weight="fill" onClick={handleLogout}/>
 
 
             </div>
