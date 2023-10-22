@@ -24,15 +24,15 @@ const Home: NextPage = () => {
     const router = useRouter();
 
     useEffect(() => {
-        if (!authLoading && !user) {
-            console.log("Auth: You need to login!");
-            router.push('/api/auth/login');
-        } else if (userData) {
-            console.log("auth user object ", user)
-            console.log("User saved or found in the database.");
-        } else if (isError) {
-            console.log("Error saving or finding user in the database.");
-        }
+        // if (!authLoading && !user) {
+        //     console.log("Auth: You need to login!");
+        //     router.push('/api/auth/login');
+        // } else if (userData) {
+        //     console.log("auth user object ", user)
+        //     console.log("User saved or found in the database.");
+        // } else if (isError) {
+        //     console.log("Error saving or finding user in the database.");
+        // }
     }, [user, authLoading, userData, isError]);
 
 
@@ -82,8 +82,11 @@ const Home: NextPage = () => {
     return (
         <div className={styles.app} id="videos__container">
             <Head>
+                                    <meta name="apple-mobile-web-app-capable" content="yes"></meta>
+                    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"></meta>
                 <title>FlowTok</title>
                 <meta name="description" content="Curated AI videos. For You." />
+
                 <link rel="icon" href="/favicon.ico" />
             </Head>
 

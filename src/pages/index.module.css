@@ -12,6 +12,7 @@
     height: calc(100vh - 80px);
     width: 100%;
     scroll-snap-type: y mandatory;
+    scroll-snap-stop: always;
     overflow-y: scroll;
 }
 

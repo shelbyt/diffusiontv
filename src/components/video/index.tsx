@@ -57,7 +57,7 @@ const VideoComponent: FC<IvideosProps> = ({ video, mutate }): JSX.Element => {
                     />
                     <div onClick={onVideoPress} className={styles.video__press}></div>
 
-                    <Footer video={video} />
+                    {/* <Footer video={video} /> */}
                     <Sidebar video={video} mutate={mutate} />
                 </div>
             )}
