@@ -9,18 +9,11 @@ generator client {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  email        String
-  name         String?
-  socialLogins SocialLogin[]
-}
-
-model SocialLogin {
-  id         Int    @id @default(autoincrement())
-  userId     Int
-  provider   String
-  providerId String
-  user       User   @relation(fields: [userId], references: [id])
-
-  @@index([userId])
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String?
+  sl_id     String   @unique
+  provider  String 
+  createdAt DateTime @default(now())
+  imageUrl  String?
 }

@@ -10,21 +10,32 @@ import styles from './index.module.css'
 import Navbar from '../components/navbar'
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/router';
+import { useUserDB } from '../hooks/useUserDB';
+
 
 const Home: NextPage = () => {
     const [videos, setVideos] = useState<Video[]>([])
     const observerRef = useRef(null)
     const [currentPage, setCurrentPage] = useState(1)
     const { data, mutate } = useSWR<VideosListResponse>(() => `api/videos?method=get&currentPage=${currentPage}`)
-    const { user, isLoading, error } = useUser();
+    const { user, isLoading: authLoading, error } = useUser();
+    const { userData, isLoading: userDBLoading, isError } = useUserDB(user);
+
     const router = useRouter();
 
     useEffect(() => {
-        if (!isLoading && !user) {
+        if (!authLoading && !user) {
             console.log("Auth: You need to login!");
             router.push('/api/auth/login');
+        } else if (userData) {
+            console.log("auth user object ", user)
+            console.log("User saved or found in the database.");
+        } else if (isError) {
+            console.log("Error saving or finding user in the database.");
         }
-    }, [user, isLoading]);
+    }, [user, authLoading, userData, isError]);
+
+
 
 
     useEffect(() => {
