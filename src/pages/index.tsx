@@ -24,15 +24,15 @@ const Home: NextPage = () => {
     const router = useRouter();
 
     useEffect(() => {
-        // if (!authLoading && !user) {
-        //     console.log("Auth: You need to login!");
-        //     router.push('/api/auth/login');
-        // } else if (userData) {
-        //     console.log("auth user object ", user)
-        //     console.log("User saved or found in the database.");
-        // } else if (isError) {
-        //     console.log("Error saving or finding user in the database.");
-        // }
+        if (!authLoading && !user) {
+            console.log("Auth: You need to login!");
+            router.push('/api/auth/login');
+        } else if (userData) {
+            console.log("auth user object ", user)
+            console.log("User saved or found in the database.");
+        } else if (isError) {
+            console.log("Error saving or finding user in the database.");
+        }
     }, [user, authLoading, userData, isError]);
 
 
