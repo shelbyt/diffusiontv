@@ -13,7 +13,38 @@ model User {
   email     String   @unique
   username  String?
   sl_id     String   @unique
-  provider  String 
+  provider  String
   createdAt DateTime @default(now())
   imageUrl  String?
+  videos Video[]
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  videoId     String   @unique
+  tags        Tag[] // Many-to-many relation
+  publishedAt DateTime
+  updatedAt   DateTime
+  asset       Asset?
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdById String 
+
+  @@index([createdById])
+}
+
+model Tag {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  videos Video[]
+}
+
+model Asset {
+  id        String @id @default(cuid())
+  iframe    String
+  player    String
+  hls       String
+  thumbnail String
+  mp4       String
+  videoId   String @unique
+  video     Video  @relation(fields: [videoId], references: [id])
 }
