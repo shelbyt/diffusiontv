@@ -26,8 +26,6 @@ const Navbar: React.FC = () => {
             </div>
             <div className="flex flex-col items-center text-white">
                 <PaintBrushHousehold size={32} color="#fff" weight="fill" onClick={handleLogout}/>
-
-
             </div>
             <div className="flex flex-col items-center text-white" onClick={navigateToProfile}>
                 {router.pathname === '/profile' ? <User size={24} weight='fill' color="#fff" /> : <User size={24} color="#fff" />}

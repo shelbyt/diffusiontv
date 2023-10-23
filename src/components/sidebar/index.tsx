@@ -1,5 +1,5 @@
-import {MdOutlineBookmark } from 'react-icons/md'
-import { ShareFat, Heart, SpeakerSimpleHigh, SpeakerSimpleSlash} from "@phosphor-icons/react";
+import { MdOutlineBookmark } from 'react-icons/md'
+import { ShareFat, Heart, SpeakerSimpleHigh, SpeakerSimpleSlash } from "@phosphor-icons/react";
 import styles from './sidebar.module.css'
 import Image from 'next/image'
 import Logo from '../../../public/icon-192x192.png'
@@ -27,10 +27,6 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
             setIsMuted(audioElement.muted);
         }
     };
-
-
-
-
 
     const [clickedLikes, setClickedLikes] = useState(false)
     const [clickedBookmarks, setClickedBookmarks] = useState(false)
@@ -62,12 +58,12 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
     }
 
     return (
-        <div className={styles.sidebar}>
+            <div className="absolute top-1/2 right-2.5 text-white flex flex-col space-y-5">
             <a href="https://github.com/FlowyMe/flowtok" target={'_blank'} rel="noreferrer">
                 <Image src={Logo} width={40} height={40} />
             </a>
             <div
-                className={styles.sidebar__button}
+                className="flex flex-col items-center"
                 onClick={() =>
                     !clickedLikes &&
                     onPressItem(
@@ -80,18 +76,15 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
                 }
             >
                 <Heart
-                    size={40}
+                    size={30}
                     color={clickedLikes ? '#D65076' : '#fff'}
                     className={clickedLikes ? 'animate__animated animate__heartBeat' : ''}
                     weight="fill"
                 />
-
-
-
                 <p>{likes}</p>
             </div>
             <div
-                className={styles.sidebar__button}
+                className="flex flex-col items-center"
                 onClick={() =>
                     !clickedBookmarks &&
                     onPressItem(
@@ -104,17 +97,17 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
                 }
             >
                 <MdOutlineBookmark
-                    size={40}
+                    size={30}
                     color={clickedBookmarks ? '#FCD354' : '#FFFFFF'}
                     className={clickedBookmarks ? 'animate__animated animate__heartBeat' : ''}
                 />
                 <p>{bookmarks}</p>
             </div>
-            <div className={styles.sidebar__button} onClick={toggleMute}>
-                {isMuted ? <SpeakerSimpleSlash size={40} weight='fill' /> : <SpeakerSimpleHigh size={40} weight='fill' />}
+            <div className="flex flex-col items-center pb-4" onClick={toggleMute}>
+                {isMuted ? <SpeakerSimpleSlash size={30} weight='fill' /> : <SpeakerSimpleHigh size={40} weight='fill' />}
             </div>
-            <div className={styles.sidebar__button} onClick={onShare}>
-                <ShareFat size={40} color="#fff" weight="fill" />
+            <div className="flex flex-col items-center" onClick={onShare}>
+                <ShareFat size={30} color="#fff" weight="fill" />
             </div>
         </div>
     )

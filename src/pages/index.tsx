@@ -62,6 +62,7 @@ const Home: NextPage = () => {
         const observer = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
+                    console.log("XXX: Intersection Observer - ", currentPage)
                     fetchMoreVideos()
                 }
             })
