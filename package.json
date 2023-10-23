@@ -1,5 +1,5 @@
 {
-  "name": "new_tiktok_demo",
+  "name": "flowtok",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@api.video/nodejs-client": "^2.2.7",
+    "@api.video/nodejs-client": "^2.5.4",
     "@api.video/react-player": "^1.0.1",
     "@api.video/video-uploader": "^1.0.9",
     "@auth0/nextjs-auth0": "^3.2.0",
