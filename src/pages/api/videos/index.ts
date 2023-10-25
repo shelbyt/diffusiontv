@@ -1,14 +1,15 @@
 import ApiVideoClient from '@api.video/nodejs-client'
 import { NextApiRequest, NextApiResponse } from 'next'
+import prisma from '../../../utils/prismaClient'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const defaultApiKey = process.env.API_KEY
 
     const sortBy = 'publishedAt'; // Allowed: publishedAt, title. You can search by the time videos were published at, or by title.
     const sortOrder = 'asc'; // Allowed: asc, desc. asc is ascending and sorts from A to Z. desc is descending and sorts from Z to A.
-    const pageSize = 5; // Results per page. Allowed values 1-100, default is 25.
+    const pageSize = 2; // Results per page. Allowed values 1-100, default is 25. Loading 2 at a time is really good
     let currentPage = 1;
-    if(req.query.currentPage) {
+    if (req.query.currentPage) {
         currentPage = Number(req.query.currentPage)
     }
 
@@ -20,8 +21,46 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     })
 
     if (method == 'get') {
-        const result = await client.videos.list({sortBy, sortOrder, pageSize, currentPage})
-        return res.status(200).json({ ...result })
+        async function getTopImages() {
+            const images = await prisma.image.findMany({
+                skip: (currentPage - 1) * pageSize,
+                take: pageSize ,
+                orderBy: {
+                    heartCount: 'desc',
+                },
+                select: {
+                    videoId: true,
+                    heartCount: true,
+                    username: true,
+                    user: {
+                        select: {
+                            imageUrl: true,
+                        },
+                    },
+                },
+            });
+
+            return images;
+        }
+
+        const results = await getTopImages();
+        const videoIds = results.map(item => `${item.videoId}.mp4`)
+        // console.log("videoid", videoIds)
+        let title = videoIds[0]
+
+
+        const result1 = await client.videos.list({ title })
+        title = videoIds[1]
+        const result2 = await client.videos.list({ title })
+        // Perform the merge
+        const mergedVideosListResponse = {
+            ...result1, // Shallow copy of the first object
+            data: [...result1.data, ...result2.data], // Concatenate the data arrays
+        };
+        console.log(mergedVideosListResponse)
+
+        //const result = await client.videos.list({ sortBy, sortOrder, pageSize, currentPage })
+        return res.status(200).json({ ...mergedVideosListResponse })
     }
 
     // UPDATE DATA
