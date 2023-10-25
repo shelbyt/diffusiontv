@@ -24,13 +24,14 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         async function getTopImages() {
             const images = await prisma.image.findMany({
                 skip: (currentPage - 1) * pageSize,
-                take: pageSize ,
+                take: pageSize,
                 orderBy: {
                     heartCount: 'desc',
                 },
                 select: {
                     videoId: true,
                     heartCount: true,
+                    commentCount: true,
                     username: true,
                     user: {
                         select: {
@@ -52,14 +53,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const result1 = await client.videos.list({ title })
         title = videoIds[1]
         const result2 = await client.videos.list({ title })
-        // Perform the merge
         const mergedVideosListResponse = {
             ...result1, // Shallow copy of the first object
-            data: [...result1.data, ...result2.data], // Concatenate the data arrays
+            data: [...result1.data, ...result2.data].map((item, index) => ({
+                ...item,
+                meta: results[index],
+            })), // Add the meta field to each item in the data array
         };
-        console.log(mergedVideosListResponse)
+        // console.log("AAA", mergedVideosListResponse.data)
 
-        //const result = await client.videos.list({ sortBy, sortOrder, pageSize, currentPage })
         return res.status(200).json({ ...mergedVideosListResponse })
     }
 
