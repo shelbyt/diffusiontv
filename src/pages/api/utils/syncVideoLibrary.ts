@@ -15,6 +15,7 @@ async function fetchAndStoreVideos() {
         if (currentPage >= res.pagination.pagesTotal) {
             break;
         }
+        break;
     }
 
     for (const video of allVideos) {
