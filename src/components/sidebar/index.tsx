@@ -1,13 +1,8 @@
-import { MdOutlineBookmark } from 'react-icons/md'
-import { ShareFat, Heart, SpeakerSimpleHigh, SpeakerSimpleSlash } from "@phosphor-icons/react";
-import styles from './sidebar.module.css'
-import Image from 'next/image'
-import Logo from '../../../public/icon-192x192.png'
+import { ShareFat, Heart, SpeakerSimpleHigh, SpeakerSimpleSlash, ChatCircleDots } from "@phosphor-icons/react";
 import { FC, useEffect, useState } from 'react'
 import { onShare } from '../../utils/share'
 import Video from '@api.video/nodejs-client/lib/model/Video'
 import 'animate.css'
-import { getSocialResults } from '../../utils/socialResults'
 import Metadata from '@api.video/nodejs-client/lib/model/Metadata'
 
 export interface ISidebarProps {
@@ -58,7 +53,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
 
     const onPressItem = async (metadata: Array<Metadata>, icon: string) => {
         icon === 'MdFavorite' && setClickedLikes(true)
-        icon === 'MdOutlineBookmark' && setClickedBookmarks(true)
+        icon === 'ChatCircleDots' && setClickedBookmarks(true)
 
         await updateVideos(metadata)
 
@@ -68,17 +63,13 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
     return (
         <div className="absolute top-1/2 right-2.5 text-white flex flex-col space-y-5">
             <a href={`https://civitai.com/user/${videoMeta.meta.username}`} target="_blank" rel="noopener noreferrer">
-            <div className="avatar">
-                <div className="w-16 mask mask-hexagon">
-                    <img src={videoMeta.meta.user.imageUrl} />
+                <div className="avatar">
+                    <div className="w-16 mask mask-hexagon">
+                        <img src={videoMeta.meta.user.imageUrl} />
+                    </div>
                 </div>
-            </div>
             </a>
 
-            {/* <a href="https://github.com/FlowyMe/flowtok" target={'_blank'} rel="noreferrer">
-                <img src={} width={40} height={40} className="border-2 border-white rounded-full"
-                />
-            </a> */}
             <div
                 className="flex flex-col items-center"
                 onClick={() =>
@@ -100,26 +91,30 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
                 />
                 <p>{likes}</p>
             </div>
-            <div
-                className="flex flex-col items-center"
-                onClick={() =>
-                    !clickedBookmarks &&
-                    onPressItem(
-                        [
-                            { key: 'likes', value: `${likes}` },
-                            { key: 'bookmarks', value: `${bookmarks + 1}` },
-                        ],
-                        'MdOutlineBookmark'
-                    )
-                }
-            >
-                <MdOutlineBookmark
-                    size={30}
-                    color={clickedBookmarks ? '#FCD354' : '#FFFFFF'}
-                    className={clickedBookmarks ? 'animate__animated animate__heartBeat' : ''}
-                />
-                <p>{bookmarks}</p>
-            </div>
+            <a href={`https://civitai.com/images/${videoMeta.meta.remoteId}`} target="_blank" rel="noopener noreferrer">
+                <div
+                    className="flex flex-col items-center"
+                    onClick={() =>
+                        !clickedBookmarks &&
+                        onPressItem(
+                            [
+                                { key: 'likes', value: `${likes}` },
+                                { key: 'bookmarks', value: `${bookmarks + 1}` },
+                            ],
+                            'ChatCircleDots'
+                        )
+                    }
+                >
+                    <ChatCircleDots
+                        weight="fill"
+                        size={30}
+                        color={'#FFFFFF'}
+                    // color={clickedBookmarks ? '#FCD354' : '#FFFFFF'}
+                    // className={clickedBookmarks ? 'animate__animated animate__heartBeat' : ''}
+                    />
+                    <p>{bookmarks}</p>
+                </div>
+            </a>
             <div className="flex flex-col items-center pb-4" onClick={toggleMute}>
                 {isMuted ? <SpeakerSimpleSlash size={30} weight='fill' /> : <SpeakerSimpleHigh size={40} weight='fill' />}
             </div>

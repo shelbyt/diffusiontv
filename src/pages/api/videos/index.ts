@@ -30,6 +30,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 },
                 select: {
                     videoId: true,
+                    remoteId: true,
                     heartCount: true,
                     commentCount: true,
                     username: true,
@@ -60,7 +61,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 meta: results[index],
             })), // Add the meta field to each item in the data array
         };
-        // console.log("AAA", mergedVideosListResponse.data)
+        console.log("AAA", mergedVideosListResponse.data)
 
         return res.status(200).json({ ...mergedVideosListResponse })
     }
