@@ -6,7 +6,7 @@ import path from 'path';
 const prisma = new PrismaClient();
 
 async function main() {
-  const filePath = path.join(__dirname, 'username_db.dat');
+  const filePath = path.join(__dirname, 'data/username_db.dat');
   const fileContent = fs.readFileSync(filePath, 'utf-8');
 
   const lines = fileContent.split('\n');
@@ -14,7 +14,7 @@ async function main() {
     const [username, imageUrl] = line.split(',').map(s => s.trim());
     return {
       username: username || null,
-      imageUrl: imageUrl === "" ? null : imageUrl, // Set to null if empty string
+      imageUrl: imageUrl === "" ? " https://avatars.githubusercontent.com/u/117393426?s=128&v=4" : imageUrl, // Set to null if empty string
       fromCiv: true,
     };
   });
