@@ -43,3 +43,4 @@ yarn-error.log*
 **/public/worker-*.js.map
 .env
 examples/*
+src/scripts/data/*

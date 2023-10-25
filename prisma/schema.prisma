@@ -10,12 +10,19 @@ generator client {
 
 model User {
   id        String   @id @default(cuid())
-  email     String   @unique
+  email     String?   @unique
   username  String?
-  sl_id     String   @unique
-  provider  String
-  createdAt DateTime @default(now())
+  sl_id     String?   @unique
+  provider  String?
+
+  //TODO:This should have default but removed for insertion
+  createdAt DateTime?
+
+  insertedAt DateTime @default(now())
   imageUrl  String?
+  verified  Boolean   @default(false)
+  verifiedAt DateTime?
+  fromCiv   Boolean   @default(false)
   videos Video[]
 }
 
@@ -47,4 +54,30 @@ model Asset {
   mp4       String
   videoId   String @unique
   video     Video  @relation(fields: [videoId], references: [id])
+}
+
+model Image {
+  id          String       @id @default(cuid())
+  remoteId    Int          @unique
+  videoId     String       @unique
+  url         String?
+  hash        String?
+  width       Int?
+  height      Int?
+  nsfwLevel   String?
+  nsfw        Boolean?
+  createdAt   DateTime?
+  postId      Int?
+  username    String?
+
+  // Fields from Stats
+  laughCount  Int?
+  likeCount   Int?
+  heartCount  Int?
+  commentCount Int?
+  stats       Json      // Stats as JSON string
+
+  // Fields from Meta
+  model       String?
+  meta        Json      // Meta as JSON string
 }
