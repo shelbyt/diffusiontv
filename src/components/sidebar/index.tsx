@@ -20,6 +20,12 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
     const [bookmarks, setBookmarks] = useState(0)
     const [isMuted, setIsMuted] = useState(true);
 
+    //TODO: Ineffeicnet, creating a clone so i dont have to deal with typescript
+    const videoMeta: any = video;
+
+
+    console.log("xxx video = ", video)
+
     const toggleMute = () => {
         const audioElement = document.getElementById("background-music") as HTMLAudioElement;
         if (audioElement) {
@@ -33,10 +39,12 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
 
     const { videoId } = video
 
+    //TODO: Validation and Types on videoMeta.
     useEffect(() => {
         if (video) {
-            setLikes(getSocialResults(video, 'likes'))
-            setBookmarks(getSocialResults(video, 'bookmarks'))
+            // setLikes(getSocialResults(video, 'likes'))
+            setLikes(videoMeta.meta.heartCount)
+            setBookmarks(videoMeta.meta.commentCount)
         }
     }, [video])
 
@@ -58,10 +66,19 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
     }
 
     return (
-            <div className="absolute top-1/2 right-2.5 text-white flex flex-col space-y-5">
-            <a href="https://github.com/FlowyMe/flowtok" target={'_blank'} rel="noreferrer">
-                <Image src={Logo} width={40} height={40} />
+        <div className="absolute top-1/2 right-2.5 text-white flex flex-col space-y-5">
+            <a href={`https://civitai.com/user/${videoMeta.meta.username}`} target="_blank" rel="noopener noreferrer">
+            <div className="avatar">
+                <div className="w-16 mask mask-hexagon">
+                    <img src={videoMeta.meta.user.imageUrl} />
+                </div>
+            </div>
             </a>
+
+            {/* <a href="https://github.com/FlowyMe/flowtok" target={'_blank'} rel="noreferrer">
+                <img src={} width={40} height={40} className="border-2 border-white rounded-full"
+                />
+            </a> */}
             <div
                 className="flex flex-col items-center"
                 onClick={() =>
