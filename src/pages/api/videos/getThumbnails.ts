@@ -13,6 +13,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         currentPage = Number(req.query.currentPage)
     }
 
+    const {videoIdList} = req.body
+
 
     const { videoId, metadata } = req.body
     const { method } = req.query
@@ -26,7 +28,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 skip: (currentPage - 1) * pageSize,
                 take: pageSize,
                 orderBy: {
-                    commentCount: 'desc',
+                    heartCount: 'desc',
                 },
                 select: {
                     videoId: true,
@@ -46,15 +48,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         const results = await getTopImages();
-        console.log("ZZZ results", results)
         const videoIds = results.map(item => `${item.videoId}.mp4`)
-        console.log("videoid", videoIds)
+        // console.log("videoid", videoIds)
         let title = videoIds[0]
 
 
         const result1 = await client.videos.list({ title })
         title = videoIds[1]
-        console.log("Tag Return-> ", result1)
         const result2 = await client.videos.list({ title })
         const mergedVideosListResponse = {
             ...result1, // Shallow copy of the first object
@@ -63,20 +63,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 meta: results[index],
             })), // Add the meta field to each item in the data array
         };
-        // console.log("AAA", mergedVideosListResponse.data)
+        console.log("AAA", mergedVideosListResponse.data)
 
         return res.status(200).json({ ...mergedVideosListResponse })
-    }
-
-    // UPDATE DATA
-    if (method === 'patch') {
-        const videoUpdatePayload = {
-            metadata, // A list (array) of dictionaries where each dictionary contains a key value pair that describes the video. As with tags, you must send the complete list of metadata you want as whatever you send here will overwrite the existing metadata for the video.
-        }
-
-        const result = await client.videos.update(videoId, videoUpdatePayload)
-        res.status(204).send(result)
-        return
     }
 }
 export default handler

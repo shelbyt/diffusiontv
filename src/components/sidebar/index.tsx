@@ -4,6 +4,7 @@ import { onShare } from '../../utils/share'
 import Video from '@api.video/nodejs-client/lib/model/Video'
 import 'animate.css'
 import Metadata from '@api.video/nodejs-client/lib/model/Metadata'
+import { useRouter } from "next/router";
 
 export interface ISidebarProps {
     video: Video
@@ -14,6 +15,12 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
     const [likes, setLikes] = useState(0)
     const [bookmarks, setBookmarks] = useState(0)
     const [isMuted, setIsMuted] = useState(true);
+
+    const router = useRouter()
+
+    const goToUserProfile = () => {
+        router.push(`/u/${videoMeta.meta.username}`)
+    }
 
     //TODO: Ineffeicnet, creating a clone so i dont have to deal with typescript
     const videoMeta: any = video;
@@ -62,14 +69,16 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
 
     return (
         <div className="absolute top-1/2 right-2.5 text-white flex flex-col space-y-5">
-            <a href={`https://civitai.com/user/${videoMeta.meta.username}`} target="_blank" rel="noopener noreferrer">
-                <div className="avatar">
-                    <div className="w-16 mask mask-hexagon">
-                        <img src={videoMeta.meta.user.imageUrl} />
+                <div className="avatar relative">
+                    <div className="w-20 mask mask-hexagon">
+                        <img src={videoMeta.meta.user.imageUrl} alt="User avatar" onClick={goToUserProfile} />
+                    </div>
+                    <div className="absolute bottom-0 left-1/2 bg-red-600 rounded-full p-1 transform -translate-x-1/2">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="white">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M12 4v16m8-8H4" />
+                        </svg>
                     </div>
                 </div>
-            </a>
-
             <div
                 className="flex flex-col items-center"
                 onClick={() =>
