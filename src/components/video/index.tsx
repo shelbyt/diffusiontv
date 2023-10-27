@@ -8,9 +8,10 @@ import ApiVideoPlayer from '@api.video/react-player'
 export interface IvideosProps {
     video: Video
     mutate: () => void
+    parentRef?: React.Ref<any>;
 }
 
-const VideoComponent: FC<IvideosProps> = ({ video, mutate }): JSX.Element => {
+const VideoComponent: FC<IvideosProps> = ({ video, mutate, parentRef }): JSX.Element => {
     const [playing, setPlaying] = useState<boolean>(true)
 
     const { videoId } = video
@@ -33,13 +34,18 @@ const VideoComponent: FC<IvideosProps> = ({ video, mutate }): JSX.Element => {
         videoRef.current?.play()
         setPlaying(true)
     }
-    const [muted, setMuted] = useState<boolean>(true); // New state for mute status
+    const [muted, setMuted] = useState<boolean>(false); // New state for mute status
 
-    const height = window.screen.availHeight - 50
     const toggleMute = () => {
         console.log("xxx clicked -> prev= ", muted)
         setMuted(!muted); // Toggle between mute and unmute
     };
+    const height = window.screen.availHeight - 50
+
+    useEffect(() => {
+        console.log("db: Player Component has re-rendered");
+        // console.log("db: parentRef = ", parentRef)
+    }, []);
 
 
     return (
@@ -48,21 +54,20 @@ const VideoComponent: FC<IvideosProps> = ({ video, mutate }): JSX.Element => {
                 <div className={styles.video} id={videoId}>
                     <ApiVideoPlayer
                         video={{ id: videoId }}
-                        videoStyleObjectFit={'cover'}
-                        ref={videoRef}
+                        videoStyleObjectFit={"contain"}
+                        ref={parentRef}
                         style={{
                             width: screen.width,
                             height: height,
                             scrollSnapAlign: 'start',
                             border: 0,
                         }}
-                        volume={muted ? 0 : 1}
+                       volume={muted ? 0 : 0.25}
                         autoplay
                         chromeless
                         loop
-                        muted={muted}  // Use the state variable here
+                       muted={true}  // Use the state variable here
                     />
-
                     <button
                         onClick={toggleMute}
                         style={{

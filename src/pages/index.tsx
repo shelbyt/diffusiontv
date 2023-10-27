@@ -63,11 +63,46 @@ const Home: NextPage = () => {
     }, [data]);
 
     const fetchMoreVideos = () => {
-        console.log("db:prev,current = ", prev,currentPage)
+        console.log("db:prev,current = ", prev, currentPage)
         if (prev === currentPage) return
         setPrevPage(currentPage)
         setCurrentPage(currentPage + 1);
     };
+    const videoRefs = useRef<HTMLVideoElement[]>([]);
+
+    const handleSlideChange = (swiper: any) => {
+        const current = swiper.activeIndex;
+        const previous = swiper.previousIndex;
+
+        // Pause the video at the previous index
+        if (videoRefs.current[previous]) {
+            console.log("db:pause")
+            videoRefs.current[previous].pause();
+            // videoRefs.current[previous].muted = true;
+            // videoRefs.current[current].volume = 0;
+        }
+
+        // Decide to play previous or next based on swipe direction
+        if (current > previous) {
+            // Swiped down, play next
+            if (videoRefs.current[current]) {
+                console.log("db:play")
+                videoRefs.current[current].play();
+                // videoRefs.current[current].muted = false;
+                // videoRefs.current[current].volume = 0.25;
+            }
+        } else {
+            // Swiped up, play previous
+            if (videoRefs.current[current]) {
+
+                console.log("db:play")
+                videoRefs.current[current].play();
+                // videoRefs.current[current].muted = false;
+                // videoRefs.current[current].volume = 0.25;
+            }
+        }
+    };
+
 
     return (
         <div className={styles.app} id="videos__container">
@@ -92,11 +127,16 @@ const Home: NextPage = () => {
                     spaceBetween={0}
                     freeMode={false}
                     autoHeight={true}  // Adjust the height automatically
-                onReachEnd={fetchMoreVideos}
+                    onReachEnd={fetchMoreVideos}
+                    onSlideChange={(swiper) => {
+                        handleSlideChange(swiper);
+                        console.log("db: Change triggered!")
+                    }}
+
                 >
                     {videos.map((video: Video, index) => (
                         <SwiperSlide key={video?.videoId}>
-                            <VideoComponent video={video} mutate={mutate} />
+                            <VideoComponent parentRef={(el) => videoRefs.current[index] = el} video={video} mutate={mutate} />
                         </SwiperSlide>
                     ))}
                 </Swiper>

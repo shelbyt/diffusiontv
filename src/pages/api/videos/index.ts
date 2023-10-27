@@ -26,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 skip: (currentPage - 1) * pageSize,
                 take: pageSize,
                 orderBy: {
-                    commentCount: 'desc',
+                    heartCount: 'desc',
                 },
                 select: {
                     videoId: true,
@@ -55,6 +55,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         // Wait for all promises to resolve
         const allResults = await Promise.all(videoPromises);
+        // console.log("zzz ", allResults[0].data[0].assets)
 
         // Merge all the results
         const mergedVideosListResponse = {
