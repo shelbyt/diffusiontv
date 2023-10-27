@@ -11,7 +11,8 @@ const TopNavbar = () => {
   };
 
   return (
-    <div className="sticky top-0 z-50 bg-transparent">
+    // <div className="sticky top-0 z-50 bg-transparent">
+        <div className="fixed top-0 left-0 right-0 z-50 bg-transparent">
       <div className="flex justify-center items-center px-2 pb-2 pt-4">
         <div
           className={getTabStyle('following')}

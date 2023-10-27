@@ -67,7 +67,7 @@ const VideoComponent: FC<IvideosProps> = ({ video, mutate }): JSX.Element => {
                         onClick={toggleMute}
                         style={{
                             position: 'absolute',
-                            top: '10px',
+                            top: '50px',  // Updated from '10px' to '50px' to move it downwards
                             left: '10px',
                             zIndex: 1000
                         }}

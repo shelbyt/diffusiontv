@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 import { useUserDB } from '../hooks/useUserDB';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
-
+import TopNavbar from '../components/topNavbar';
 
 const Home: NextPage = () => {
     const [videos, setVideos] = useState<Video[]>([])
@@ -52,6 +52,7 @@ const Home: NextPage = () => {
 
     return (
         <div className={styles.app} id="videos__container">
+            <TopNavbar />
             <Head>
                 <meta name="apple-mobile-web-app-capable" content="yes"></meta>
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"></meta>
@@ -67,10 +68,11 @@ const Home: NextPage = () => {
 
             <div className={styles.app__videos}>
                 <Swiper
-                    direction="vertical" // vertical scrolling
-                    slidesPerView={1} // 1 slide visible at a time
-                    spaceBetween={0} // no space between slides
-                    freeMode={false} // disable free mode to stick to slides
+                    direction="vertical"
+                    slidesPerView={1}
+                    spaceBetween={0}
+                    freeMode={false}
+                    autoHeight={true}  // Adjust the height automatically
                     onReachEnd={fetchMoreVideos}>
                     {videos.map((video: Video, index) => (
                         <SwiperSlide key={video?.videoId}>
@@ -78,9 +80,11 @@ const Home: NextPage = () => {
                         </SwiperSlide>
                     ))}
                 </Swiper>
+
+                {/* <TopNavbar /> */}
             </div>
             {/* <Navbar /> */}
-        </div>
+        </div >
     )
 }
 
