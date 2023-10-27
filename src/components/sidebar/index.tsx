@@ -26,8 +26,6 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
     const videoMeta: any = video;
 
 
-    console.log("xxx video = ", video)
-
     const toggleMute = () => {
         const audioElement = document.getElementById("background-music") as HTMLAudioElement;
         if (audioElement) {

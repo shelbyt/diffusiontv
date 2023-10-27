@@ -11,6 +11,8 @@ import Navbar from '../components/navbar'
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/router';
 import { useUserDB } from '../hooks/useUserDB';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/swiper-bundle.css';
 
 
 const Home: NextPage = () => {
@@ -40,45 +42,13 @@ const Home: NextPage = () => {
 
     useEffect(() => {
         if (data) {
-            setVideos(prevVideos => [...prevVideos, ...data.data.reverse()])
-
+            setVideos(prevVideos => [...prevVideos, ...data.data.reverse()]);
         }
-        const sections = document.getElementById('videos__container')
-        sections?.scrollIntoView(true)
-    }, [data])
+    }, [data]);
 
-    useEffect(() => {
-        const fetchMoreVideos = async () => {
-            console.log("XXX: Fetching more videos")
-            setCurrentPage(currentPage + 1)
-        }
-
-        const options = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
-        }
-
-        const observer = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    console.log("XXX: Intersection Observer - ", currentPage)
-                    fetchMoreVideos()
-                }
-            })
-        }, options)
-
-        if (observerRef.current) {
-            observer.observe(observerRef.current)
-        }
-
-        return () => {
-            if (observerRef.current) {
-                observer.unobserve(observerRef.current)
-            }
-        }
-
-    }, [videos])
+    const fetchMoreVideos = () => {
+        setCurrentPage(currentPage + 1);
+    };
 
     return (
         <div className={styles.app} id="videos__container">
@@ -96,13 +66,18 @@ const Home: NextPage = () => {
             </div>
 
             <div className={styles.app__videos}>
-                {videos.map((video: Video, index) => {
-                    return (
-                        <div key={video?.videoId} ref={index === videos.length - 2 ? observerRef : null}>
+                <Swiper
+                    direction="vertical" // vertical scrolling
+                    slidesPerView={1} // 1 slide visible at a time
+                    spaceBetween={0} // no space between slides
+                    freeMode={false} // disable free mode to stick to slides
+                    onReachEnd={fetchMoreVideos}>
+                    {videos.map((video: Video, index) => (
+                        <SwiperSlide key={video?.videoId}>
                             <VideoComponent video={video} mutate={mutate} />
-                        </div>
-                    )
-                })}
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
             </div>
             {/* <Navbar /> */}
         </div>

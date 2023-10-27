@@ -15,7 +15,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <Layout>
                 <SWRConfig value={{ fetcher }}>
                     <audio id="background-music" loop autoPlay>
-                        <source src="/music/m3.mp3" type="audio/mpeg" />
+                        {/* <source src="/music/m3.mp3" type="audio/mpeg" /> */}
                         Your browser does not support the audio element.
                     </audio>
                     <Component {...pageProps} />

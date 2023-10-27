@@ -1,5 +1,5 @@
 import Video from '@api.video/nodejs-client/lib/model/Video'
-import React, { FC, useRef, useState } from 'react'
+import React, { FC, useRef, useState, useEffect } from 'react'
 import Footer from '../footer'
 import Sidebar from '../sidebar'
 import styles from './videos.module.css'
@@ -33,8 +33,14 @@ const VideoComponent: FC<IvideosProps> = ({ video, mutate }): JSX.Element => {
         videoRef.current?.play()
         setPlaying(true)
     }
+    const [muted, setMuted] = useState<boolean>(true); // New state for mute status
 
     const height = window.screen.availHeight - 50
+    const toggleMute = () => {
+        console.log("xxx clicked -> prev= ", muted)
+        setMuted(!muted); // Toggle between mute and unmute
+    };
+
 
     return (
         <>
@@ -50,19 +56,32 @@ const VideoComponent: FC<IvideosProps> = ({ video, mutate }): JSX.Element => {
                             scrollSnapAlign: 'start',
                             border: 0,
                         }}
+                        volume={muted ? 0 : 1}
                         autoplay
                         chromeless
                         loop
-                        muted
+                        muted={muted}  // Use the state variable here
                     />
-                    <div onClick={onVideoPress} className={styles.video__press}></div>
 
+                    <button
+                        onClick={toggleMute}
+                        style={{
+                            position: 'absolute',
+                            top: '10px',
+                            left: '10px',
+                            zIndex: 1000
+                        }}
+                    >
+                        {muted ? 'Unmute' : 'Mute'}
+                    </button>
+                    <div onClick={onVideoPress} className={styles.video__press}></div>
                     {/* <Footer video={video} /> */}
                     <Sidebar video={video} mutate={mutate} />
                 </div>
             )}
         </>
-    )
+    );
 }
 
-export default VideoComponent
+export default VideoComponent;
+
