@@ -46,26 +46,29 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         const results = await getTopImages();
-        console.log("ZZZ results", results)
-        const videoIds = results.map(item => `${item.videoId}.mp4`)
-        console.log("videoid", videoIds)
-        let title = videoIds[0]
+        const videoIds = results.map(item => `${item.videoId}.mp4`);
 
+        console.log(`Fetching ${videoIds.length} videos`);
 
-        const result1 = await client.videos.list({ title })
-        title = videoIds[1]
-        console.log("Tag Return-> ", result1)
-        const result2 = await client.videos.list({ title })
+        // Create an array of promises
+        const videoPromises = videoIds.map(title => client.videos.list({ title }));
+
+        // Wait for all promises to resolve
+        const allResults = await Promise.all(videoPromises);
+
+        // Merge all the results
         const mergedVideosListResponse = {
-            ...result1, // Shallow copy of the first object
-            data: [...result1.data, ...result2.data].map((item, index) => ({
-                ...item,
-                meta: results[index],
-            })), // Add the meta field to each item in the data array
+            ...allResults[0], // Take the first object as a base
+            data: allResults.flatMap(result => result.data) // Flat map all the data arrays into one
+                .map((item, index) => ({
+                    ...item,
+                    meta: results[index],
+                })),
         };
-        // console.log("AAA", mergedVideosListResponse.data)
 
-        return res.status(200).json({ ...mergedVideosListResponse })
+        return res.status(200).json({ ...mergedVideosListResponse });
+
+
     }
 
     // UPDATE DATA
