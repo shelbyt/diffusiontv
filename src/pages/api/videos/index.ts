@@ -7,7 +7,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const sortBy = 'publishedAt'; // Allowed: publishedAt, title. You can search by the time videos were published at, or by title.
     const sortOrder = 'asc'; // Allowed: asc, desc. asc is ascending and sorts from A to Z. desc is descending and sorts from Z to A.
-    const pageSize = 2; // Results per page. Allowed values 1-100, default is 25. Loading 2 at a time is really good
+    const pageSize = 5; // Results per page. Allowed values 1-100, default is 25. Loading 2 at a time is really good
     let currentPage = 1;
     if (req.query.currentPage) {
         currentPage = Number(req.query.currentPage)

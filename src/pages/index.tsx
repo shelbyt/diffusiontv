@@ -15,13 +15,23 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 import TopNavbar from '../components/topNavbar';
 
+let debounceTimer: string | number | NodeJS.Timeout | undefined;
+
+
 const Home: NextPage = () => {
     const [videos, setVideos] = useState<Video[]>([])
     const observerRef = useRef(null)
-    const [currentPage, setCurrentPage] = useState(1)
-    const { data, mutate } = useSWR<VideosListResponse>(() => `api/videos?method=get&currentPage=${currentPage}`)
+    const [currentPage, setCurrentPage] = useState(0)
+    const [prev, setPrevPage] = useState(-1)
+    const { data, mutate } = useSWR(`api/videos?method=get&currentPage=${currentPage}`, {
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+        revalidateOnMount: false,
+    });
+
     const { user, isLoading: authLoading, error } = useUser();
     const { userData, isLoading: userDBLoading, isError } = useUserDB(user);
+    const [shouldFetch, setShouldFetch] = useState(true);
 
     const router = useRouter();
 
@@ -38,7 +48,13 @@ const Home: NextPage = () => {
     }, [user, authLoading, userData, isError]);
 
 
+    useEffect(() => {
+        console.log("db: Current page = ", currentPage)
+    }, [currentPage]);
 
+    useEffect(() => {
+        console.log("db: Component has re-rendered");
+    }, []);
 
     useEffect(() => {
         if (data) {
@@ -47,6 +63,9 @@ const Home: NextPage = () => {
     }, [data]);
 
     const fetchMoreVideos = () => {
+        console.log("db:prev,current = ", prev,currentPage)
+        if (prev === currentPage) return
+        setPrevPage(currentPage)
         setCurrentPage(currentPage + 1);
     };
 
@@ -73,7 +92,8 @@ const Home: NextPage = () => {
                     spaceBetween={0}
                     freeMode={false}
                     autoHeight={true}  // Adjust the height automatically
-                    onReachEnd={fetchMoreVideos}>
+                onReachEnd={fetchMoreVideos}
+                >
                     {videos.map((video: Video, index) => (
                         <SwiperSlide key={video?.videoId}>
                             <VideoComponent video={video} mutate={mutate} />
