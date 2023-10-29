@@ -43,7 +43,7 @@ const VideoComponent: FC<IvideosProps> = ({ video, mutate, parentRef }): JSX.Ele
     const height = window.screen.availHeight - 50
 
     useEffect(() => {
-        console.log("db: Player Component has re-rendered");
+        console.log("db: Player Component has re-rendered and videoId = ", videoId);
         // console.log("db: parentRef = ", parentRef)
     }, []);
 

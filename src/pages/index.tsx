@@ -1,26 +1,22 @@
 import React, { useRef, useEffect, useState } from 'react'
 import Video from '@api.video/nodejs-client/lib/model/Video'
-import VideosListResponse from '@api.video/nodejs-client/lib/model/VideosListResponse'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import useSWR from 'swr'
 import DesktopView from '../components/desktopView'
 import VideoComponent from '../components/video/index'
 import styles from './index.module.css'
-import Navbar from '../components/navbar'
 import { useUser } from '@auth0/nextjs-auth0/client';
-import { useRouter } from 'next/router';
 import { useUserDB } from '../hooks/useUserDB';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 import TopNavbar from '../components/topNavbar';
 
-let debounceTimer: string | number | NodeJS.Timeout | undefined;
+
 
 
 const Home: NextPage = () => {
     const [videos, setVideos] = useState<Video[]>([])
-    const observerRef = useRef(null)
     const [currentPage, setCurrentPage] = useState(0)
     const [prev, setPrevPage] = useState(-1)
     const { data, mutate } = useSWR(`api/videos?method=get&currentPage=${currentPage}`, {
@@ -31,9 +27,7 @@ const Home: NextPage = () => {
 
     const { user, isLoading: authLoading, error } = useUser();
     const { userData, isLoading: userDBLoading, isError } = useUserDB(user);
-    const [shouldFetch, setShouldFetch] = useState(true);
 
-    const router = useRouter();
 
     useEffect(() => {
         // if (!authLoading && !user) {
@@ -53,10 +47,11 @@ const Home: NextPage = () => {
     }, [currentPage]);
 
     useEffect(() => {
-        console.log("db: Component has re-rendered");
+        console.log("db: parent pages has re-rendered");
     }, []);
 
     useEffect(() => {
+        console.log("db: setting videos length of videos = ", videos.length)
         if (data) {
             setVideos(prevVideos => [...prevVideos, ...data.data.reverse()]);
         }
@@ -141,7 +136,6 @@ const Home: NextPage = () => {
                     ))}
                 </Swiper>
 
-                {/* <TopNavbar /> */}
             </div>
             {/* <Navbar /> */}
         </div >

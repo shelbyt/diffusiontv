@@ -78,7 +78,7 @@ const User = () => {
                     </div>
                 </div>
                 <h2 className="mt-2 text-xl text-white font-bold">{`@${user}`}</h2>
-                <button className="btn btn-secondary mt-4 text-xl">Follow</button>
+                <button className="btn btn-primary mt-4 text-xl">Follow</button>
             </div>
             {/* Centered Text */}
             <div className="text-center mt-8 text-white text-xl">
