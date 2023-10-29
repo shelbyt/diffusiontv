@@ -3,7 +3,7 @@ import Document, { Html, Head, Main, NextScript } from 'next/document'
 class MyDocument extends Document {
     render() {
         return (
-            <Html data-theme="cupcake">
+            <Html data-theme="garden">
                 <Head>
                     <link rel="manifest" href="/manifest.json" />
                     <link
@@ -11,7 +11,7 @@ class MyDocument extends Document {
                         rel="stylesheet"
                     />
                     <link rel="apple-touch-icon" href="/icon.png"></link>
-                    <meta name="theme-color" content="#fff" />
+                    {/* <meta name="theme-color" content="#fff" /> */}
                 </Head>
                 <body>
                     <Main />

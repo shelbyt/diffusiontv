@@ -6,7 +6,7 @@ import path from 'path';
 const prisma = new PrismaClient();
 
 async function main() {
-  const filePath = path.join(__dirname, 'data/username_db.dat');
+  const filePath = path.join(__dirname, 'data/10-25/username-list');
   const fileContent = fs.readFileSync(filePath, 'utf-8');
 
   const lines = fileContent.split('\n');
