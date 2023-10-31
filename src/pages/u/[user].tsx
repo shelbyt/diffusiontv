@@ -1,11 +1,7 @@
 // pages/profile.jsa
-import ApiVideoClient from '@api.video/nodejs-client'
 import React, { useState, useEffect } from 'react';
-import { ShareFat } from '@phosphor-icons/react'
+import { ShareFat, PlayCircle } from '@phosphor-icons/react'
 import { useRouter } from 'next/router';
-import prisma from '../../utils/prismaClient'
-import getUserProfile from '../api/user/getUserProfile';
-import { PlayCircle } from '@phosphor-icons/react';
 
 type UserImage = {
     videoId: string;
@@ -33,13 +29,10 @@ const User = () => {
     const [userProfileData, setUserProfile] = useState<UserProfileData | null>(null);
 
     useEffect(() => {
-        console.log('ok --', user)
-
         if (user) {
             const fetchUserProfile = async () => {
                 const response = await fetch(`/api/user/getUserProfile?user=${user}`);
                 const data = await response.json();
-                console.log("xxx data", data)
                 setUserProfile(data);
             };
 
@@ -47,18 +40,6 @@ const User = () => {
         }
 
     }, [user]);
-
-    //await client.videos.list({ title })
-
-
-
-    // Now you can use this 'user' variable to make database calls or whatever you need
-    // if (user) {
-    //     console.log(`User from URL: ${user}`);
-    //     getUserProfileData(user);
-    //     // Make your database calls or other logic here
-    // }
-
 
     return (
         <div className="bg-black-100 min-h-screen text-black"> {/* Apply text-black here for global effect */}
