@@ -44,3 +44,4 @@ yarn-error.log*
 .env
 examples/*
 src/scripts/data/*
+.vscode/launch.json

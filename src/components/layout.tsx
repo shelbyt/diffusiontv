@@ -11,7 +11,7 @@ const Layout = ({ children }: LayoutProps) => {
     <div>
       {/* <TopNavbar/> */}
       {children}
-      <Navbar />
+      {/* <Navbar /> */}
     </div>
   );
 }

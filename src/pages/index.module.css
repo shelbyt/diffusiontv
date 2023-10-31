@@ -1,38 +1,39 @@
-.app {
-    height: 100vh;
-    width: 100vw;
-}
-.app__videos > div {
-    height: calc(100vh - 80px);  /* Adjust as needed */
-    width: 100%;
-}
+/* .DivSlideOverlay::before {
+	z-index: -1;
+	content: "";
+	width: 100%;
+	height: 225px;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	color: rgb(255, 255, 255);
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+} */
 
-
-.app__videos {
-    height: calc(100vh - 80px);
-    width: 100%;
-    overflow-y: hidden;
-}
-
-@media screen and (min-width: 1024px) {
-    .app__videos {
-        display: none;
-    }
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-.app__videos {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
+.DivSlideOverlay {
+	height: 100%;
+	width: 100%;
+	position: relative;
 }
 
-.app__large_screen {
-    width: 100%;
-    height: 100%;
+.DivVideoSlideContainer {
+	height: 100%;
+	width: 100%;
+	position: relative;
+
+	/* Needed to center thumbnail */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+
 }
 
-@media screen and (max-width: 1024px) {
-    .app__large_screen {
-        display: none;
-    }
+.DivFakeVideoSlide {
+	height: 100%;
+	width: 100%;
+	position: relative;
 }
