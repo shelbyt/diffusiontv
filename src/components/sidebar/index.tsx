@@ -68,7 +68,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, mutate }): JSX.Element => {
     return (
         <div className="absolute top-1/2 right-2.5 text-white flex flex-col space-y-5">
                 <div className="avatar relative">
-                    <div className="w-20 mask mask-hexagon">
+                    <div className="w-14 mask mask-hexagon">
                         <img src={videoMeta.meta.user.imageUrl} alt="User avatar" onClick={goToUserProfile} />
                     </div>
                     <div className="absolute bottom-0 left-1/2 bg-red-600 rounded-full p-1 transform -translate-x-1/2">

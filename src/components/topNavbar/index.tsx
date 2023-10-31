@@ -3,7 +3,7 @@ import { useState } from 'react';
 const TopNavbar = () => {
   const [activeTab, setActiveTab] = useState('forYou');
 
-  const getTabStyle = (tab) => {
+  const getTabStyle = (tab: string) => {
     if (activeTab === tab) {
       return "cursor-pointer p-2 text-xl  text-white pb-1 border-b-2 border-white";
     }
