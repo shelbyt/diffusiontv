@@ -11,7 +11,7 @@ class MyDocument extends Document {
                         rel="stylesheet"
                     />
                     <link rel="apple-touch-icon" href="/icon.png"></link>
-                    {/* <meta name="theme-color" content="#fff" /> */}
+                    <meta name="theme-color" content="#fff" />
                 </Head>
                 <body>
                     <Main />
