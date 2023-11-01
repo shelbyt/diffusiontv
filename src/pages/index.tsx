@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import Navbar from '../components/navbar';
 import ApiVideoPlayer from '@api.video/react-player'
 import styles from './index.module.css'
+import Sidebar from '../components/sidebar';
 
 const Home: React.FC = () => {
     const [videos, setVideos] = useState<any[]>([]);
@@ -23,8 +24,8 @@ const Home: React.FC = () => {
 
     const mockFetchB = ['https://vod.api.video/vod/vi5Q75MhlTktcb0gBojP03pO/hls/manifest.m3u8', 'https://vod.api.video/vod/vi5uo8TNlLqil4DzuNBGgBT/hls/manifest.m3u8']
     const mockFetch = ['https://storage-nyc3.qencode.com/27c8af384031a52f261cc536cb0d9ec4/mp4/1-0/811b7d6c776711ee9627565943a578d8.mp4', 'https://vod.api.video/vod/vi5uo8TNlLqil4DzuNBGgBT/hls/manifest.m3u8']
-    const mockFetchVid = ['vi5Q75MhlTktcb0gBojP03pO', 'vi5uo8TNlLqil4DzuNBGgBT']
-    const mockFetchThumbs = ['https://vod.api.video/vod/vi5Q75MhlTktcb0gBojP03pO/thumbnail.jpg', 'https://vod.api.video/vod/vi5uo8TNlLqil4DzuNBGgBT/thumbnail.jpg']
+    const mockFetchVid = ['vi5Q75MhlTktcb0gBojP03pO', 'vi5uo8TNlLqil4DzuNBGgBT','vi5Q75MhlTktcb0gBojP03pO']
+    const mockFetchThumbs = ['https://vod.api.video/vod/vi5Q75MhlTktcb0gBojP03pO/thumbnail.jpg', 'https://vod.api.video/vod/vi5uo8TNlLqil4DzuNBGgBT/thumbnail.jpg', 'https://vod.api.video/vod/vi5Q75MhlTktcb0gBojP03pO/thumbnail.jpg']
     useEffect(() => {
         setIsClient(true);
         setTmpUrl(mockFetch[0])
@@ -131,6 +132,7 @@ const Home: React.FC = () => {
                             {/* Logic to display thumbnails for previous, current, and next slides */}
                             {(index === activeVideoIndex - 1 || index === activeVideoIndex || index === activeVideoIndex + 1) && (
                                 <div className={styles.DivVideoSlideContainer}>
+                                    <Sidebar />
                                     {/* <img src={video.assets.thumbnail} */}
                                     <img src={mockFetchThumbs[index]}
                                         style={{
@@ -151,6 +153,7 @@ const Home: React.FC = () => {
 
 
                 </Swiper>
+
                 {isClient && (
                     <div
                         className="webapp-mobile-player-container"
@@ -180,7 +183,6 @@ const Home: React.FC = () => {
 
                 )}
             </div>
-
             <div className="flex-shrink-0 flex-grow-0 relative" >
                 <Navbar />
             </div>
