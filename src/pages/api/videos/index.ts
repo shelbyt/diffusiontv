@@ -2,8 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../utils/prismaClient'
 
 // Define the base URLs for your S3 bucket for videos and thumbnails
-const S3_VIDEO_BASE_URL = '';
-const S3_THUMBS_BASE_URL = '';
+const S3_VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
+const S3_THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
 
 
 export interface IDbData {
@@ -44,7 +44,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 skip: (currentPage - 1) * pageSize,
                 take: pageSize,
                 orderBy: {
-                    heartCount: 'asc',
+                    heartCount: 'desc',
                 },
                 select: {
                     videoId: true,

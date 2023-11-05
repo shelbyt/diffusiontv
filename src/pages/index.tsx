@@ -5,6 +5,7 @@ import Navbar from '../components/navbar';
 import ReactPlayer from 'react-player';
 import styles from './index.module.css'
 import Sidebar from '../components/sidebar';
+import {SpeakerSimpleX } from '@phosphor-icons/react';
 
 interface VideoData {
     videoUrl: string;
@@ -25,6 +26,7 @@ const Home: React.FC = () => {
     const [activeVideoData, setActiveVideoData] = useState<VideoData>();
     const [nextVideoId, setNextVideoId] = useState<string | null>(null);
     const [isSwiping, setIsSwiping] = useState(false);
+    const [firstPlay, setFirstPlay] = useState(true);
 
 
     useEffect(() => {
@@ -132,6 +134,7 @@ const Home: React.FC = () => {
         setCurrentPage(prevPage => prevPage + 1);
     };
     const activeVideoIndex = videos.findIndex(video => video.data.dbData.videoId === activeVideoId);
+    console.log("Active index = ", activeVideoIndex)
 
     return (
         <div className="bg-black flex flex-col fixed inset-0" id="videos__container">
@@ -157,20 +160,20 @@ const Home: React.FC = () => {
                                 <div className={styles.DivVideoSlideContainer}>
                                     <ReactPlayer
                                         url={video.data.storage.videoUrl}
-                                        playing={index === activeVideoIndex && !isSwiping}
-                                        muted={index !== activeVideoIndex || muted}
+                                        playing={(index === activeVideoIndex && !isSwiping) || firstPlay === false}
+                                        muted={(index !== activeVideoIndex && activeVideoIndex !== -1) || muted}
                                         loop={true}
                                         playsinline={true}
                                         className="webapp-mobile-player-container"
                                         width="100%"
                                         height="100%"
-                                        style={{pointerEvents: 'none'}}
+                                        style={{ pointerEvents: 'none' }}
                                     />
 
                                 </div>
                             )}
 
-                            <Sidebar video={video}/>
+                            <Sidebar video={video} />
 
                             {/* Display a placeholder for other videos */}
                             {index < activeVideoIndex - 1 || index > activeVideoIndex + 1 && (
@@ -184,6 +187,41 @@ const Home: React.FC = () => {
             <div className="flex-shrink-0 flex-grow-0 relative" >
                 <Navbar />
             </div>
+            {
+                firstPlay && (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        zIndex: 1000,
+                        backgroundColor: 'rgba(0, 0, 0, 0.4)' // This gives a faded background
+                    }}>
+                        <button
+                        className='btn'
+                            style={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                fontSize: '1em',
+                                padding: '10px 20px'
+                            }}
+                            onClick={() => {
+                                setMuted(false);  // Assuming setMuted is the setter for your muted state
+                                setFirstPlay(false);
+                            }}
+                        >
+                            Unmute
+                            <SpeakerSimpleX size={20} color="#140000" weight="fill" />
+
+
+                        </button>
+                    </div>
+                )
+            }
+
         </div>
     );
 }
