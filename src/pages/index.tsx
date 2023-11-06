@@ -27,6 +27,8 @@ const Home: React.FC = () => {
     const [nextVideoId, setNextVideoId] = useState<string | null>(null);
     const [isSwiping, setIsSwiping] = useState(false);
     const [firstPlay, setFirstPlay] = useState(true);
+    const [buffered, setBuffered] = useState(false);
+    const [touched, setTouched] = useState(false);
 
     useEffect(() => {
         async function fetchVideos() {
@@ -108,6 +110,7 @@ const Home: React.FC = () => {
 
     const handleSlideChange = (swiper: any) => {
         console.log("Inside handle");
+        setBuffered(false);
         const videosList = videos;
 
         const prevVideoId = swiper.slides[swiper.previousIndex].getAttribute('data-video-id');
@@ -170,7 +173,6 @@ const Home: React.FC = () => {
                     // onTouchEnd={() => setIsSwiping(false)}
                     onTouchStart={() => setIsSwiping(true)}
                     onSlideChangeTransitionEnd={() => setIsSwiping(false)}
-
                 >
                     {videos.map((video, index) => (
                         <SwiperSlide
@@ -188,7 +190,7 @@ const Home: React.FC = () => {
                                         style={{
                                             width: '100%',
                                             maxHeight: 'calc(100vh - 64px)',
-                                            display: (isSwiping) ? 'block' : 'none',
+                                            display: (isSwiping || !buffered) ? 'block' : 'none',
                                             objectFit: 'cover'
                                         }} />
                                 </div>
@@ -207,19 +209,40 @@ const Home: React.FC = () => {
                 </Swiper>
                 {isClient && (
                     <ReactPlayer
-                        // ref={videoRefs}
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100%', zIndex: 3, opacity: (isSwiping) ? 0 : 1, pointerEvents: 'none' }}
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100%', zIndex: 3, opacity: (isSwiping || !buffered) ? 0 : 1, pointerEvents: 'none' }}
                         className="webapp-mobile-player-container"
                         width="100%"
                         height="100%"
                         url={activeVideoData?.videoUrl} // state managed URL of the currently playing video
-                        playing={isSwiping ? false : true}
+                        playing={!isSwiping}
                         muted={muted}
                         loop={true}
                         playsinline={true}
+                        onBufferEnd={() => {
+                            setBuffered(true)
+                        }}
                     />
                 )}
             </div>
+            {
+
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    zIndex: 1000,
+                    pointerEvents: 'none',
+                    color: 'white',
+                }}>
+
+                    <span>{isSwiping ? "Swiping" : "Not Swiping"}</span>
+                    <span>{buffered ? "Buffered" : "Not Buffered"}</span>
+                    <span> {(activeVideoIndex === activeVideoIndex) || firstPlay === false || buffered} </span>
+
+                </div>
+            }
 
             <div className="flex-shrink-0 flex-grow-0 relative" >
                 <Navbar />
