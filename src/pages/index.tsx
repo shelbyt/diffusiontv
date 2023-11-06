@@ -4,8 +4,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import Navbar from '../components/navbar';
 import ReactPlayer from 'react-player';
 import styles from './index.module.css'
+import { SpeakerSimpleX } from '@phosphor-icons/react';
 import Sidebar from '../components/sidebar';
-import {SpeakerSimpleX } from '@phosphor-icons/react';
 
 interface VideoData {
     videoUrl: string;
@@ -27,7 +27,6 @@ const Home: React.FC = () => {
     const [nextVideoId, setNextVideoId] = useState<string | null>(null);
     const [isSwiping, setIsSwiping] = useState(false);
     const [firstPlay, setFirstPlay] = useState(true);
-
 
     useEffect(() => {
         async function fetchVideos() {
@@ -54,7 +53,6 @@ const Home: React.FC = () => {
 
         fetchVideos();
     }, [currentPage]);
-
 
     // useEffect(() => {
     //     async function fetchVideos() {
@@ -98,6 +96,8 @@ const Home: React.FC = () => {
         setIsPlayClicked(true);
         setMuted(false);
 
+
+
         const videoRef = videoRefs[videoId];
         if (videoRef && videoRef.current) {
             videoRef.current.play(); // Call the Play method using the specific ref
@@ -130,11 +130,33 @@ const Home: React.FC = () => {
         }
     };
 
+    // const handleSlideChange = (swiper: any) => {
+    //     console.log("Inside handle");
+    //     const videosList = videos;
+
+    //     const prevVideoId = swiper.slides[swiper.previousIndex].getAttribute('data-video-id');
+    //     const activeVideoId = swiper.slides[swiper.activeIndex].getAttribute('data-video-id');
+    //     const activeIndex = swiper.activeIndex;
+    //     setActiveVideoId(activeVideoId);
+    //     setActiveVideoData({
+    //         index: swiper.activeIndex,
+    //         videoUrl: videosList[swiper.activeIndex].data.storage.videoUrl,
+    //         thumbUrl: videosList[swiper.activeIndex].data.storage.thumbUrl
+    //     })
+
+    //     if (swiper.activeIndex > swiper.previousIndex) {
+    //         // User swiped to the next slide (down)
+    //         setTmpUrl(mockFetch[1]);  // For simplicity, using mockFetch[1] as example
+    //     } else if (swiper.activeIndex < swiper.previousIndex) {
+    //         // User swiped to the previous slide (up)
+    //         setTmpUrl(mockFetch[0]);  // Use the URL for the previous video
+    //     }
+    // };
+
     const fetchMoreVideos = () => {
         setCurrentPage(prevPage => prevPage + 1);
     };
     const activeVideoIndex = videos.findIndex(video => video.data.dbData.videoId === activeVideoId);
-    console.log("Active index = ", activeVideoIndex)
 
     return (
         <div className="bg-black flex flex-col fixed inset-0" id="videos__container">
@@ -145,8 +167,10 @@ const Home: React.FC = () => {
                     slidesPerView={1}
                     spaceBetween={0}
                     onSlideChange={(swiper) => handleSlideChange(swiper)}
-                    // onTouchStart={() => setIsSwiping(true)}
+                    // onTouchEnd={() => setIsSwiping(false)}
+                    onTouchStart={() => setIsSwiping(true)}
                     onSlideChangeTransitionEnd={() => setIsSwiping(false)}
+
                 >
                     {videos.map((video, index) => (
                         <SwiperSlide
@@ -154,39 +178,53 @@ const Home: React.FC = () => {
                             data-video-id={video.data.dbData.videoId}
                             style={{ height: 'calc(100vh - 64px)' }}
                         >
+                            {/* Logic to display thumbnails for previous, current, and next slides */}
 
-                            {/* Render ReactPlayer for prev, current, and next videos */}
-                            {(index >= activeVideoIndex - 1 && index <= activeVideoIndex + 1) && (
+                            {/* {(video.data.storage.videoUrl === activeVideoData?.videoUrl) && ( */}
+                            {(index === activeVideoIndex - 1 || index === activeVideoIndex || index === activeVideoIndex + 1) && (
                                 <div className={styles.DivVideoSlideContainer}>
-                                    <ReactPlayer
-                                        url={video.data.storage.videoUrl}
-                                        playing={(index === activeVideoIndex && !isSwiping) || firstPlay === false}
-                                        muted={(index !== activeVideoIndex && activeVideoIndex !== -1) || muted}
-                                        loop={true}
-                                        playsinline={true}
-                                        className="webapp-mobile-player-container"
-                                        width="100%"
-                                        height="100%"
-                                        style={{ pointerEvents: 'none' }}
-                                    />
-
+                                    {/* <img src={video.assets.thumbnail} */}
+                                    <img src={video.data.storage.thumbUrl}
+                                        style={{
+                                            width: '100%',
+                                            maxHeight: 'calc(100vh - 64px)',
+                                            display: (isSwiping) ? 'block' : 'none',
+                                            objectFit: 'cover'
+                                        }} />
                                 </div>
                             )}
 
-                            <Sidebar video={video} />
-
-                            {/* Display a placeholder for other videos */}
-                            {index < activeVideoIndex - 1 || index > activeVideoIndex + 1 && (
+                            {/* Display the fake video slide if the condition above doesn't hold */}
+                            {index !== activeVideoIndex - 1 && index !== activeVideoIndex && index !== activeVideoIndex + 1 && (
                                 <div className={styles.DivFakeVideoSlide} />
                             )}
+
+                            <Sidebar video={video} />
                         </SwiperSlide>
                     ))}
+
+
                 </Swiper>
+                {isClient && (
+                    <ReactPlayer
+                        // ref={videoRefs}
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100%', zIndex: 3, opacity: (isSwiping) ? 0 : 1, pointerEvents: 'none' }}
+                        className="webapp-mobile-player-container"
+                        width="100%"
+                        height="100%"
+                        url={activeVideoData?.videoUrl} // state managed URL of the currently playing video
+                        playing={isSwiping ? false : true}
+                        muted={muted}
+                        loop={true}
+                        playsinline={true}
+                    />
+                )}
             </div>
 
             <div className="flex-shrink-0 flex-grow-0 relative" >
                 <Navbar />
             </div>
+
             {
                 firstPlay && (
                     <div style={{
@@ -199,7 +237,7 @@ const Home: React.FC = () => {
                         backgroundColor: 'rgba(0, 0, 0, 0.4)' // This gives a faded background
                     }}>
                         <button
-                        className='btn'
+                            className='btn'
                             style={{
                                 position: 'absolute',
                                 top: '50%',
@@ -215,14 +253,12 @@ const Home: React.FC = () => {
                         >
                             Unmute
                             <SpeakerSimpleX size={20} color="#140000" weight="fill" />
-
-
                         </button>
                     </div>
                 )
             }
-
         </div>
     );
 }
+
 export default Home;
