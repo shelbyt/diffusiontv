@@ -2,26 +2,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { formatNumber } from '../../utils/formatNumber';
 import { GetServerSidePropsContext } from 'next';
-
-// This function runs on the server for each request
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-    // Fetch user details like name, likes, and followers count
-    const userDetails = await fetchUserData(context?.params?.user as string);
-    return {
-        props: {
-            userDetails, // Passed to the page component as props
-        },
-    };
-}
-
-async function fetchUserData(userId: string) {
-    const res = await fetch(`${process.env.API_BASE_URL}/api/user/getUserProfile?method=get&user=${userId}`);
-    if (!res.ok) {
-        throw new Error('Failed to fetch user details');
-    }
-    const data = await res.json();
-    return data;
-}
+import { useRouter } from 'next/router';
 
 export interface IUserDetails {
     username: string
@@ -31,19 +12,59 @@ export interface IUserDetails {
 }
 
 
+export default function User() {
+    const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState('');
+    const router = useRouter();
+    const { user } = router.query
+    console.log('username xxx ', user)
 
-export default function User({ userDetails }: { userDetails: IUserDetails }) {
-    console.log("user data = ", userDetails)
+
+
 
     useEffect(() => {
-
-        async function fetchUserThumbs() {
-            const res = await fetch(`/api/user/getUserVideoThumbs?method=get&user=${userDetails.username}`);
-            const data = await res.json()
-            setUserThumbs(data)
+        console.log("username = ", user)
+        if (!user) return; // Exit early if username is not available
+        async function fetchUserData() {
+            try {
+                const res = await fetch(`/api/user/getUserProfile?method=get&user=${user}`);
+                if (!res.ok) {
+                    throw new Error('Failed to fetch user details');
+                }
+                const data = await res.json();
+                console.log("data = ", data)
+                setUserDetails(data);
+                setIsLoading(false);
+            } catch (error) {
+                setError(error.message);
+            }
         }
+        async function fetchUserThumbs() {
+            try {
+                const res = await fetch(`/api/user/getUserVideoThumbs?method=get&user=${user}`);
+                if (!res.ok) {
+                    throw new Error('Failed to fetch user thumbnails');
+                }
+                const thumbs = await res.json();
+                setUserThumbs(thumbs);
+            } catch (error) {
+                setError(error.message);
+            }
+        }
+        fetchUserData();
         fetchUserThumbs();
-    }, [])
+    }, [user]);
+
+    // useEffect(() => {
+
+    //     async function fetchUserThumbs() {
+    //         const res = await fetch(`/api/user/getUserVideoThumbs?method=get&user=${userDetails.username}`);
+    //         const data = await res.json()
+    //         setUserThumbs(data)
+    //     }
+    //     fetchUserThumbs();
+    // }, [])
 
 
     const [userThumbs, setUserThumbs] = useState([]);
@@ -76,19 +97,19 @@ export default function User({ userDetails }: { userDetails: IUserDetails }) {
                 {/* User icon and name */}
                 <div className="avatar placeholder absolute -top-12 left-1/2 transform -translate-x-1/2 z-20">
                     <div className="bg-neutral-focus text-neutral-content rounded-full w-24">
-                        <img src={userDetails.imageUrl} />
+                        <img src={userDetails?.imageUrl} />
                     </div>
                 </div>
                 <div className="card-body items-center text-center pt-10">
-                    <h2 className="card-title">{userDetails.username}</h2>
+                    <h2 className="card-title">{userDetails?.username}</h2>
                     {/* User stats, displayed side by side with spacing */}
                     <div className="flex justify-between px-8"> {/* px-4 is added here for padding inside the container */}
                         <div className="flex-1 text-center px-8"> {/* px-2 is added for spacing between stat items */}
-                            <div className="stat-value">{formatNumber(userDetails.likeCount)}</div>
+                            <div className="stat-value">{formatNumber((userDetails?.likeCount || 0))}</div>
                             <div className="stat-title">Likes</div>
                         </div>
                         <div className="flex-1 text-center px-8"> {/* Same spacing applied here */}
-                            <div className="stat-value">{formatNumber(userDetails.videosMade)}</div>
+                            <div className="stat-value">{formatNumber((userDetails?.videosMade || 0))}</div>
                             <div className="stat-title">Creations</div>
                         </div>
                     </div>
