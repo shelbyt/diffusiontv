@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { ShareFat, Heart, ChatCircleDots } from "@phosphor-icons/react";
 import { IDbData, IVideoData } from '../../pages/api/videos';
 import Router, { useRouter } from 'next/router';
+import { handleNavigationAway } from '../../state/localStorageHelpers'; '../state/localStorageHelpers'
 
 
 interface ISidebarProps { video: IVideoData }
@@ -10,7 +11,11 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
     const router = useRouter();
     return (
         <div className="fixed right-0 top-1/2 transform -translate-y-1/2 bg-tranparent p-4 rounded-l-lg flex flex-col items-center space-y-4">
-            <div className="avatar" onClick={() => router.push('/u/'+video.data.dbData.username)}>
+            <div className="avatar" onClick={() => {
+                handleNavigationAway();
+                router.push('/u/' + video.data.dbData.username, undefined, { shallow: true })
+            }
+            }>
                 <div className="bg-neutral-focus text-neutral-content border border-white rounded-full w-12 h-12 flex items-center justify-center">
                     <img src={video.data.dbData.user?.imageUrl || "https://site-icons.media-storage.us-west.qencode.com/civ.png"} />
                 </div>

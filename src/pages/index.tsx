@@ -6,31 +6,80 @@ import ReactPlayer from 'react-player';
 import styles from './index.module.css'
 import { SpeakerSimpleX } from '@phosphor-icons/react';
 import Sidebar from '../components/sidebar';
+import { useVideoFeed } from '../state/VideoFeedProvider';
+import { handleNavigationReturn, checkHasNavigatedAway } from '../state/localStorageHelpers'
+import { Swiper as SwiperClass } from 'swiper';
 
-interface VideoData {
-    videoUrl: string;
-    thumbUrl: string;
-    index: number;
-}
+
 const Home: React.FC = () => {
-    const [videos, setVideos] = useState<any[]>([]);
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [isPlayClicked, setIsPlayClicked] = useState(true);
-    const [muted, setMuted] = useState(true);
+    const {
+        videos,
+        currentPage,
+        muted,
+        isClient,
+        activeVideoId,
+        activeVideoData,
+        isSwiping,
+        firstPlay,
+        buffered,
+        setVideos,
+        setCurrentPage,
+        setMuted,
+        setIsClient,
+        setActiveVideoId,
+        setActiveVideoData,
+        setIsSwiping,
+        setFirstPlay,
+        setBuffered,
+    } = useVideoFeed();
+
+    // const [videos, setVideos] = useState<any[]>([]); //keep
+    // const [currentPage, setCurrentPage] = useState<number>(1); //keep
+    // const [muted, setMuted] = useState(true);
+    // const [isClient, setIsClient] = useState(false); //keep
+    // const [activeVideoId, setActiveVideoId] = useState<string | null>(null); // keep
+    // const [activeVideoData, setActiveVideoData] = useState<IVideoData>();  // keep
+    // const [isSwiping, setIsSwiping] = useState(false);
+    // const [firstPlay, setFirstPlay] = useState(true); //keep
+    // const [buffered, setBuffered] = useState(false); //keep
+
     const [videoRefs, setVideoRefs] = useState<Record<string, any>>({});
     const [lastSlideIndex, setLastSlideIndex] = useState<number | null>(null);
     const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
-    const [isClient, setIsClient] = useState(false);
-    const [tmpUrl, setTmpUrl] = useState<string | string>("");
-    const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
-    const [activeVideoData, setActiveVideoData] = useState<VideoData>();
-    const [nextVideoId, setNextVideoId] = useState<string | null>(null);
-    const [isSwiping, setIsSwiping] = useState(false);
-    const [firstPlay, setFirstPlay] = useState(true);
-    const [buffered, setBuffered] = useState(false);
     const [touched, setTouched] = useState(false);
+    const [tmpUrl, setTmpUrl] = useState<string | string>("");
+    const [nextVideoId, setNextVideoId] = useState<string | null>(null);
+    const [isPlayClicked, setIsPlayClicked] = useState(true);
+    const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(null);
+
+
 
     useEffect(() => {
+        // Set isClient to true only on client-side (after mounting)
+        console.log("isclient = ", isClient);
+        // localStorage.removeItem('activeSwiperIndex');
+        // localStorage.removeItem('hasNavigatedAway');
+        setIsClient(typeof window !== 'undefined');
+    }, []);
+
+    useEffect(() => {
+        console.log("swiper instance = ", swiperInstance);
+        const savedIndex = localStorage.getItem('activeSwiperIndex');
+        if (swiperInstance && savedIndex !== null) {
+            const index = parseInt(savedIndex, 10);
+            // Use the Swiper API to go to the saved slide
+            swiperInstance.slideTo(index, 0, false);
+        }
+        // Assuming swiperInstance is a reference to your Swiper instance
+    }, [swiperInstance]);
+
+
+    useEffect(() => {
+
+        console.log("Check Nav top of UE: ", checkHasNavigatedAway())
+        console.log("fetching videos again", currentPage)
+        console.log("video length = ", videos.length)
+
         async function fetchVideos() {
             try {
                 const response = await fetch(`/api/videos?method=get&currentPage=${currentPage}`);
@@ -53,65 +102,25 @@ const Home: React.FC = () => {
             }
         }
 
-        fetchVideos();
-    }, [currentPage]);
-
-    // useEffect(() => {
-    //     async function fetchVideos() {
-    //         try {
-    //             const response = await fetch(`/api/videos?method=get&currentPage=${currentPage}`);
-    //             const data = await response.json();
-    //             if (currentPage === 1) {
-    //                 setActiveVideoData({
-    //                     index: 0,
-    //                     videoUrl: data[0].data.storage.videoUrl,
-    //                     thumbUrl: data[0].data.storage.thumbUrl
-    //                 })
-    //                 console.log("Data check")
-    //                 console.log(data)
-    //                 setVideos(prevVideos => [...prevVideos, ...data]);
-    //                 setIsClient(true);
-    //             }
-    //             else {
-    //                 setVideos(prevVideos => [...prevVideos, ...data]);
-    //             }
-    //         } catch (error) {
-    //             console.error("Error fetching videos:", error);
-    //         }
-    //     }
-
-
-    //     fetchVideos();
-    // }, [currentPage]);
-
-    const xhandlePlayClick = (videoId: string) => {
-
-        // Timeout is some magic to get video to play on first click and load
-        setTimeout(() => {
-            setIsPlayClicked(true);
-            // setTmpUrl(mockFetch[0])
-            console.log("Play click");
-        }, 100);  // Adjust the delay as needed
-    };
-
-    const handlePlayClick = (videoId: string) => {
-        setIsPlayClicked(true);
-        setMuted(false);
-
-
-
-        const videoRef = videoRefs[videoId];
-        if (videoRef && videoRef.current) {
-            videoRef.current.play(); // Call the Play method using the specific ref
+        if (checkHasNavigatedAway()) {
+            console.log("yes, has moved away: ", checkHasNavigatedAway())
+            console.log("active vid = ", activeVideoId)
+            console.log("video set = ", videos)
+            console.log("Video url = ", activeVideoData?.videoUrl)
+            setIsSwiping(false);
+            handleNavigationReturn();
         }
-
-        console.log("Play click");
-    };
+        else {
+            fetchVideos();
+        }
+    }, [currentPage]);
 
     const handleSlideChange = (swiper: any) => {
         console.log("Inside handle");
         setBuffered(false);
         const videosList = videos;
+        localStorage.setItem('activeSwiperIndex', swiper.activeIndex);
+
 
         const prevVideoId = swiper.slides[swiper.previousIndex].getAttribute('data-video-id');
         const activeVideoId = swiper.slides[swiper.activeIndex].getAttribute('data-video-id');
@@ -159,12 +168,25 @@ const Home: React.FC = () => {
     const fetchMoreVideos = () => {
         setCurrentPage(prevPage => prevPage + 1);
     };
+
     const activeVideoIndex = videos.findIndex(video => video.data.dbData.videoId === activeVideoId);
+    console.log("XXX Active video index = ", activeVideoIndex)
+
+    useEffect(() => {
+        if (activeVideoIndex === -1) {
+            localStorage.removeItem('activeSwiperIndex');
+            localStorage.removeItem('hasNavigatedAway');
+        }
+
+    }, [activeVideoIndex])
+
+
 
     return (
         <div className="bg-black flex flex-col fixed inset-0" id="videos__container">
             <div className="flex-grow relative max-h-[calc(100%-64px)]">
                 <Swiper
+                    onSwiper={(swiper: SwiperClass) => setSwiperInstance(swiper)}
                     style={{ height: '100%', zIndex: 4 }}  // Setting height to 100% of its parent
                     direction="vertical"
                     slidesPerView={1}
@@ -239,6 +261,8 @@ const Home: React.FC = () => {
 
                     <span>{isSwiping ? "Swiping" : "Not Swiping"}</span>
                     <span>{buffered ? "Buffered" : "Not Buffered"}</span>
+                    <span>{checkHasNavigatedAway() ? "| N-Yes" : "| N-Not "}</span>
+                    <span>{isClient ? "| Client-Yes" : "| Client-Not "}</span>
                     <span> {(activeVideoIndex === activeVideoIndex) || firstPlay === false || buffered} </span>
 
                 </div>

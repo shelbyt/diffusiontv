@@ -3,6 +3,7 @@ import type { AppProps } from 'next/app'
 import { SWRConfig } from 'swr'
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import Layout from '../components/layout'
+import { VideoFeedProvider } from '../state/VideoFeedProvider';
 
 const fetcher = async (input: RequestInfo, init: RequestInit, ...args: any[]) => {
     const res = await fetch(input, init)
@@ -12,15 +13,13 @@ const fetcher = async (input: RequestInfo, init: RequestInit, ...args: any[]) =>
 function MyApp({ Component, pageProps }: AppProps) {
     return (
         <UserProvider>
+            <VideoFeedProvider>
             <Layout>
                 <SWRConfig value={{ fetcher }}>
-                    <audio id="background-music" loop autoPlay>
-                        {/* <source src="/music/m3.mp3" type="audio/mpeg" /> */}
-                        Your browser does not support the audio element.
-                    </audio>
                     <Component {...pageProps} />
                 </SWRConfig>
             </Layout>
+            </VideoFeedProvider>
         </UserProvider>
     )
 }
