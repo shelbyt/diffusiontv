@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { formatNumber } from '../../utils/formatNumber';
 import { GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
+import { ArrowLeft, ShareFat } from '@phosphor-icons/react';
+import Error from 'next/error';
 
 export interface IUserDetails {
     username: string
@@ -10,7 +12,6 @@ export interface IUserDetails {
     likeCount: number
     videosMade: number
 }
-
 
 export default function User() {
     const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
@@ -20,8 +21,9 @@ export default function User() {
     const { user } = router.query
     console.log('username xxx ', user)
 
-
-
+    const SkeletonLoader = ({ className }: { className: string }) => (
+        <div className={`animate-pulse ${className} bg-gray-300 rounded`}></div>
+    );
 
     useEffect(() => {
         console.log("username = ", user)
@@ -36,7 +38,7 @@ export default function User() {
                 console.log("data = ", data)
                 setUserDetails(data);
                 setIsLoading(false);
-            } catch (error) {
+            } catch (error : Error) {
                 setError(error.message);
             }
         }
@@ -56,17 +58,6 @@ export default function User() {
         fetchUserThumbs();
     }, [user]);
 
-    // useEffect(() => {
-
-    //     async function fetchUserThumbs() {
-    //         const res = await fetch(`/api/user/getUserVideoThumbs?method=get&user=${userDetails.username}`);
-    //         const data = await res.json()
-    //         setUserThumbs(data)
-    //     }
-    //     fetchUserThumbs();
-    // }, [])
-
-
     const [userThumbs, setUserThumbs] = useState([]);
     const [selectedImage, setSelectedImage] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,58 +67,81 @@ export default function User() {
     };
 
     const closeModal = () => {
+        setSelectedImage("");
         setIsModalOpen(false);
     };
 
+    const handleBackClick = () => {
+        if (window.history.length > 1) {
+            router.back();
+        } else {
+            router.push('/');
+        }
+    };
 
     return (
-        <div className="relative h-screen w-full bg-gray-100">
-            {/* Background image */}
-            <div className="relative top-0 left-0 h-1/3 w-full overflow-hidden z-0">
-                <Image
-                    src="/bg/bg1.jpg"
-                    layout="fill"
-                    objectFit="cover"
-                    quality={100}
-                    alt="Background"
-                />
-            </div>
-            {/* Profile card */}
-            <div className="absolute top-15 left-0 right-0 mx-auto w-11/12 p-1 bg-base-100 shadow-xl rounded-box z-10">
-                {/* User icon and name */}
-                <div className="avatar placeholder absolute -top-12 left-1/2 transform -translate-x-1/2 z-20">
-                    <div className="bg-neutral-focus text-neutral-content rounded-full w-24">
-                        <img src={userDetails?.imageUrl} />
-                    </div>
+        <>
+            {/* Top Navbar with Phosphor Icons */}
+            <div className="navbar bg-base-100">
+                <div className="flex-1">
+                    <button className="btn btn-ghost" onClick={handleBackClick}>
+                        <ArrowLeft size={24} />
+                    </button>
                 </div>
-                <div className="card-body items-center text-center pt-10">
-                    <h2 className="card-title">{userDetails?.username}</h2>
-                    {/* User stats, displayed side by side with spacing */}
-                    <div className="flex justify-between px-8"> {/* px-4 is added here for padding inside the container */}
-                        <div className="flex-1 text-center px-8"> {/* px-2 is added for spacing between stat items */}
-                            <div className="stat-value">{formatNumber((userDetails?.likeCount || 0))}</div>
-                            <div className="stat-title">Likes</div>
-                        </div>
-                        <div className="flex-1 text-center px-8"> {/* Same spacing applied here */}
-                            <div className="stat-value">{formatNumber((userDetails?.videosMade || 0))}</div>
-                            <div className="stat-title">Creations</div>
-                        </div>
-                    </div>
-                    {/* Follow button */}
-                    <div className="card-actions justify-center mt-4">
-                        <button className="btn btn-primary">Follow</button>
-                    </div>
+                <div className="flex-none">
+                    <button className="btn btn-ghost">
+                        <ShareFat size={24} />
+                    </button>
                 </div>
             </div>
-            {/* Images section */}
 
-            <div className="mt-24 px-5">
+            {/* User's Picture and Name */}
+            <div className="flex flex-col items-center py-4">
+                {!userDetails ? (
+                    <>
+                        {/* Skeleton for the avatar */}
+                        <div className="w-24 h-24 rounded-full bg-gray-300 animate-pulse" />
+                        {/* Skeleton for the username */}
+                        <div className="h-6 w-48 my-2 bg-gray-300 animate-pulse rounded" />
+                    </>
+                ) : (
+                    <>
+                        <div className="avatar">
+                            <div className="w-24 rounded-full">
+                                <Image src={userDetails.imageUrl || '/'} alt="User Avatar" width={96} height={96} layout="fixed" />
+                            </div>
+                        </div>
+                        <h2 className="text-base font-bold my-2">{userDetails.username}</h2>
+                    </>
+                )}
+            </div>
+
+            <div className="flex justify-around text-center mb-8">
+                <div>
+                    <div className="text-base font-semibold">{0}</div>
+                    <div className="text-xs text-gray-600">Following</div>
+                </div>
+                <div>
+                    <div className="text-base font-semibold">{formatNumber(userDetails?.videosMade || 0)}</div>
+                    <div className="text-xs text-gray-600">Videos</div>
+                </div>
+                <div>
+                    <div className="text-base font-semibold">{formatNumber(userDetails?.likeCount || 0)}</div>
+                    <div className="text-xs text-gray-600">Likes</div>
+                </div>
+            </div>
+
+            <div className="flex justify-center mb-4">
+                <button className="btn btn-primary btn-wide">Follow</button>
+            </div>
+
+            <div className="mt-4 px-5">
                 <div className="columns-2 gap-4 overflow-hidden">
                     {userThumbs.map((image, index) => (
                         <img
                             key={index}
                             src={image}
-                            className="mb-4 w-full object-cover rounded-lg shadow-lg cursor-pointer"
+                            className="mb-4 w-full object-cover rounded-lg cursor-pointer"
                             style={{ breakInside: 'avoid' }}
                             onClick={() => openModal(image)}
                         />
@@ -135,12 +149,10 @@ export default function User() {
                 </div>
             </div>
 
-            {/* Modal with transition */}
             <div
                 className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 transition-opacity duration-300 ease-in-out ${isModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
                     }`}
                 onClick={closeModal}
-            // You might want to manage the visibility of the modal here with conditional rendering as well
             >
                 <img
                     src={selectedImage}
@@ -148,9 +160,6 @@ export default function User() {
                     onClick={(e) => e.stopPropagation()} // Prevent click inside from closing the modal
                 />
             </div>
-
-
-
-        </div>
-    );
+        </>
+    )
 }
