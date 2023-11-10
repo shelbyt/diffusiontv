@@ -18,6 +18,7 @@ interface VideoFeedContextState {
   isSwiping: boolean;
   firstPlay: boolean;
   buffered: boolean;
+  drawerOpen: boolean;
   setVideos: React.Dispatch<React.SetStateAction<any[]>>;
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   setMuted: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,6 +28,7 @@ interface VideoFeedContextState {
   setIsSwiping: React.Dispatch<React.SetStateAction<boolean>>;
   setFirstPlay: React.Dispatch<React.SetStateAction<boolean>>;
   setBuffered: React.Dispatch<React.SetStateAction<boolean>>;
+  setDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Create context with default values
@@ -43,6 +45,7 @@ export const VideoFeedProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isSwiping, setIsSwiping] = useState(false);
   const [firstPlay, setFirstPlay] = useState(true);
   const [buffered, setBuffered] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -59,6 +62,7 @@ export const VideoFeedProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     isSwiping,
     firstPlay,
     buffered,
+    drawerOpen,
     setVideos,
     setCurrentPage,
     setMuted,
@@ -68,6 +72,7 @@ export const VideoFeedProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsSwiping,
     setFirstPlay,
     setBuffered,
+    setDrawerOpen
   };
 
   return <VideoFeedContext.Provider value={value}>{children}</VideoFeedContext.Provider>;

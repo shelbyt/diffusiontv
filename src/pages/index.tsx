@@ -22,6 +22,7 @@ const Home: React.FC = () => {
         isSwiping,
         firstPlay,
         buffered,
+        drawerOpen,
         setVideos,
         setCurrentPage,
         setMuted,
@@ -31,6 +32,7 @@ const Home: React.FC = () => {
         setIsSwiping,
         setFirstPlay,
         setBuffered,
+        setDrawerOpen,
     } = useVideoFeed();
 
     // const [videos, setVideos] = useState<any[]>([]); //keep
@@ -50,7 +52,7 @@ const Home: React.FC = () => {
     const [tmpUrl, setTmpUrl] = useState<string | string>("");
     const [nextVideoId, setNextVideoId] = useState<string | null>(null);
     const [isPlayClicked, setIsPlayClicked] = useState(true);
-    const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(null);
+    const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(null); // Done through localstorage don't remember why vs. contextapi
 
 
 
@@ -186,14 +188,16 @@ const Home: React.FC = () => {
         <div className="bg-black flex flex-col fixed inset-0" id="videos__container">
             <div className="flex-grow relative max-h-[calc(100%-64px)]">
                 <Swiper
-                    onSwiper={(swiper: SwiperClass) => setSwiperInstance(swiper)}
+                    onSwiper={(swiper: SwiperClass) => setSwiperInstance(swiper)} // Sets swiper's active index
                     style={{ height: '100%', zIndex: 4 }}  // Setting height to 100% of its parent
                     direction="vertical"
                     slidesPerView={1}
                     spaceBetween={0}
                     onSlideChange={(swiper) => handleSlideChange(swiper)}
                     // onTouchEnd={() => setIsSwiping(false)}
-                    onTouchStart={() => setIsSwiping(true)}
+                    // onTouchStart={() => setIsSwiping(true)}
+                    onSliderMove={() => setIsSwiping(true)}
+                    onTouchEnd={() => setIsSwiping(false)} // this is ok but sidebar kind of messed 
                     onSlideChangeTransitionEnd={() => setIsSwiping(false)}
                 >
                     {videos.map((video, index) => (
@@ -272,6 +276,34 @@ const Home: React.FC = () => {
                 <Navbar />
             </div>
 
+
+            {/* Drawer (Modal) */}
+            <dialog id="drawerModal" className={`modal ${drawerOpen ? 'modal-open' : ''}`}>
+                <div className="modal-box relative">
+                    {/* Close button */}
+                    <button
+                        className="btn btn-sm btn-circle absolute right-2 top-2"
+                        onClick={() => setDrawerOpen(false)}
+                    >✕</button>
+
+                    {/* Drawer contents */}
+                    <h3 className="text-lg font-bold mb-4">Report</h3>
+                    {/* Buttons */}
+                    <div className="flex flex-col space-y-2">
+                        <button className="btn w-full px-4 py-2">Not Playing</button> {/* Adjust px and py values as needed */}
+                        <button className="btn w-full px-4 py-2">Content Missing</button>
+                        <button className="btn w-full px-4 py-2">Graphic Content</button>
+                    </div>
+                </div>
+                <form method="dialog" className="modal-backdrop">
+                    <button onClick={() => setDrawerOpen(false)}>close</button>
+                </form>
+
+            </dialog>
+
+
+
+
             {
                 firstPlay && (
                     <div style={{
@@ -304,6 +336,9 @@ const Home: React.FC = () => {
                     </div>
                 )
             }
+
+
+
         </div>
     );
 }
