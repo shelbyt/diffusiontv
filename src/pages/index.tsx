@@ -53,6 +53,7 @@ const Home: React.FC = () => {
     const [nextVideoId, setNextVideoId] = useState<string | null>(null);
     const [isPlayClicked, setIsPlayClicked] = useState(true);
     const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(null); // Done through localstorage don't remember why vs. contextapi
+    const [reportComplete, setReportComplete] = useState(false);
 
 
 
@@ -118,8 +119,11 @@ const Home: React.FC = () => {
     }, [currentPage]);
 
     const handleSlideChange = (swiper: any) => {
-        console.log("Inside handle");
+        // Cleanup from prev
         setBuffered(false);
+        setReportComplete(false);
+        setDrawerOpen(false);
+
         const videosList = videos;
         localStorage.setItem('activeSwiperIndex', swiper.activeIndex);
 
@@ -289,11 +293,20 @@ const Home: React.FC = () => {
                     {/* Drawer contents */}
                     <h3 className="text-lg font-bold mb-4">Report</h3>
                     {/* Buttons */}
-                    <div className="flex flex-col space-y-2">
-                        <button className="btn w-full px-4 py-2">Not Playing</button> {/* Adjust px and py values as needed */}
-                        <button className="btn w-full px-4 py-2">Content Missing</button>
-                        <button className="btn w-full px-4 py-2">Graphic Content</button>
-                    </div>
+                    {!reportComplete ? (
+                        // Buttons
+                        <div className="flex flex-col space-y-2">
+                            <button className="btn w-full px-4 py-2" onClick={() => setReportComplete(true)}>Not Playing</button>
+                            <button className="btn w-full px-4 py-2" onClick={() => setReportComplete(true)}>Content Missing</button>
+                            <button className="btn w-full px-4 py-2" onClick={() => setReportComplete(true)}>Graphic Content</button>
+                        </div>
+                    ) : (
+                        // Thank you message
+                        <div className="text-center p-4">
+                            Reported! Thank You
+                        </div>
+                    )}
+
                 </div>
                 <form method="dialog" className="modal-backdrop">
                     <button onClick={() => setDrawerOpen(false)}>close</button>
