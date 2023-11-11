@@ -1,7 +1,7 @@
-import React, { useState, FC } from 'react';
-import { ShareFat, Heart, Scroll, BookmarkSimple, Warning } from "@phosphor-icons/react";
-import { IDbData, IVideoData } from '../../pages/api/videos';
-import Router, { useRouter } from 'next/router';
+import React, { FC } from 'react';
+import { ShareFat, Heart, BookmarkSimple, Warning } from "@phosphor-icons/react";
+import { IVideoData } from '../../pages/api/videos';
+import { useRouter } from 'next/router';
 import { handleNavigationAway } from '../../state/localStorageHelpers';
 import { useVideoFeed } from '../../state/VideoFeedProvider';
 

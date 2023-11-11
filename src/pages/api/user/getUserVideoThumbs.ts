@@ -17,9 +17,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			}
 		})
 
-        const userThumbLinks = userVideos.map((video) => {
-            return `${THUMBS_BASE_URL}${video.videoId}.jpg`
-        })
+		const userThumbLinks = userVideos.map((video) => {
+			return `${THUMBS_BASE_URL}${video.videoId}.jpg`
+		})
 
 		if (userThumbLinks) {
 			// console.log("userProfile", userProfile)
@@ -27,7 +27,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		} else {
 			res.status(404).json({ message: 'User not found' });
 		}
-	} catch (error: any) {
-		res.status(500).json({ message: 'Internal Server Error', error: error.message });
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			res.status(500).json({ message: 'Internal Server Error', error: error.message });
+		} else {
+			res.status(500).json({ message: 'Internal Server Error' });
+		}
+
 	}
 }

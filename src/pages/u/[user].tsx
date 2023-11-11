@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { formatNumber } from '../../utils/formatNumber';
-import { GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
 import { ArrowLeft, ShareFat } from '@phosphor-icons/react';
-import Error from 'next/error';
 
 export interface IUserDetails {
     username: string
@@ -15,43 +13,38 @@ export interface IUserDetails {
 
 export default function User() {
     const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState('');
     const router = useRouter();
     const { user } = router.query
-    console.log('username xxx ', user)
-
-    const SkeletonLoader = ({ className }: { className: string }) => (
-        <div className={`animate-pulse ${className} bg-gray-300 rounded`}></div>
-    );
 
     useEffect(() => {
-        console.log("username = ", user)
         if (!user) return; // Exit early if username is not available
         async function fetchUserData() {
             try {
                 const res = await fetch(`/api/user/getUserProfile?method=get&user=${user}`);
                 if (!res.ok) {
-                    throw new Error('Failed to fetch user details');
+                    //TODO: handle error
+                    // throw new Error('Failed to fetch user data');
                 }
                 const data = await res.json();
-                console.log("data = ", data)
                 setUserDetails(data);
-                setIsLoading(false);
-            } catch (error : Error) {
-                setError(error.message);
+            } catch (error : unknown) {
+
+                //TODO: Handle Error
+                // Handle error
             }
         }
         async function fetchUserThumbs() {
             try {
                 const res = await fetch(`/api/user/getUserVideoThumbs?method=get&user=${user}`);
                 if (!res.ok) {
-                    throw new Error('Failed to fetch user thumbnails');
+                    //TODO: handle error
+                    // throw new Error('Failed to fetch user thumbnails');
                 }
                 const thumbs = await res.json();
                 setUserThumbs(thumbs);
-            } catch (error) {
-                setError(error.message);
+            } catch (error : unknown) {
+                //TODO: Handle Error
+                // setError(error.message);
             }
         }
         fetchUserData();

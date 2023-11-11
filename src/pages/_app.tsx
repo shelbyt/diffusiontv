@@ -5,7 +5,8 @@ import { UserProvider } from '@auth0/nextjs-auth0/client';
 import Layout from '../components/layout'
 import { VideoFeedProvider } from '../state/VideoFeedProvider';
 
-const fetcher = async (input: RequestInfo, init: RequestInit, ...args: any[]) => {
+// const fetcher = async (input: RequestInfo, init: RequestInit, ...args: any[]) => {
+const fetcher = async (input: RequestInfo, init: RequestInit,) => {
     const res = await fetch(input, init)
     return res.json()
 }

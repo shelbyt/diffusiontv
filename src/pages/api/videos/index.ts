@@ -28,7 +28,6 @@ export interface IVideoData {
         storage: IDataStorage;
     }
 }
-
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const pageSize = 5; // Results per page
     let currentPage = 1;
@@ -38,31 +37,31 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const { method } = req.query;
 
-    if (method == 'get') {
-        async function getTopImages() {
-            const images = await prisma.image.findMany({
-                skip: (currentPage - 1) * pageSize,
-                take: pageSize,
-                orderBy: {
-                    commentCount: 'desc',
-                },
-                select: {
-                    videoId: true,
-                    remoteId: true,
-                    heartCount: true,
-                    commentCount: true,
-                    username: true,
-                    user: {
-                        select: {
-                            imageUrl: true,
-                        },
+    async function getTopImages() {
+        const images = await prisma.image.findMany({
+            skip: (currentPage - 1) * pageSize,
+            take: pageSize,
+            orderBy: {
+                likeCount: 'desc',
+            },
+            select: {
+                videoId: true,
+                remoteId: true,
+                heartCount: true,
+                commentCount: true,
+                username: true,
+                user: {
+                    select: {
+                        imageUrl: true,
                     },
                 },
-            });
+            },
+        });
 
-            return images;
-        }
+        return images;
+    }
 
+    if (method == 'get') {
         const results = await getTopImages();
 
         // Map each result to include video URL, thumbnail URL, and DB data
@@ -76,13 +75,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             }
         }));
 
-        console.log(`Constructed URLs for ${videosWithThumbs.length} videos with thumbnails`);
-        console.log(videosWithThumbs)
+        // console.log(`Constructed URLs for ${videosWithThumbs.length} videos with thumbnails`);
+        // console.log(videosWithThumbs)
 
         return res.status(200).json(videosWithThumbs);
     }
 
-    // ... (The rest of your endpoint logic, like the 'patch' method, remains unchanged)
 }
 
 export default handler;

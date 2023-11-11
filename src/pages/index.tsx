@@ -111,6 +111,9 @@ const Home: React.FC = () => {
             console.log("video set = ", videos)
             console.log("Video url = ", activeVideoData?.videoUrl)
             setIsSwiping(false);
+            setMuted(true)
+            setFirstPlay(true)
+
             handleNavigationReturn();
         }
         else {
@@ -122,7 +125,7 @@ const Home: React.FC = () => {
         // Cleanup from prev
         setBuffered(false);
         setReportComplete(false);
-        setDrawerOpen(false);
+        // setDrawerOpen(false);
 
         const videosList = videos;
         localStorage.setItem('activeSwiperIndex', swiper.activeIndex);
@@ -199,7 +202,7 @@ const Home: React.FC = () => {
                     spaceBetween={0}
                     onSlideChange={(swiper) => handleSlideChange(swiper)}
                     // onTouchEnd={() => setIsSwiping(false)}
-                    // onTouchStart={() => setIsSwiping(true)}
+                    onTouchStart={() => setMuted(false)}
                     onSliderMove={() => setIsSwiping(true)}
                     onTouchEnd={() => setIsSwiping(false)} // this is ok but sidebar kind of messed 
                     onSlideChangeTransitionEnd={() => setIsSwiping(false)}
@@ -232,6 +235,31 @@ const Home: React.FC = () => {
                             )}
 
                             <Sidebar video={video} />
+
+            {
+                !buffered  && (
+                    <div style={{
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        zIndex: 999,
+                        backgroundColor: 'rgba(0, 0, 0, 0.0)' // This gives a faded background
+                    }}
+                    >
+                        <span
+                        
+                            style={{
+                                position: 'absolute',
+                                // top: '50%',
+                                // left: '33%',
+                                fontSize: '1em',
+                                padding: '10px 20px'
+                            }}
+                        className="loading  text-secondary loading-bars loading-sm"></span>
+                    </div>
+                )
+            }
+
                         </SwiperSlide>
                     ))}
 
@@ -252,6 +280,8 @@ const Home: React.FC = () => {
                             setBuffered(true)
                         }}
                     />
+
+
                 )}
             </div>
             {
@@ -272,6 +302,13 @@ const Home: React.FC = () => {
                     <span>{checkHasNavigatedAway() ? "| N-Yes" : "| N-Not "}</span>
                     <span>{isClient ? "| Client-Yes" : "| Client-Not "}</span>
                     <span> {(activeVideoIndex === activeVideoIndex) || firstPlay === false || buffered} </span>
+                    <span> {activeVideoData?.videoUrl} </span>
+                    <span> {muted ? 'Mtrue' : 'Mfalse'} </span>
+
+                    {/* <span> {"(LS)NavAway:"} </span>
+                    <span> {localStorage.getItem('hasNavigatedAway') } </span>
+                    <span> {"(LS)ActiveIndex:"} </span>
+                    <span> {localStorage.getItem('activeSwiperIndex')} </span> */}
 
                 </div>
             }
@@ -281,18 +318,14 @@ const Home: React.FC = () => {
             </div>
 
 
-            {/* Drawer (Modal) */}
             <dialog id="drawerModal" className={`modal ${drawerOpen ? 'modal-open' : ''}`}>
                 <div className="modal-box relative">
-                    {/* Close button */}
                     <button
                         className="btn btn-sm btn-circle absolute right-2 top-2"
                         onClick={() => setDrawerOpen(false)}
                     >✕</button>
 
-                    {/* Drawer contents */}
                     <h3 className="text-lg font-bold mb-4">Report</h3>
-                    {/* Buttons */}
                     {!reportComplete ? (
                         // Buttons
                         <div className="flex flex-col space-y-2">
@@ -311,9 +344,7 @@ const Home: React.FC = () => {
                 <form method="dialog" className="modal-backdrop">
                     <button onClick={() => setDrawerOpen(false)}>close</button>
                 </form>
-
             </dialog>
-
 
 
 
@@ -327,20 +358,20 @@ const Home: React.FC = () => {
                         height: '100vh',
                         zIndex: 1000,
                         backgroundColor: 'rgba(0, 0, 0, 0.4)' // This gives a faded background
-                    }}>
+                    }}
+                        onClick={() => {
+                            setMuted(false);  // Assuming setMuted is the setter for your muted state
+                            setFirstPlay(false);
+                        }}
+                    >
                         <button
                             className='btn'
                             style={{
                                 position: 'absolute',
                                 top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
+                                left: '33%',
                                 fontSize: '1em',
                                 padding: '10px 20px'
-                            }}
-                            onClick={() => {
-                                setMuted(false);  // Assuming setMuted is the setter for your muted state
-                                setFirstPlay(false);
                             }}
                         >
                             Unmute
