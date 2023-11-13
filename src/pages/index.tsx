@@ -201,7 +201,7 @@ const Home: React.FC = () => {
                     direction="vertical"
                     slidesPerView={1}
                     spaceBetween={0}
-                    onSlideChange={(swiper) => handleSlideChange(swiper)}
+                    onSlideChange={(swiper:any) => handleSlideChange(swiper)}
                     // onTouchEnd={() => setIsSwiping(false)}
                     onTouchStart={() => setMuted(false)}
                     onSliderMove={() => setIsSwiping(true)}
