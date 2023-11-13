@@ -9,6 +9,7 @@ import Sidebar from '../components/sidebar';
 import { useVideoFeed } from '../state/VideoFeedProvider';
 import { handleNavigationReturn, checkHasNavigatedAway } from '../state/localStorageHelpers'
 import { Swiper as SwiperClass } from 'swiper';
+import BottomText from '../components/bottomTextbar';
 
 
 const Home: React.FC = () => {
@@ -235,8 +236,11 @@ const Home: React.FC = () => {
                             )}
 
                             <Sidebar video={video} />
+                            {/* Add the BottomText component here */}
+                            <BottomText username={video.data.dbData.username} image={video.data.dbData.user?.imageUrl} meta={video.data.dbData.meta} />
 
-            {
+
+                            {/* {
                 !buffered  && (
                     <div style={{
                         position: 'fixed',
@@ -255,10 +259,10 @@ const Home: React.FC = () => {
                                 fontSize: '1em',
                                 padding: '10px 20px'
                             }}
-                        className="loading  text-secondary loading-bars loading-sm"></span>
+                        className="loading loading-dots loading-xs"></span>
                     </div>
                 )
-            }
+            } */}
 
                         </SwiperSlide>
                     ))}

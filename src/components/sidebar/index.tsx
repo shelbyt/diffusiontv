@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
-import { ShareFat, Heart, BookmarkSimple, Warning } from "@phosphor-icons/react";
+import { ShareFat, Heart, BookmarkSimple,DotsThreeOutline  } from "@phosphor-icons/react";
 import { IVideoData } from '../../pages/api/videos';
 import { useRouter } from 'next/router';
-import { handleNavigationAway } from '../../state/localStorageHelpers';
+// import { handleNavigationAway } from '../../state/localStorageHelpers';
 import { useVideoFeed } from '../../state/VideoFeedProvider';
 
 
@@ -17,8 +17,8 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
     };
 
     return (
-        <div className="fixed right-0 top-1/2 transform -translate-y-1/2 bg-tranparent p-4 rounded-l-lg flex flex-col items-center space-y-4">
-            <div className="avatar" onClick={() => {
+        <div className="fixed right-0 top-3/4 transform -translate-y-3/4 bg-tranparent p-4 rounded-l-lg flex flex-col items-center space-y-4">
+            {/* <div className="avatar" onClick={() => {
                 handleNavigationAway();
                 router.push('/u/' + video.data.dbData.username, undefined, { shallow: true })
             }
@@ -26,7 +26,7 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
                 <div className="bg-neutral-focus text-neutral-content border border-black rounded-full w-12 h-12 flex items-center justify-center">
                     <img src={video.data.dbData.user?.imageUrl || "https://site-icons.media-storage.us-west.qencode.com/civ.png"} />
                 </div>
-            </div>
+            </div> */}
 
             <div className="flex flex-col items-center space-y-1"> {/* Adjust vertical spacing here */}
                 <label className="swap swap-rotate cursor-pointer">
@@ -93,7 +93,7 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
                 stroke='black'
                 strokeWidth={15}
             />
-            <Warning
+            <DotsThreeOutline
                 size={30}
                 weight="fill"
                 className="cursor-pointer hover:text-red-500 text-white"
@@ -101,6 +101,7 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
                 strokeWidth={15}
                 onClick={toggleDrawer} // Toggle drawer on click
             />
+
         </div>
     );
 }

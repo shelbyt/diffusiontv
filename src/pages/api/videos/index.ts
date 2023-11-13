@@ -3,7 +3,8 @@ import prisma from '../../../utils/prismaClient'
 
 // Define the base URLs for your S3 bucket for videos and thumbnails
 const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
-const THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
+//const THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
+const THUMBS_BASE_URL = 'https://ps-lofiagihab.s3.us-west-2.amazonaws.com/';
 
 
 export interface IDbData {
@@ -44,12 +45,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             orderBy: {
                 likeCount: 'desc',
             },
+            where: {
+                likeCount: {
+                    gt: 1
+                }
+            },
             select: {
                 videoId: true,
                 remoteId: true,
                 heartCount: true,
                 commentCount: true,
                 username: true,
+                meta: true,
                 user: {
                     select: {
                         imageUrl: true,
