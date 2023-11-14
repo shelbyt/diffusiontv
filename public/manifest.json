@@ -4,9 +4,9 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "FlowTok",
-    "short_name": "FlowTok",
-    "description": "Remix GenAI Videos",
+    "name": "Civitai TV",
+    "short_name": "CTV",
+    "description": "Civitai Videos",
     "icons": [
         {
             "src": "/icon-192x192.png",
