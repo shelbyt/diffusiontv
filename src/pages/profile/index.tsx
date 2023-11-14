@@ -1,5 +1,5 @@
 // pages/profile.js
-import React, { useState } from 'react';
+import React from 'react';
 import { ShareFat } from '@phosphor-icons/react'
 
 const Profile = () => {

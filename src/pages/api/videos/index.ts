@@ -1,86 +1,93 @@
-import ApiVideoClient from '@api.video/nodejs-client'
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../utils/prismaClient'
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    const defaultApiKey = process.env.API_KEY
-
-    const sortBy = 'publishedAt'; // Allowed: publishedAt, title. You can search by the time videos were published at, or by title.
-    const sortOrder = 'asc'; // Allowed: asc, desc. asc is ascending and sorts from A to Z. desc is descending and sorts from Z to A.
-    const pageSize = 5; // Results per page. Allowed values 1-100, default is 25. Loading 2 at a time is really good
-    let currentPage = 1;
-    if (req.query.currentPage) {
-        currentPage = Number(req.query.currentPage)
-    }
+// Define the base URLs for your S3 bucket for videos and thumbnails
+const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
+//const THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
+const THUMBS_BASE_URL = 'https://ps-lofiagihab.s3.us-west-2.amazonaws.com/';
 
 
-    const { videoId, metadata } = req.body
-    const { method } = req.query
-    const client = new ApiVideoClient({
-        apiKey: defaultApiKey,
-    })
+export interface IDbData {
+    videoId: string;
+    remoteId: number;
+    heartCount: number | null;
+    commentCount: number | null;
+    username: string | null;
+    user: {
+        imageUrl: string | null;
+    } | null;
+}
 
-    if (method == 'get') {
-        async function getTopImages() {
-            const images = await prisma.image.findMany({
-                skip: (currentPage - 1) * pageSize,
-                take: pageSize,
-                orderBy: {
-                    heartCount: 'desc',
-                },
-                select: {
-                    videoId: true,
-                    remoteId: true,
-                    heartCount: true,
-                    commentCount: true,
-                    username: true,
-                    user: {
-                        select: {
-                            imageUrl: true,
-                        },
-                    },
-                },
-            });
+export interface IDataStorage {
+    videoUrl: string;
+    thumbUrl: string;
+}
 
-            return images;
-        }
-
-        const results = await getTopImages();
-        const videoIds = results.map(item => `${item.videoId}.mp4`);
-
-        console.log(`Fetching ${videoIds.length} videos`);
-
-        // Create an array of promises
-        const videoPromises = videoIds.map(title => client.videos.list({ title }));
-
-        // Wait for all promises to resolve
-        const allResults = await Promise.all(videoPromises);
-        // console.log("zzz ", allResults[0].data[0].assets)
-
-        // Merge all the results
-        const mergedVideosListResponse = {
-            ...allResults[0], // Take the first object as a base
-            data: allResults.flatMap(result => result.data) // Flat map all the data arrays into one
-                .map((item, index) => ({
-                    ...item,
-                    meta: results[index],
-                })),
-        };
-
-        return res.status(200).json({ ...mergedVideosListResponse });
-
-
-    }
-
-    // UPDATE DATA
-    if (method === 'patch') {
-        const videoUpdatePayload = {
-            metadata, // A list (array) of dictionaries where each dictionary contains a key value pair that describes the video. As with tags, you must send the complete list of metadata you want as whatever you send here will overwrite the existing metadata for the video.
-        }
-
-        const result = await client.videos.update(videoId, videoUpdatePayload)
-        res.status(204).send(result)
-        return
+export interface IVideoData {
+    data: {
+        dbData: IDbData;
+        storage: IDataStorage;
     }
 }
-export default handler
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+    const pageSize = 5; // Results per page
+    let currentPage = 1;
+    if (req.query.currentPage) {
+        currentPage = Number(req.query.currentPage);
+    }
+
+    const { method } = req.query;
+
+    async function getTopImages() {
+        const images = await prisma.image.findMany({
+            skip: (currentPage - 1) * pageSize,
+            take: pageSize,
+            orderBy: {
+                likeCount: 'desc',
+            },
+            where: {
+                likeCount: {
+                    gt: 1
+                }
+            },
+            select: {
+                videoId: true,
+                remoteId: true,
+                heartCount: true,
+                commentCount: true,
+                username: true,
+                meta: true,
+                user: {
+                    select: {
+                        imageUrl: true,
+                    },
+                },
+            },
+        });
+
+        return images;
+    }
+
+    if (method == 'get') {
+        const results = await getTopImages();
+
+        // Map each result to include video URL, thumbnail URL, and DB data
+        const videosWithThumbs: IVideoData[] = results.map(item => ({
+            data: {
+                dbData: item,
+                storage: {
+                    videoUrl: `${VIDEO_BASE_URL}${item.videoId}.mp4`,
+                    thumbUrl: `${THUMBS_BASE_URL}${item.videoId}.jpg`
+                }
+            }
+        }));
+
+        // console.log(`Constructed URLs for ${videosWithThumbs.length} videos with thumbnails`);
+        // console.log(videosWithThumbs)
+
+        return res.status(200).json(videosWithThumbs);
+    }
+
+}
+
+export default handler;

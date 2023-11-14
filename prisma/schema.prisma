@@ -68,6 +68,7 @@ model Image {
   nsfwLevel   String?
   nsfw        Boolean?
   createdAt   DateTime?
+  insertedAt  DateTime @default(now())
   postId      Int?
   username    String?
   user        User?         @relation(fields: [username], references: [username])

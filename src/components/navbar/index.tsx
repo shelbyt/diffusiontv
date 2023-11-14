@@ -19,16 +19,16 @@ const Navbar: React.FC = () => {
     }
 
     return (
-        <div className="fixed bottom-0 left-0 right-0 flex justify-between items-start bg-black px-12 h-28 mt-2">
+            <div className="h-16 flex justify-between items-start bg-black px-16">
             <div className="flex flex-col items-center text-white" onClick={navigateToHome}>
-                {router.pathname === '/' ? <House size={24} weight='fill' color="#fff" /> : <House size={24} color="#fff" />}
+                {router.pathname === '/' ? <House size={32} weight='fill' color="#fff" /> : <House size={32} color="#fff" />}
                 <p className="text-xs mt-1">Home</p>
             </div>
             <div className="flex flex-col items-center text-white">
                 <PaintBrushHousehold size={32} color="#fff" weight="fill" onClick={handleLogout}/>
             </div>
             <div className="flex flex-col items-center text-white" onClick={navigateToProfile}>
-                {router.pathname === '/profile' ? <User size={24} weight='fill' color="#fff" /> : <User size={24} color="#fff" />}
+                {router.pathname === '/profile' ? <User size={32} weight='fill' color="#fff" /> : <User size={32} color="#fff" />}
                 <p className="text-xs mt-1">Profile</p>
             </div>
         </div>

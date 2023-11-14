@@ -6,7 +6,7 @@ import path from 'path';
 const prisma = new PrismaClient();
 
 async function main() {
-  const filePath = path.join(__dirname, './data/10-25/matched-objects-vidid.json');  // Replace with your actual JSON file path
+  const filePath = path.join(__dirname, './data/11-8-4/matched-objects-vidid.json');  // Replace with your actual JSON file path
   const fileContent = fs.readFileSync(filePath, 'utf-8');
   const jsonDataArray = JSON.parse(fileContent);
 
