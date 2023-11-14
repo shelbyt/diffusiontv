@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { formatNumber } from '../../utils/formatNumber';
 import { useRouter } from 'next/router';
-import { ArrowLeft, ShareFat } from '@phosphor-icons/react';
+import { ArrowLeft, ShareFat, Heart, Calendar } from '@phosphor-icons/react';
 
 export interface IUserDetails {
     username: string
@@ -10,6 +10,13 @@ export interface IUserDetails {
     likeCount: number
     videosMade: number
 }
+
+interface IUserThumb {
+    thumbUrl: string;
+    likeCount: number;
+    createdAt: Date;
+}
+
 
 export default function User() {
     const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
@@ -27,7 +34,7 @@ export default function User() {
                 }
                 const data = await res.json();
                 setUserDetails(data);
-            } catch (error : unknown) {
+            } catch (error: unknown) {
 
                 //TODO: Handle Error
                 // Handle error
@@ -41,8 +48,9 @@ export default function User() {
                     // throw new Error('Failed to fetch user thumbnails');
                 }
                 const thumbs = await res.json();
+                console.log(thumbs)
                 setUserThumbs(thumbs);
-            } catch (error : unknown) {
+            } catch (error: unknown) {
                 //TODO: Handle Error
                 // setError(error.message);
             }
@@ -51,7 +59,7 @@ export default function User() {
         fetchUserThumbs();
     }, [user]);
 
-    const [userThumbs, setUserThumbs] = useState([]);
+    const [userThumbs, setUserThumbs] = useState<IUserThumb[]>([]);
     const [selectedImage, setSelectedImage] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = (image: string) => {
@@ -71,6 +79,17 @@ export default function User() {
             router.push('/');
         }
     };
+
+    const [sortBy, setSortBy] = useState('date');
+
+    const toggleSort = () => {
+        setSortBy(sortBy === 'popular' ? 'date' : 'popular');
+    };
+
+    const sortedThumbs = sortBy === 'popular'
+        ? [...userThumbs].sort((a, b) => b.likeCount - a.likeCount)
+        : [...userThumbs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
 
     return (
         <>
@@ -124,24 +143,38 @@ export default function User() {
                 </div>
             </div>
 
-            <div className="flex justify-center mb-4">
-                <button className="btn btn-primary btn-wide">Follow</button>
+            <div className="flex justify-between items-center mb-4 mx-2">
+                {/* Container for centering the Follow Button */}
+                <div className="flex-grow flex justify-center">
+                    <button className="btn btn-primary w-32">Follow</button>
+                </div>
+
+                {/* Sort Toggle Button - Right Aligned */}
+                <button className="btn btn-outline bg-neutral text-white" onClick={toggleSort}>
+                    {sortBy === 'popular' ? <Calendar size={24} /> : <Heart size={24} />}
+                </button>
             </div>
 
-            <div className="mt-4 px-5">
-                <div className="columns-2 gap-4 overflow-hidden">
-                    {userThumbs.map((image, index) => (
-                        <img
-                            key={index}
-                            src={image}
-                            className="mb-4 w-full object-cover rounded-lg cursor-pointer"
-                            style={{ breakInside: 'avoid' }}
-                            onClick={() => openModal(image)}
-                        />
+
+            <div className="mt-4 px-1">
+                <div className="grid grid-cols-3 gap-1">
+                    {sortedThumbs.map((image, index) => (
+                        <div key={index} className="w-full h-48 overflow-hidden rounded-lg cursor-pointer relative">
+                            <img
+                                src={image?.thumbUrl}
+                                className="w-full h-full object-cover"
+                                onClick={() => openModal(image?.thumbUrl)}
+                            />
+
+                            {/* Overlay for Likes */}
+                            <div className="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white p-2 flex items-center">
+                                <Heart size={16} color="white" className="mr-2" />
+                                <span>{image?.likeCount}</span>
+                            </div>
+                        </div>
                     ))}
                 </div>
             </div>
-
             <div
                 className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 transition-opacity duration-300 ease-in-out ${isModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
                     }`}

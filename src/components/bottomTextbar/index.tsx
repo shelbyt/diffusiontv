@@ -11,6 +11,8 @@ interface BottomTextProps {
 const BottomText: FC<BottomTextProps> = ({ username, image, meta }) => {
     const router = useRouter();
     const [isExpanded, setIsExpanded] = useState(false);
+    const [isPressed, setIsPressed] = useState(false);
+
     const charLimit = 145; // Set your character limit for truncation
 
     let metaData;
@@ -29,17 +31,29 @@ const BottomText: FC<BottomTextProps> = ({ username, image, meta }) => {
         setIsExpanded(!isExpanded);
     };
 
+    const handlePressDown = () => {
+        setIsPressed(true);
+    };
 
+    const handlePressUp = () => {
+        setIsPressed(false);
+    };
 
     return (
         <div className="absolute bottom-0 left-0 flex flex-col items-start text-white p-2 mb-24 ml-4">
             {/* Avatar and Username in a Row */}
-            <div className="flex items-center mb-2"> {/* Added margin-bottom */}
-                {/* Avatar */}
-                <div className="avatar mr-2" onClick={() => {
+            <div
+                className={`flex items-center mb-2 ${isPressed ? 'opacity-50' : 'opacity-100'}`}
+                onMouseDown={handlePressDown}
+                onMouseUp={handlePressUp}
+                onTouchStart={handlePressDown}
+                onTouchEnd={handlePressUp}
+                onClick={() => {
                     handleNavigationAway();
                     router.push('/u/' + username, undefined, { shallow: true })
-                }}>
+                }}
+            >
+                <div className="avatar mr-2" >
                     <div className="bg-neutral-focus text-neutral-content border border-black rounded-full w-8 h-8 flex items-center justify-center">
                         <img src={image || "https://default-avatar-placeholder.png"} alt="User avatar" />
                     </div>
@@ -47,15 +61,15 @@ const BottomText: FC<BottomTextProps> = ({ username, image, meta }) => {
 
                 <div>{username}</div>
             </div>
-            <div className={`${isExpanded ? '' : (isTruncated ? 'line-clamp-3 text-base-200' : 'text-base-200')} max-w-xs overflow-hidden text-sm`}>
+            <div className={`${isExpanded ? 'bg-neutral bg-opacity-80 rounded' : (isTruncated ? 'line-clamp-3 text-base-200' : 'text-base-200')} max-w-xs overflow-hidden text-sm`}>
                 {metaData?.prompt}
             </div>
 
             {/* "See More" Button */}
             {isTruncated && (
-            <button onClick={toggleExpanded} className="text-xs mt-2">
-                {isExpanded ? 'See Less' : 'See More'}
-            </button>
+                <button onClick={toggleExpanded} className="text-xs mt-2">
+                    {isExpanded ? 'See Less' : 'See More'}
+                </button>
             )}
 
 

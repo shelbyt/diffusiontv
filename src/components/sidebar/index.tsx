@@ -40,7 +40,7 @@ const Sidebar: FC<ISidebarProps> = ({video }: ISidebarProps): JSX.Element => {
 
                 {/* Displaying the number of hearts */}
                 <div className="text-xs text-white"> {/* Adjust text size here */}
-                    100 {/* Replace with your state variable or logic */}
+                {video.data.dbData ? video?.data?.dbData?.heartCount : 0}
                 </div>
             </div>
 
@@ -68,7 +68,7 @@ const Sidebar: FC<ISidebarProps> = ({video }: ISidebarProps): JSX.Element => {
                 </label>
                 {/* Displaying the number of hearts */}
                 <div className="text-xs text-white"> {/* Adjust text size here */}
-                    100 {/* Replace with your state variable or logic */}
+                    0 {/* Replace with your state variable or logic */}
                 </div>
             </div>
 

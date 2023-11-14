@@ -1,7 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '../../../utils/prismaClient';
 
-const THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
+//const THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
+//const THUMBS_BASE_URL = 'https://ps-lofiagihab.s3.us-west-2.amazonaws.com/';
+const THUMBS_BASE_URL = 'https://d10bxkdso1dzcx.cloudfront.net/';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
@@ -13,12 +15,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 				username: user as string,
 			},
 			select: {
-				videoId: true
-			}
+				videoId: true,
+                likeCount: true,
+                createdAt: true
+			},
+            orderBy: {
+                createdAt: 'desc'
+            }
 		})
 
 		const userThumbLinks = userVideos.map((video) => {
-			return `${THUMBS_BASE_URL}${video.videoId}.jpg`
+			// return `${THUMBS_BASE_URL}${video.videoId}.jpg`
+            return {
+                thumbUrl: `${THUMBS_BASE_URL}${video.videoId}.jpg`,  
+                likeCount: video.likeCount,
+                createdAt: video.createdAt
+
+            }
 		})
 
 		if (userThumbLinks) {
