@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../../utils/prismaClient'
+import { NSFWLevel } from '@prisma/client';
+
 
 // Define the base URLs for your S3 bucket for videos and thumbnails
 const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
@@ -11,6 +13,7 @@ const THUMBS_BASE_URL = 'https://d10bxkdso1dzcx.cloudfront.net/';
 export interface IDbData {
     videoId: string;
     remoteId: number;
+    likeCount: number | null;
     heartCount: number | null;
     commentCount: number | null;
     username: string | null;
@@ -37,23 +40,43 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         currentPage = Number(req.query.currentPage);
     }
 
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 2);
+
+
     const { method } = req.query;
 
     async function getTopImages() {
         const images = await prisma.image.findMany({
             skip: (currentPage - 1) * pageSize,
             take: pageSize,
+            // orderBy: {
+            //     createdAt: 'desc',
+            // },
+            // where: {
+            //     likeCount: {
+            //         gt: 5
+            //     },
+            //     nsfwLevel: {
+            //         notIn: [NSFWLevel.X, NSFWLevel.Mature] // Enum values here
+            //     },
+            // },
             orderBy: {
-                createdAt: 'desc',
+                likeCount: 'desc', // Order by likeCount
             },
             where: {
-                likeCount: {
-                    gt:5 
+                createdAt: {
+                    gte: twoWeeksAgo // Only videos created in the last week
                 }
             },
+
             select: {
                 videoId: true,
                 remoteId: true,
+                likeCount: true,
                 heartCount: true,
                 commentCount: true,
                 username: true,

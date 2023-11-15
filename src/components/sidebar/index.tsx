@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { ShareFat, Heart, BookmarkSimple,DotsThreeOutline  } from "@phosphor-icons/react";
+import { ShareFat, Heart, BookmarkSimple,DotsThreeOutline, ArrowFatUp  } from "@phosphor-icons/react";
 import { IVideoData } from '../../pages/api/videos';
 import { useVideoFeed } from '../../state/VideoFeedProvider';
 
@@ -20,7 +20,7 @@ const Sidebar: FC<ISidebarProps> = ({video }: ISidebarProps): JSX.Element => {
                     <input type="checkbox" />
 
                     {/* Heart icon when not liked */}
-                    <Heart
+                    <ArrowFatUp
                         size={30}
                         weight="fill"
                         stroke='black'
@@ -29,10 +29,10 @@ const Sidebar: FC<ISidebarProps> = ({video }: ISidebarProps): JSX.Element => {
                     />
 
                     {/* Heart icon when liked */}
-                    <Heart
+                    <ArrowFatUp
                         size={30}
                         weight="fill"
-                        className="swap-on text-yellow-500"
+                        className="swap-on text-orange-500"
                         stroke='black'
                         strokeWidth={15}
                     />
@@ -40,12 +40,12 @@ const Sidebar: FC<ISidebarProps> = ({video }: ISidebarProps): JSX.Element => {
 
                 {/* Displaying the number of hearts */}
                 <div className="text-xs text-white"> {/* Adjust text size here */}
-                {video.data.dbData ? video?.data?.dbData?.heartCount : 0}
+                {video.data.dbData ? video?.data?.dbData?.likeCount : 0}
                 </div>
             </div>
 
             <div className="flex flex-col items-center space-y-1"> {/* Adjust vertical spacing here */}
-                <label className="swap swap-rotate cursor-pointer">
+                <label className="swap swap-flip cursor-pointer">
                     <input type="checkbox" />
 
                     {/* Heart icon when not liked */}
@@ -71,8 +71,6 @@ const Sidebar: FC<ISidebarProps> = ({video }: ISidebarProps): JSX.Element => {
                     0 {/* Replace with your state variable or logic */}
                 </div>
             </div>
-
-
             <ShareFat
                 size={30}
                 weight="fill"
