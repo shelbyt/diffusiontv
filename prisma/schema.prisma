@@ -25,6 +25,7 @@ model User {
   fromCiv   Boolean   @default(false)
   videos Video[]
   images  Image []
+  engagement UserEngagement[]
 }
 
 model Video {
@@ -57,6 +58,14 @@ model Asset {
   video     Video  @relation(fields: [videoId], references: [id])
 }
 
+enum NSFWLevel {
+  X
+  Mature
+  Soft
+  None
+  ADD
+}
+
 model Image {
   id          String       @id @default(cuid())
   remoteId    Int          @unique
@@ -65,7 +74,7 @@ model Image {
   hash        String?
   width       Int?
   height      Int?
-  nsfwLevel   String?
+  nsfwLevel   NSFWLevel?
   nsfw        Boolean?
   createdAt   DateTime?
   insertedAt  DateTime @default(now())
@@ -81,7 +90,23 @@ model Image {
   commentCount Int?
   stats       Json      // Stats as JSON string
 
+  category    Int?
   // Fields from Meta
   model       String?
   meta        Json      // Meta as JSON string
+
+  engagement UserEngagement[]
 }
+
+model UserEngagement {
+  id           String   @id @default(cuid())
+  userId       String
+  imageId      String
+  liked        Boolean  @default(false)
+  bookmarked   Boolean  @default(false)
+  playCount    Int      @default(0)
+  playDuration Int      @default(0)
+  user         User     @relation(fields: [userId], references: [id])
+  image        Image    @relation(fields: [imageId], references: [id])
+}
+
