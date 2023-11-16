@@ -4,9 +4,9 @@
     "display": "standalone",
     "scope": "/",
     "start_url": "/",
-    "name": "Civitai TV",
-    "short_name": "CTV",
-    "description": "Civitai Videos",
+    "name": "Diffusion TV",
+    "short_name": "Diffusion TV",
+    "description": "AI Generated Videos",
     "icons": [
         {
             "src": "/icon-192x192.png",

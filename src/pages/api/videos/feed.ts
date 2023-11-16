@@ -2,7 +2,8 @@
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
+//const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
+const VIDEO_BASE_URL = 'https://psv-uttzefxkok.s3.us-west-2.amazonaws.com/'
 //const THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
 //const THUMBS_BASE_URL = 'https://ps-lofiagihab.s3.us-west-2.amazonaws.com/';
 const THUMBS_BASE_URL = 'https://d10bxkdso1dzcx.cloudfront.net/';
@@ -14,7 +15,7 @@ async function getRandomItemFromCategory(categoryId) {
         where: {
             category: categoryId,
             likeCount: {
-                gt: 15 // Only select items with more than 10 likes
+                gt: 1 // Only select items with more than 10 likes
             }
         },
 
@@ -25,12 +26,13 @@ async function getRandomItemFromCategory(categoryId) {
         where: {
             category: categoryId,
             likeCount: {
-                gt: 15 // Only select items with more than 10 likes
+                gt: 1 // Only select items with more than 10 likes
             }
         },
         take: 1,
         skip: randomOffset,
         select: {
+            id: true,
             category: true,
             videoId: true,
             remoteId: true,
@@ -43,6 +45,7 @@ async function getRandomItemFromCategory(categoryId) {
             user: {
                 select: {
                     imageUrl: true,
+                    id: true
                 },
             },
         },
@@ -80,8 +83,8 @@ function selectRandomItemsFromArray(array, numberOfItems) {
 }
 
 async function getRandomItemsFromAllCategories(pageSize: number) {
-    const categories = [0, 1, 2, 3, 4, 5, 6];
-    const weights =    [1, 1, 1, 3, 2, 1, 1]; // Higher weight for category 3
+    const categories = [ 0, 1, 2, 3, 4, 5, 6];
+    const weights =    [1, 1, 1, 6, 4, 2, 1]; // Higher weight for category 3
 
     const weightedDistribution = createWeightedDistribution(categories, weights);
     const selectedCategories = selectRandomItemsFromArray(weightedDistribution,pageSize); // Select 5 items, allowing duplicates
