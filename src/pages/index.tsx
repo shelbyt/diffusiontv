@@ -10,6 +10,9 @@ import { useVideoFeed } from '../state/VideoFeedProvider';
 import { handleNavigationReturn, checkHasNavigatedAway } from '../state/localStorageHelpers'
 import { Swiper as SwiperClass } from 'swiper';
 import BottomText from '../components/bottomTextbar';
+import { preloadVideo } from "@remotion/preload";
+import useUserUUID from '../hooks/useUserUUID';
+
 
 
 const Home: React.FC = () => {
@@ -55,7 +58,7 @@ const Home: React.FC = () => {
     const [isPlayClicked, setIsPlayClicked] = useState(true);
     const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(null); // Done through localstorage don't remember why vs. contextapi
     const [reportComplete, setReportComplete] = useState(false);
-
+    const { userState } = useUserUUID();
 
 
     useEffect(() => {
@@ -83,10 +86,14 @@ const Home: React.FC = () => {
         console.log("Check Nav top of UE: ", checkHasNavigatedAway())
         console.log("fetching videos again", currentPage)
         console.log("video length = ", videos.length)
-
         async function fetchVideos() {
             try {
-                const response = await fetch(`/api/videos?method=get&currentPage=${currentPage}`);
+                console.log("In Fetch = ", userState)
+                const baseUrl = `/api/videos/feed?method=get&currentPage=${currentPage}`;
+                const userUuidParam = userState?.prismaUUID ? `&uuid=${userState.prismaUUID}` : `&uuid=unauth`;
+                const finalUrl = baseUrl + userUuidParam;
+
+                const response = await fetch(finalUrl);
                 const newData = await response.json();
                 setVideos(prevVideos => {
                     const newVideos = newData.filter((newVideo: any) =>
@@ -190,6 +197,20 @@ const Home: React.FC = () => {
 
     }, [activeVideoIndex])
 
+    // useEffect(() => {
+
+    //     if(isSwiping){
+
+    // console.log("IS SWIPING Next video url is ", videos[activeVideoIndex + 1]?.data.storage.videoUrl)
+    // const unpreload = preloadVideo(
+    //     videos[activeVideoIndex + 1]?.data.storage.videoUrl
+    // );
+
+    // console.log("unpreload = ", unpreload)
+    //     }
+
+    // }, [isSwiping])
+
 
 
     return (
@@ -201,7 +222,7 @@ const Home: React.FC = () => {
                     direction="vertical"
                     slidesPerView={1}
                     spaceBetween={0}
-                    onSlideChange={(swiper:any) => handleSlideChange(swiper)}
+                    onSlideChange={(swiper: any) => handleSlideChange(swiper)}
                     // onTouchEnd={() => setIsSwiping(false)}
                     onTouchStart={() => setMuted(false)}
                     onSliderMove={() => setIsSwiping(true)}
@@ -215,7 +236,6 @@ const Home: React.FC = () => {
                             style={{ height: 'calc(100vh - 64px)' }}
                         >
                             {/* Logic to display thumbnails for previous, current, and next slides */}
-
                             {/* {(video.data.storage.videoUrl === activeVideoData?.videoUrl) && ( */}
                             {(index === activeVideoIndex - 1 || index === activeVideoIndex || index === activeVideoIndex + 1) && (
                                 <div className={styles.DivVideoSlideContainer}>
@@ -238,35 +258,8 @@ const Home: React.FC = () => {
                             <Sidebar video={video} />
                             {/* Add the BottomText component here */}
                             <BottomText username={video.data.dbData.username} image={video.data.dbData.user?.imageUrl} meta={video.data.dbData.meta} />
-
-
-                            {/* {
-                !buffered  && (
-                    <div style={{
-                        position: 'fixed',
-                        top: '50%',
-                        left: '50%',
-                        zIndex: 999,
-                        backgroundColor: 'rgba(0, 0, 0, 0.0)' // This gives a faded background
-                    }}
-                    >
-                        <span
-                        
-                            style={{
-                                position: 'absolute',
-                                // top: '50%',
-                                // left: '33%',
-                                fontSize: '1em',
-                                padding: '10px 20px'
-                            }}
-                        className="loading loading-dots loading-xs"></span>
-                    </div>
-                )
-            } */}
-
                         </SwiperSlide>
                     ))}
-
 
                 </Swiper>
                 {isClient && (

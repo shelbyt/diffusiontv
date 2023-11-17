@@ -10,7 +10,8 @@ const THUMBS_BASE_URL = 'https://d10bxkdso1dzcx.cloudfront.net/';
 
 
 // Function to fetch a random item from a category
-async function getRandomItemFromCategory(categoryId) {
+async function getRandomItemFromCategory(categoryId, uuid) {
+    console.log("got UUID = in get random ", uuid)
     const totalItems = await prisma.Image.count({
         where: {
             category: categoryId,
@@ -22,34 +23,115 @@ async function getRandomItemFromCategory(categoryId) {
     });
 
     const randomOffset = Math.floor(Math.random() * totalItems);
-    return await prisma.Image.findMany({
-        where: {
-            category: categoryId,
-            likeCount: {
-                gt: 1 // Only select items with more than 10 likes
-            }
+    // const query = {
+    //     where: {
+    //         category: categoryId,
+    //         likeCount: {
+    //             gt: 1 // Only select items with more than 1 like
+    //         }
+    //     },
+    //     take: 1,
+    //     skip: randomOffset,
+    //     select: {
+    //         id: true,
+    //         category: true,
+    //         videoId: true,
+    //         remoteId: true,
+    //         likeCount: true,
+    //         heartCount: true,
+    //         commentCount: true,
+    //         username: true,
+    //         meta: true,
+    //         user: {
+    //             select: {
+    //                 imageUrl: true,
+    //                 id: true
+    //             },
+    //         },
+    //         // Conditionally add this part
+    //         // ...(uuid !== 'unauth' && {
+    //             engagement: {
+    //                 // where: {
+    //                 //     userId: uuid
+    //                 // },
+    //                 select: {
+    //                     liked: true,
+    //                     // other fields if needed
+    //                 }
+    //             }
+    //         // })
+    //     },
+    // };
+    // const ree = await prisma.Image.findMany(query);
+    // Construct the raw SQL query
+    // Use tagged template literals for the raw query
+    // uuid = "clo0wrpcf0000umd818ziecrp"
+    const sqlQuery = prisma.$queryRaw`
+        SELECT 
+            img.id,
+            img.category,
+            img.videoId,
+            img.remoteId,
+            img.likeCount,
+            img.heartCount,
+            img.commentCount,
+            img.username,
+            img.meta,
+            usr.imageUrl AS user_imageUrl,
+            usr.id AS user_id,
+            eng.liked,
+            eng.bookmarked
+
+        FROM 
+            Image img
+        LEFT JOIN 
+            User usr ON img.username = usr.username
+        LEFT JOIN 
+            (SELECT 
+                ue.liked,
+                ue.bookmarked,
+                ue.imageId
+            FROM 
+                UserEngagement ue
+            WHERE 
+                ue.userId = ${uuid === 'unauth' ? null : uuid}
+            ) AS eng ON img.id = eng.imageId
+        WHERE 
+            img.category = ${categoryId} AND 
+            img.likeCount > 1
+        LIMIT 1
+        OFFSET ${randomOffset}
+    `;
+
+    const rawResults = await sqlQuery;
+    console.log("rawResults = ", rawResults)
+
+    // Organize data as required
+    const organizedResults = rawResults.map(item => ({
+        id: item.id,
+        category: item.category,
+        videoId: item.videoId,
+        remoteId: item.remoteId,
+        likeCount: item.likeCount,
+        heartCount: item.heartCount,
+        commentCount: item.commentCount,
+        username: item.username,
+        meta: item.meta,
+        user: {
+            imageUrl: item.user_imageUrl,
+            id: item.user_id
         },
-        take: 1,
-        skip: randomOffset,
-        select: {
-            id: true,
-            category: true,
-            videoId: true,
-            remoteId: true,
-            likeCount: true,
-            heartCount: true,
-            commentCount: true,
-            username: true,
-            meta: true,
-            category: true,
-            user: {
-                select: {
-                    imageUrl: true,
-                    id: true
-                },
-            },
-        },
-    });
+        engagement: {
+            liked: item.liked === 1,
+            bookmarked: item.bookmarked === 1
+        }
+    }));
+
+    console.log("organizedResults = ", organizedResults)
+    return organizedResults;
+
+
+
 }
 
 
@@ -82,15 +164,15 @@ function selectRandomItemsFromArray(array, numberOfItems) {
     return selectedItems;
 }
 
-async function getRandomItemsFromAllCategories(pageSize: number) {
-    const categories = [ 0, 1, 2, 3, 4, 5, 6];
-    const weights =    [1, 1, 1, 6, 4, 2, 1]; // Higher weight for category 3
+async function getRandomItemsFromAllCategories(pageSize: number, uuid: string) {
+    const categories = [0, 1, 2, 3, 4, 5, 6];
+    const weights = [1, 1, 1, 6, 4, 1, 1]; // Higher weight for category 3
 
     const weightedDistribution = createWeightedDistribution(categories, weights);
-    const selectedCategories = selectRandomItemsFromArray(weightedDistribution,pageSize); // Select 5 items, allowing duplicates
+    const selectedCategories = selectRandomItemsFromArray(weightedDistribution, pageSize); // Select 5 items, allowing duplicates
 
-    return await Promise.all(selectedCategories.map(categoryId => 
-        getRandomItemFromCategory(categoryId)
+    return await Promise.all(selectedCategories.map(categoryId =>
+        getRandomItemFromCategory(categoryId, uuid)
     ));
 }
 
@@ -111,13 +193,13 @@ function formatVideoData(videos) {
 
 // Next.js API handler
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    const { method } = req.query;
+    const { method, uuid } = req.query;
     const pageSize = 5;
 
     if (method === 'get') {
         console.log('called')
         try {
-            const randomItemsResults = await getRandomItemsFromAllCategories(pageSize);
+            const randomItemsResults = await getRandomItemsFromAllCategories(pageSize, uuid);
             const formattedRandomVideos = formatVideoData(randomItemsResults);
 
             return res.status(200).json(formattedRandomVideos);
