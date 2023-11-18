@@ -26,6 +26,7 @@ model User {
   videos     Video[]
   images     Image[]
   engagement UserEngagement[]
+  reports    Report[]
 }
 
 model Video {
@@ -95,6 +96,8 @@ model Image {
   meta     Json // Meta as JSON string
 
   engagement UserEngagement[]
+  reports    Report[]
+
 }
 
 model UserEngagement {
@@ -112,3 +115,31 @@ model UserEngagement {
 
   @@unique([userId, imageId], name: "userId_imageId")
 }
+
+enum REPORTTYPE {
+  videoMissing
+  videoLag
+  videoIncorrect
+  thumbnailMissing
+  thumbnailLag
+  thumbnailIncorrect
+  susContent
+}
+
+model Report {
+  id        String   @id @default(cuid())
+  type      REPORTTYPE      // Integer representing the type of report (e.g., bad content, missing, etc.)
+  imageId   String   // References the Image table
+  userId    String?  // Optional, references the User table
+
+  // Relations
+  image     Image    @relation(fields: [imageId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([imageId])
+  @@index([userId])
+}
+

@@ -1,5 +1,5 @@
 import React, { useState, FC, useEffect } from 'react';
-import { ShareFat, Heart, BookmarkSimple, DotsThreeOutline, ArrowFatUp } from "@phosphor-icons/react";
+import {Warning, BookmarkSimple, ArrowFatUp } from "@phosphor-icons/react";
 import { IVideoData } from '../../pages/api/videos/feed';
 import { useVideoFeed } from '../../state/VideoFeedProvider';
 import { useUser } from '@auth0/nextjs-auth0/client';
@@ -192,14 +192,7 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
                     0 {/* Replace with your state variable or logic */}
                 </div>
             </div>
-            <ShareFat
-                size={30}
-                weight="fill"
-                className="cursor-pointer hover:text-blue-500 text-white"
-                stroke='black'
-                strokeWidth={15}
-            />
-            <DotsThreeOutline
+            <Warning
                 size={30}
                 weight="fill"
                 className="cursor-pointer hover:text-red-500 text-white"
