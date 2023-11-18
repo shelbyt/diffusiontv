@@ -12,6 +12,8 @@ import { Swiper as SwiperClass } from 'swiper';
 import BottomText from '../components/bottomTextbar';
 import { preloadVideo } from "@remotion/preload";
 import useUserUUID from '../hooks/useUserUUID';
+import { submitReport } from '../utils/submitReport';
+import { REPORTTYPE } from '@prisma/client';
 
 
 
@@ -103,6 +105,7 @@ const Home: React.FC = () => {
                 if (currentPage === 1) {
                     setActiveVideoData({
                         index: 0,
+                        iid: newData[0].data.dbData.id,
                         videoUrl: newData[0].data.storage.videoUrl,
                         thumbUrl: newData[0].data.storage.thumbUrl
                     });
@@ -146,7 +149,8 @@ const Home: React.FC = () => {
         setActiveVideoData({
             index: swiper.activeIndex,
             videoUrl: videosList[swiper.activeIndex].data.storage.videoUrl,
-            thumbUrl: videosList[swiper.activeIndex].data.storage.thumbUrl
+            thumbUrl: videosList[swiper.activeIndex].data.storage.thumbUrl,
+            iid: videosList[swiper.activeIndex].data.dbData.id
         })
 
         // If the current index is len-2, fetch the next set of videos by incrementing currentpage? 
@@ -196,6 +200,17 @@ const Home: React.FC = () => {
         }
 
     }, [activeVideoIndex])
+
+    const handleReportAndClose = async (reportType: REPORTTYPE, iid: string, uuid: string = 'unauth') => {
+        console.log("active = ", activeVideoData)
+        try {
+            const res = await submitReport(reportType, iid, uuid);
+            setReportComplete(true); // Close the modal after submitting the report
+        } catch (error) {
+            console.error('Failed to submit report:', error);
+        }
+    };
+
 
     // useEffect(() => {
 
@@ -326,9 +341,13 @@ const Home: React.FC = () => {
                     {!reportComplete ? (
                         // Buttons
                         <div className="flex flex-col space-y-2">
-                            <button className="btn w-full px-4 py-2" onClick={() => setReportComplete(true)}>Not Playing</button>
-                            <button className="btn w-full px-4 py-2" onClick={() => setReportComplete(true)}>Content Missing</button>
-                            <button className="btn w-full px-4 py-2" onClick={() => setReportComplete(true)}>Graphic Content</button>
+                            <button className="btn w-full px-4 py-2" onClick={() => handleReportAndClose(REPORTTYPE.videoMissing, activeVideoData?.iid || '', userState?.prismaUUID || 'unauth')}>Video Missing</button>
+                            <button className="btn w-full px-4 py-2" onClick={() => handleReportAndClose(REPORTTYPE.videoLag, activeVideoData?.iid || '', userState?.prismaUUID || 'unauth')}>Video Lag</button>
+                            <button className="btn w-full px-4 py-2" onClick={() => handleReportAndClose(REPORTTYPE.videoIncorrect, activeVideoData?.iid || '', userState?.prismaUUID || 'unauth')}>Video Incorrect</button>
+                            <button className="btn w-full px-4 py-2" onClick={() => handleReportAndClose(REPORTTYPE.thumbnailMissing, activeVideoData?.iid || '', userState?.prismaUUID || 'unauth')}>Thumbnail Missing</button>
+                            <button className="btn w-full px-4 py-2" onClick={() => handleReportAndClose(REPORTTYPE.thumbnailLag, activeVideoData?.iid || '', userState?.prismaUUID || 'unauth')}>Thumbnail Lag</button>
+                            <button className="btn w-full px-4 py-2" onClick={() => handleReportAndClose(REPORTTYPE.thumbnailIncorrect, activeVideoData?.iid || '', userState?.prismaUUID || 'unauth')}>Thumbnail Incorrect</button>
+                            <button className="btn w-full px-4 py-2" onClick={() => handleReportAndClose(REPORTTYPE.susContent, activeVideoData?.iid || '', userState?.prismaUUID || 'unauth')}>Sus Content</button>
                         </div>
                     ) : (
                         // Thank you message

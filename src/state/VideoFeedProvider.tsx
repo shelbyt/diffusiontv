@@ -5,6 +5,7 @@ export interface IVideoData {
     videoUrl: string;
     thumbUrl: string;
     index: number;
+    iid: string;
 }
 
 // Define the shape of your context state
