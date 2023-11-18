@@ -16,22 +16,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			},
 			select: {
 				videoId: true,
-                likeCount: true,
-                createdAt: true
+				likeCount: true,
+				createdAt: true
 			},
-            orderBy: {
-                createdAt: 'desc'
-            }
+			orderBy: {
+				createdAt: 'desc'
+			}
 		})
 
 		const userThumbLinks = userVideos.map((video) => {
 			// return `${THUMBS_BASE_URL}${video.videoId}.jpg`
-            return {
-                thumbUrl: `${THUMBS_BASE_URL}${video.videoId}.jpg`,  
-                likeCount: video.likeCount,
-                createdAt: video.createdAt
+			return {
+				thumbUrl: `${THUMBS_BASE_URL}${video.videoId}.jpg`,
+                videoUrl: `${THUMBS_BASE_URL}${video.videoId}.mp4`,
+				likeCount: video.likeCount,
+				createdAt: video.createdAt
 
-            }
+			}
 		})
 
 		if (userThumbLinks) {

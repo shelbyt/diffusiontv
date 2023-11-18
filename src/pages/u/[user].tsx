@@ -1,8 +1,12 @@
+// pages/api/u/[user].ts
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { formatNumber } from '../../utils/formatNumber';
 import { useRouter } from 'next/router';
 import { ArrowLeft, ShareFat, Heart, Calendar } from '@phosphor-icons/react';
+import { GetServerSideProps } from 'next';
+import { getUserData } from '../../utils/getUserData';
+
 
 export interface IUserDetails {
     username: string
@@ -18,31 +22,15 @@ interface IUserThumb {
 }
 
 
-export default function User() {
-    const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
+// export default function User() {
+export default function User({ userDetails }: { userDetails: IUserDetails }) {
     const router = useRouter();
-    const { user } = router.query
 
     useEffect(() => {
-        if (!user) return; // Exit early if username is not available
-        async function fetchUserData() {
-            try {
-                const res = await fetch(`/api/user/getUserProfile?method=get&user=${user}`);
-                if (!res.ok) {
-                    //TODO: handle error
-                    // throw new Error('Failed to fetch user data');
-                }
-                const data = await res.json();
-                setUserDetails(data);
-            } catch (error: unknown) {
-
-                //TODO: Handle Error
-                // Handle error
-            }
-        }
+        if (!userDetails) return; // Exit early if username is not available
         async function fetchUserThumbs() {
             try {
-                const res = await fetch(`/api/user/getUserVideoThumbs?method=get&user=${user}`);
+                const res = await fetch(`/api/thumbs/getUserVideoThumbs?method=get&user=${userDetails.username}`);
                 if (!res.ok) {
                     //TODO: handle error
                     // throw new Error('Failed to fetch user thumbnails');
@@ -55,9 +43,8 @@ export default function User() {
                 // setError(error.message);
             }
         }
-        fetchUserData();
         fetchUserThumbs();
-    }, [user]);
+    }, [userDetails]);
 
     const [userThumbs, setUserThumbs] = useState<IUserThumb[]>([]);
     const [selectedImage, setSelectedImage] = useState("");
@@ -189,3 +176,30 @@ export default function User() {
         </>
     )
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    if (!context.params) {
+        // Handle the case where params is undefined
+        return {
+            notFound: true,
+        };
+    }
+
+    const user = context.params.user as string;
+    const userData = await getUserData(user);
+
+    if (!userData) {
+        return {
+            redirect: {
+                destination: '/404',
+                permanent: false,
+            },
+        };
+    }
+
+    return {
+        props: {
+            userDetails: userData,
+        },
+    };
+};

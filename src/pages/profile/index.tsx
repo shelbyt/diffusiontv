@@ -1,51 +1,236 @@
 // pages/profile.js
-import React from 'react';
-import { ShareFat } from '@phosphor-icons/react'
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import { formatNumber } from '../../utils/formatNumber';
+import { useRouter } from 'next/router';
+import { ArrowLeft, ShareFat, Heart, Calendar } from '@phosphor-icons/react';
+import { useUser } from '@auth0/nextjs-auth0/client';
+// import useUserUUID from '../../hooks/useUserUUID';
+import { usePopup } from '../../state/PopupContext';
+import { GetServerSideProps } from 'next';
+import { getSession } from '@auth0/nextjs-auth0';
+import { getUserData } from '../../utils/getUserData'; // Assuming getUserData fetches the user profile
+import { getPrivateUserData } from '../../utils/getPrivateUserData';
+import ReactPlayer from 'react-player';
 
-const Profile = () => {
+
+export interface IUserDetails {
+    username: string
+    imageUrl: string
+    likeCount: number
+    videosMade: number
+    id: string
+}
+
+interface IUserThumb {
+    videoUrl: string;
+    thumbUrl: string;
+    likeCount: number;
+    createdAt: Date;
+}
+
+
+export default function Profile({ userDetails }: { userDetails: IUserDetails }) {
+    const [userAuth, setUserAuth] = useState(false);
+    const router = useRouter();
+    const { user } = router.query
+    // const { userState, fetchUserData } = useUserUUID();
+
+    useEffect(() => {
+        // if (!user) return; // Exit early if username is not available
+        async function fetchUserThumbs() {
+            if (!userDetails.id) return;
+            try {
+                console.log("passing this into the getLikes = ", userDetails.id)
+                const res = await fetch(`/api/private/getLikes?method=get&user=${userDetails.id}`);
+                console.log("res = ", res)
+
+                if (!res.ok) {
+                    //TODO: handle error
+                    // throw new Error('Failed to fetch user thumbnails');
+                }
+                const thumbs = await res.json();
+                console.log(thumbs)
+                setUserThumbs(thumbs);
+            } catch (error: unknown) {
+                //TODO: Handle Error
+                // setError(error.message);
+            }
+        }
+        // fetchUserData();
+        fetchUserThumbs();
+    }, [userDetails]);
+
+    const [userThumbs, setUserThumbs] = useState<IUserThumb[]>([]);
+    const [selectedImage, setSelectedImage] = useState("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+    const openModal = (index: number) => {
+        console.log("Index active = ", index)
+        console.log("Index video = ", userThumbs)
+        setActiveVideoIndex((index));
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setSelectedImage("");
+        setIsModalOpen(false);
+    };
+
+    const handleBackClick = () => {
+        if (window.history.length > 1) {
+            router.back();
+        } else {
+            router.push('/');
+        }
+    };
+
+    const [sortBy, setSortBy] = useState('date');
+
+    const toggleSort = () => {
+        setSortBy(sortBy === 'popular' ? 'date' : 'popular');
+    };
+
+    // const sortedThumbs = sortBy === 'popular'
+    //     ? [...userThumbs].sort((a, b) => b.likeCount - a.likeCount)
+    //     : [...userThumbs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
     return (
-        <div className="bg-black-100 min-h-screen text-black"> {/* Apply text-black here for global effect */}
-            {/* Top Bar */}
-            <div className="p-4 bg-zinc-900 flex justify-between items-center">
-                <div></div>  {/* This is a placeholder for potential future items like a back button */}
-                <button className="btn">
-                    <ShareFat size={24} color='#000' weight="fill" />
+        <>
+            {/* Top Navbar with Phosphor Icons */}
+            <div className="navbar bg-base-100">
+                <div className="flex-1">
+                    <button className="btn btn-ghost" onClick={handleBackClick}>
+                        <ArrowLeft size={24} />
+                    </button>
+                </div>
+                <div className="flex-none">
+                    <button className="btn btn-ghost">
+                        <ShareFat size={24} />
+                    </button>
+                </div>
+            </div>
+
+            {/* User's Picture and Name */}
+            <div className="flex flex-col items-center py-4">
+                {!userDetails ? (
+                    <>
+                        {/* Skeleton for the avatar */}
+                        <div className="w-24 h-24 rounded-full bg-gray-300 animate-pulse" />
+                        {/* Skeleton for the username */}
+                        <div className="h-6 w-48 my-2 bg-gray-300 animate-pulse rounded" />
+                    </>
+                ) : (
+                    <>
+                        <div className="avatar">
+                            <div className="w-24 rounded-full">
+                                <Image src={userDetails.imageUrl || '/'} alt="User Avatar" width={96} height={96} layout="fixed" />
+                            </div>
+                        </div>
+                        <h2 className="text-base font-bold my-2">{userDetails.username}</h2>
+                    </>
+                )}
+            </div>
+
+            <div className="flex justify-around text-center mb-8">
+                <div>
+                    <div className="text-base font-semibold">{0}</div>
+                    <div className="text-xs text-gray-600">Following</div>
+                </div>
+                <div>
+                    <div className="text-base font-semibold">{formatNumber(userDetails?.videosMade || 0)}</div>
+                    <div className="text-xs text-gray-600">Videos</div>
+                </div>
+                <div>
+                    <div className="text-base font-semibold">{formatNumber(userDetails?.likeCount || 0)}</div>
+                    <div className="text-xs text-gray-600">Likes</div>
+                </div>
+            </div>
+
+            <div className="flex justify-between items-center mb-4 mx-2">
+                {/* Container for centering the Follow Button */}
+                <div className="flex-grow flex justify-center">
+                    <button className="btn btn-primary w-32">Follow</button>
+                </div>
+
+                {/* Sort Toggle Button - Right Aligned */}
+                <button className="btn btn-outline bg-neutral text-white" onClick={toggleSort}>
+                    {sortBy === 'popular' ? <Calendar size={24} /> : <Heart size={24} />}
                 </button>
             </div>
 
-            {/* Profile Picture and Username */}
-            <div className="flex flex-col items-center mt-8">
-                <div className="avatar">
-                    <div className="w-28 mask mask-hexagon">
-                        <img src="/icon-192x192.png" alt="Profile" />
+
+            <div className="mt-4 px-1">
+                <div className="grid grid-cols-3 gap-1">
+                    {userThumbs.map((image, index) => (
+                        <div key={index} className="w-full h-48 overflow-hidden rounded-lg cursor-pointer relative">
+                            <img
+                                src={image?.thumbUrl}
+                                className="w-full h-full object-cover"
+                                onClick={() => openModal(index)}
+                            />
+
+                            {/* <div className="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white p-2 flex items-center">
+                                <Heart size={16} color="white" className="mr-2" />
+                                <span>{image?.likeCount}</span>
+                            </div> */}
+                        </div>
+                    ))}
+                </div>
+            </div>
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+                    <div
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 10 }}
+                        onClick={closeModal}
+                    >
+                        <ReactPlayer
+                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                            url={userThumbs[activeVideoIndex]?.videoUrl}
+                            playing={true}
+                            width="100%"
+                            height="100%"
+                            // onClick={(e) => e.stopPropagation()} // Prevents click on the player from closing the modal
+                            loop={true}
+                            playsinline={true}
+                        />
                     </div>
                 </div>
-                <h2 className="mt-2 text-xl text-white font-bold">@sapphie</h2>
-                <button className="btn btn-secondary mt-4 text-xl">Follow</button>
-            </div>
-            {/* Centered Text */}
-            <div className="text-center mt-8 text-white text-xl">
-                Creations
-            </div>
-
-            {/* Underline */}
-            <div className="mx-auto w-1/4 h-1 mt-2 bg-white"></div>
-
-            {/* Grid Container for Items */}
-            <div className="grid grid-cols-3 gap-4 mt-8">
-                {/* Replace these divs with your grid items */}
-                <div className="bg-gray-300 p-4">Item 1</div>
-                <div className="bg-gray-300 p-4">Item 2</div>
-                <div className="bg-gray-300 p-4">Item 3</div>
-                <div className="bg-gray-300 p-4">Item 4</div>
-                <div className="bg-gray-300 p-4">Item 5</div>
-                <div className="bg-gray-300 p-4">Item 6</div>
-            </div>
+            )}
 
 
-
-        </div>
-    );
+            {/* <div
+                className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 transition-opacity duration-300 ease-in-out ${isModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                onClick={closeModal} >
+                <img
+                    src={selectedImage}
+                    className="max-h-full max-w-full w-auto h-auto object-contain p-4 transition duration-300 rounded-3xl ease-in-out"
+                    onClick={(e) => e.stopPropagation()} // Prevent click inside from closing the modal
+                />
+            </div> */}
+        </>
+    )
 }
 
-export default Profile;
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    const session = await getSession(context.req, context.res);
+
+    if (!session || !session.user) {
+        return {
+            redirect: {
+                destination: '/api/auth/login', // Redirect to the login page
+                permanent: false,
+            },
+        };
+    }
+
+    console.log("passing this into user data : ", session.user)
+    // const userData = await getUserData(session.user.sub); // Fetch user data using the Auth0 session
+    const userData = await getPrivateUserData(session.user.sub);
+
+    return {
+        props: {
+            userDetails: userData,
+        },
+    };
+};

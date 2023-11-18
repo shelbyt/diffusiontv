@@ -2,8 +2,8 @@
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-//const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
-const VIDEO_BASE_URL = 'https://psv-uttzefxkok.s3.us-west-2.amazonaws.com/'
+const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
+//const VIDEO_BASE_URL = 'https://psv-uttzefxkok.s3.us-west-2.amazonaws.com/'
 //const THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
 //const THUMBS_BASE_URL = 'https://ps-lofiagihab.s3.us-west-2.amazonaws.com/';
 const THUMBS_BASE_URL = 'https://d10bxkdso1dzcx.cloudfront.net/';
