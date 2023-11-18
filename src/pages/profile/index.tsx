@@ -12,6 +12,7 @@ import { getSession } from '@auth0/nextjs-auth0';
 import { getUserData } from '../../utils/getUserData'; // Assuming getUserData fetches the user profile
 import { getPrivateUserData } from '../../utils/getPrivateUserData';
 import ReactPlayer from 'react-player';
+import VideoModal from './../../components/videoModal/index';
 
 
 export interface IUserDetails {
@@ -66,8 +67,6 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeVideoIndex, setActiveVideoIndex] = useState(0);
     const openModal = (index: number) => {
-        console.log("Index active = ", index)
-        console.log("Index video = ", userThumbs)
         setActiveVideoIndex((index));
         setIsModalOpen(true);
     };
@@ -178,25 +177,12 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
                     ))}
                 </div>
             </div>
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
-                    <div
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 10 }}
-                        onClick={closeModal}
-                    >
-                        <ReactPlayer
-                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                            url={userThumbs[activeVideoIndex]?.videoUrl}
-                            playing={true}
-                            width="100%"
-                            height="100%"
-                            // onClick={(e) => e.stopPropagation()} // Prevents click on the player from closing the modal
-                            loop={true}
-                            playsinline={true}
-                        />
-                    </div>
-                </div>
-            )}
+            <VideoModal
+                url={userThumbs[activeVideoIndex]?.videoUrl}
+                isOpen={isModalOpen}
+                closeModal={closeModal}
+            />
+
 
 
             {/* <div

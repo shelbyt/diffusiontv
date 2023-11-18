@@ -3,6 +3,7 @@ import prisma from '../../../utils/prismaClient';
 
 //const THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
 //const THUMBS_BASE_URL = 'https://ps-lofiagihab.s3.us-west-2.amazonaws.com/';
+const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
 const THUMBS_BASE_URL = 'https://d10bxkdso1dzcx.cloudfront.net/';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -28,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			// return `${THUMBS_BASE_URL}${video.videoId}.jpg`
 			return {
 				thumbUrl: `${THUMBS_BASE_URL}${video.videoId}.jpg`,
-                videoUrl: `${THUMBS_BASE_URL}${video.videoId}.mp4`,
+                videoUrl: `${VIDEO_BASE_URL}${video.videoId}.mp4`,
 				likeCount: video.likeCount,
 				createdAt: video.createdAt
 

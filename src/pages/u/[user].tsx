@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 import { ArrowLeft, ShareFat, Heart, Calendar } from '@phosphor-icons/react';
 import { GetServerSideProps } from 'next';
 import { getUserData } from '../../utils/getUserData';
-
+import VideoModal from './../../components/videoModal/index';
 
 export interface IUserDetails {
     username: string
@@ -17,6 +17,7 @@ export interface IUserDetails {
 
 interface IUserThumb {
     thumbUrl: string;
+    videoUrl: string;
     likeCount: number;
     createdAt: Date;
 }
@@ -49,8 +50,9 @@ export default function User({ userDetails }: { userDetails: IUserDetails }) {
     const [userThumbs, setUserThumbs] = useState<IUserThumb[]>([]);
     const [selectedImage, setSelectedImage] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const openModal = (image: string) => {
-        setSelectedImage(image);
+    const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+    const openModal = (index: number) => {
+        setActiveVideoIndex((index));
         setIsModalOpen(true);
     };
 
@@ -150,7 +152,7 @@ export default function User({ userDetails }: { userDetails: IUserDetails }) {
                             <img
                                 src={image?.thumbUrl}
                                 className="w-full h-full object-cover"
-                                onClick={() => openModal(image?.thumbUrl)}
+                                onClick={() => openModal(index)}
                             />
 
                             {/* Overlay for Likes */}
@@ -162,17 +164,12 @@ export default function User({ userDetails }: { userDetails: IUserDetails }) {
                     ))}
                 </div>
             </div>
-            <div
-                className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 transition-opacity duration-300 ease-in-out ${isModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                    }`}
-                onClick={closeModal}
-            >
-                <img
-                    src={selectedImage}
-                    className="max-h-full max-w-full w-auto h-auto object-contain p-4 transition duration-300 rounded-3xl ease-in-out"
-                    onClick={(e) => e.stopPropagation()} // Prevent click inside from closing the modal
-                />
-            </div>
+
+            <VideoModal
+                url={sortedThumbs[activeVideoIndex]?.videoUrl}
+                isOpen={isModalOpen}
+                closeModal={closeModal}
+            />
         </>
     )
 }
