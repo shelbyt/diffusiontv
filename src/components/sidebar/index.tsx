@@ -2,13 +2,10 @@ import React, { useState, FC, useEffect } from 'react';
 import { ShareFat, Heart, BookmarkSimple, DotsThreeOutline, ArrowFatUp } from "@phosphor-icons/react";
 import { IVideoData } from '../../pages/api/videos/feed';
 import { useVideoFeed } from '../../state/VideoFeedProvider';
-
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/router';
 import useUserUUID from '../../hooks/useUserUUID';
-
-
-
+import { usePopup } from '../../state/PopupContext';
 
 interface ISidebarProps { video: IVideoData }
 
@@ -27,12 +24,14 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
     const { user, isLoading, error } = useUser();
     const { userState, fetchUserData } = useUserUUID();
     const router = useRouter();
+    const { handleLogin } = usePopup(); // Use the custom hook
+
 
     useEffect(() => {
         if (video) {
             setLiked(video?.data?.dbData?.engagement?.liked);
         }
-    },[])
+    }, [])
 
     console.log("video = ", video)
 
@@ -42,8 +41,12 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
 
     const handleLike = async () => {
         if (!userState?.isAuthenticated) {
+            console.log("User needs to login")
+            handleLogin(); // Use handleLogin from PopupContext
+
+
             // Redirect to the login page
-            router.push('/api/auth/login');
+            // router.push('/api/auth/login');
         } else {
             console.log("in else")
             console.log("userState = ", userState)
@@ -52,13 +55,13 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
             if (userState && userState.prismaUUID && video) {
                 const data = toggleEngagement(userState.prismaUUID, video?.data?.dbData?.id, 'like', !liked);
                 console.log('data = ', data)
-                if(!liked) {
+                if (!liked) {
                     setIncreaseLike(true);
                 }
                 else {
                     setIncreaseLike(false);
                 }
-                
+
                 setLiked(!liked);
             } else {
                 // Handle the case when userState.prismaUUID or video.id is null
