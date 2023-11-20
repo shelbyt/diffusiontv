@@ -5,6 +5,7 @@ import prisma from '../../../utils/prismaClient';
 //const THUMBS_BASE_URL = 'https://ps-lofiagihab.s3.us-west-2.amazonaws.com/';
 const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
 const THUMBS_BASE_URL = 'https://d10bxkdso1dzcx.cloudfront.net/';
+//const THUMBS_BASE_URL = 'https://ps-wp-avcvmtusbw.s3.us-west-2.amazonaws.com/';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
@@ -22,11 +23,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			},
 			orderBy: {
 				createdAt: 'desc'
-			}
+			},
 		})
 
 		const userThumbLinks = userVideos.map((video) => {
-			// return `${THUMBS_BASE_URL}${video.videoId}.jpg`
 			return {
 				thumbUrl: `${THUMBS_BASE_URL}${video.videoId}.jpg`,
                 videoUrl: `${VIDEO_BASE_URL}${video.videoId}.mp4`,

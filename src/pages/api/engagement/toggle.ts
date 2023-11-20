@@ -4,13 +4,12 @@ import { NextApiRequest, NextApiResponse } from 'next';
 const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log("in toggle")
   if (req.method === 'PATCH') {
     try {
       const { userId, imageId, liked = undefined, bookmarked = undefined } = req.body;
 
 
-      let updateData: { liked?: boolean; bookmarked?: boolean } = {};
+      const updateData: { liked?: boolean; bookmarked?: boolean } = {};
       if (liked !== undefined) {
         updateData.liked = liked;
       }
@@ -38,7 +37,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       });
 
-     console.log("success insert = ", engagement)
       return res.status(200).json(engagement);
     } catch (error) {
       return res.status(500).json({ error: 'Something went wrong' });

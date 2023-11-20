@@ -1,13 +1,12 @@
 import React, { useState, FC, useEffect } from 'react';
 import {Warning, BookmarkSimple, ArrowFatUp } from "@phosphor-icons/react";
-import { IVideoData } from '../../pages/api/videos/feed';
 import { useVideoFeed } from '../../state/VideoFeedProvider';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/router';
 import useUserUUID from '../../hooks/useUserUUID';
 import { usePopup } from '../../state/PopupContext';
 
-interface ISidebarProps { video: IVideoData }
+interface ISidebarProps { video: any }
 
 interface EngagementRequestBody {
     userId: string;
@@ -89,7 +88,7 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
 
     async function toggleEngagement(userId: string, imageId: string, action: string, value: boolean) {
         try {
-            let requestBody: EngagementRequestBody = {
+            const requestBody: EngagementRequestBody = {
                 userId: userId,
                 imageId: imageId,
             };

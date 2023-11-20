@@ -10,7 +10,6 @@ import { useVideoFeed } from '../../state/VideoFeedProvider';
 import { handleNavigationReturn, checkHasNavigatedAway } from '../../state/localStorageHelpers'
 import { Swiper as SwiperClass } from 'swiper';
 import BottomText from '../../components/bottomTextbar';
-import { preloadVideo } from "@remotion/preload";
 import useUserUUID from '../../hooks/useUserUUID';
 import { submitReport } from '../../utils/submitReport';
 import { REPORTTYPE } from '@prisma/client';
