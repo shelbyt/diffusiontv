@@ -24,14 +24,40 @@ interface IUserThumb {
 
 
 // export default function User() {
-export default function User({ userDetails }: { userDetails: IUserDetails }) {
+export default function User() {
     const router = useRouter();
+    const { user } = router.query;
+    const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+
+useEffect(() => {
+    async function fetchUserData() {
+        if (!user) return;
+        try {
+            setIsLoading(true);
+            const res = await fetch(`/api/user/${user}`);
+            if (!res.ok) {
+                throw new Error('Failed to fetch user data');
+            }
+            const userData = await res.json();
+            setUserDetails(userData);
+        } catch (error) {
+            // handle error
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    fetchUserData();
+}, [user]);
+
 
     useEffect(() => {
         if (!userDetails) return; // Exit early if username is not available
         async function fetchUserThumbs() {
             try {
-                const res = await fetch(`/api/thumbs/getUserVideoThumbs?method=get&user=${userDetails.username}`);
+                const res = await fetch(`/api/thumbs/getUserVideoThumbs?method=get&user=${userDetails?.username}`);
                 if (!res.ok) {
                     //TODO: handle error
                     // throw new Error('Failed to fetch user thumbnails');
@@ -174,29 +200,29 @@ export default function User({ userDetails }: { userDetails: IUserDetails }) {
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    if (!context.params) {
-        // Handle the case where params is undefined
-        return {
-            notFound: true,
-        };
-    }
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//     if (!context.params) {
+//         // Handle the case where params is undefined
+//         return {
+//             notFound: true,
+//         };
+//     }
 
-    const user = context.params.user as string;
-    const userData = await getUserData(user);
+//     const user = context.params.user as string;
+//     const userData = await getUserData(user);
 
-    if (!userData) {
-        return {
-            redirect: {
-                destination: '/404',
-                permanent: false,
-            },
-        };
-    }
+//     if (!userData) {
+//         return {
+//             redirect: {
+//                 destination: '/404',
+//                 permanent: false,
+//             },
+//         };
+//     }
 
-    return {
-        props: {
-            userDetails: userData,
-        },
-    };
-};
+//     return {
+//         props: {
+//             userDetails: userData,
+//         },
+//     };
+// };

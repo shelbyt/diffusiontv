@@ -3,10 +3,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getUserData } from '../../../utils/getUserData';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { username } = req.query;
+  const { user } = req.query;
 
   try {
-    const userObject = await getUserData(username as string);
+    const userObject = await getUserData(user as string);
     
     if (userObject) {
       res.status(200).json(userObject);
