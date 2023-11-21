@@ -7,6 +7,8 @@ import { ArrowLeft, ShareFat, Heart, Calendar } from '@phosphor-icons/react';
 import { GetServerSideProps } from 'next';
 import { getUserData } from '../../utils/getUserData';
 import VideoModal from './../../components/videoModal/index';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
 
 export interface IUserDetails {
     username: string
@@ -23,55 +25,68 @@ interface IUserThumb {
 }
 
 
+const SkeletonLoader = () => {
+    return (
+        <div className="w-full h-48 bg-gray-300 rounded-lg animate-pulse"></div>
+    );
+};
+
 // export default function User() {
 export default function User() {
     const router = useRouter();
     const { user } = router.query;
     const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-
-
-useEffect(() => {
-    async function fetchUserData() {
-        if (!user) return;
-        try {
-            setIsLoading(true);
-            const res = await fetch(`/api/user/${user}`);
-            if (!res.ok) {
-                throw new Error('Failed to fetch user data');
-            }
-            const userData = await res.json();
-            setUserDetails(userData);
-        } catch (error) {
-            // handle error
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-    fetchUserData();
-}, [user]);
-
+    const [hasMore, setHasMore] = useState(true);
+    const [currentPage, setCurrentPage] = useState(0);
 
     useEffect(() => {
-        if (!userDetails) return; // Exit early if username is not available
-        async function fetchUserThumbs() {
+        if (!userDetails) return; // Exit early if userDetails is not available
+
+        fetchMoreData(); // Fetch the first page of data on initial load
+    }, [userDetails]);
+
+    const fetchMoreData = async () => {
+        if (!hasMore) return; // Exit if no more data to load
+
+        try {
+            const nextPage = currentPage + 1;
+            const res = await fetch(`/api/thumbs/getUserVideoThumbs?method=get&user=${userDetails?.username}&page=${nextPage}`);
+            const newThumbs = await res.json();
+
+            if (newThumbs.length > 0) {
+                setUserThumbs(prevThumbs => [...prevThumbs, ...newThumbs]);
+                setCurrentPage(nextPage);
+            } else {
+                setHasMore(false); // No more data to load
+            }
+        } catch (error) {
+            console.error("Error fetching more thumbnails:", error);
+            setHasMore(false); // Stop trying after an error
+        }
+    };
+
+    useEffect(() => {
+        async function fetchUserData() {
+            if (!user) return;
             try {
-                const res = await fetch(`/api/thumbs/getUserVideoThumbs?method=get&user=${userDetails?.username}`);
+                setIsLoading(true);
+                const res = await fetch(`/api/user/${user}`);
                 if (!res.ok) {
-                    //TODO: handle error
-                    // throw new Error('Failed to fetch user thumbnails');
+                    throw new Error('Failed to fetch user data');
                 }
-                const thumbs = await res.json();
-                console.log(thumbs)
-                setUserThumbs(thumbs);
-            } catch (error: unknown) {
-                //TODO: Handle Error
-                // setError(error.message);
+                const userData = await res.json();
+                setUserDetails(userData);
+            } catch (error) {
+                // handle error
+            } finally {
+                setIsLoading(false);
             }
         }
-        fetchUserThumbs();
-    }, [userDetails]);
+
+        fetchUserData();
+    }, [user]);
+
 
     const [userThumbs, setUserThumbs] = useState<IUserThumb[]>([]);
     const [selectedImage, setSelectedImage] = useState("");
@@ -146,7 +161,7 @@ useEffect(() => {
             <div className="flex justify-around text-center mb-8">
                 <div>
                     <div className="text-base font-semibold">{0}</div>
-                    <div className="text-xs text-gray-600">Following</div>
+                    <div className="text-xs text-gray-600">Followers</div>
                 </div>
                 <div>
                     <div className="text-base font-semibold">{formatNumber(userDetails?.videosMade || 0)}</div>
@@ -163,34 +178,45 @@ useEffect(() => {
                 <div className="flex-grow flex justify-center">
                     <button className="btn btn-primary w-32">Follow</button>
                 </div>
-
-                {/* Sort Toggle Button - Right Aligned */}
-                <button className="btn btn-outline bg-neutral text-white" onClick={toggleSort}>
-                    {sortBy === 'popular' ? <Calendar size={24} /> : <Heart size={24} />}
-                </button>
             </div>
-
-
-            <div className="mt-4 px-1">
-                <div className="grid grid-cols-3 gap-1">
-                    {sortedThumbs.map((image, index) => (
-                        <div key={index} className="w-full h-48 overflow-hidden rounded-lg cursor-pointer relative">
-                            <img
-                                src={image?.thumbUrl}
-                                className="w-full h-full object-cover"
-                                onClick={() => openModal(index)}
-                            />
-
-                            {/* Overlay for Likes */}
-                            <div className="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white p-2 flex items-center">
-                                <Heart size={16} color="white" className="mr-2" />
-                                <span>{image?.likeCount}</span>
-                            </div>
-                        </div>
+            <InfiniteScroll
+                dataLength={userThumbs.length}
+                next={fetchMoreData}
+                hasMore={hasMore}
+                loader={<div className="grid grid-cols-3 gap-1">
+                    {Array.from({ length: 6 }, (_, index) => (
+                        <SkeletonLoader key={index} />
                     ))}
-                </div>
-            </div>
+                </div>}
+            // ... other props
+            >
+                <div className="mt-4 px-1">
+                    <div className="grid grid-cols-3 gap-1">
+                        {userThumbs.map((image, index) => (
+                            <div key={index} className="w-full h-48 overflow-hidden rounded-lg cursor-pointer relative transition-opacity duration-500">
+                                <img
+                                    src={image?.thumbUrl}
+                                    className="w-full h-full object-cover opacity-0 transition-opacity duration-500"
+                                    onClick={() => openModal(index)}
+                                    onLoad={(e) => e.currentTarget.classList.replace('opacity-0', 'opacity-100')}
+                                />
+                                <div className="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white p-2 flex items-center">
 
+                                    <Heart size={16} color="white" className="mr-2" />
+                                    <span>{image?.likeCount}</span>
+                                </div>
+                                {/* Conditionally render 'Popular' badge for the first three images */}
+                                {index < 3 && (
+                                    <div className="badge badge-primary absolute top-2 left-2">
+                                        Popular
+                                    </div>
+                                )}
+
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </InfiniteScroll>
             <VideoModal
                 url={sortedThumbs[activeVideoIndex]?.videoUrl}
                 isOpen={isModalOpen}
@@ -199,30 +225,3 @@ useEffect(() => {
         </>
     )
 }
-
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-//     if (!context.params) {
-//         // Handle the case where params is undefined
-//         return {
-//             notFound: true,
-//         };
-//     }
-
-//     const user = context.params.user as string;
-//     const userData = await getUserData(user);
-
-//     if (!userData) {
-//         return {
-//             redirect: {
-//                 destination: '/404',
-//                 permanent: false,
-//             },
-//         };
-//     }
-
-//     return {
-//         props: {
-//             userDetails: userData,
-//         },
-//     };
-// };
