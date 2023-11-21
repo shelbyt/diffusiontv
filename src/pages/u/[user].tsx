@@ -294,26 +294,26 @@ export default function User() {
                     </>
                 )}
             </div>
-<div className="flex justify-around text-center mb-8">
-    <div style={{ minWidth: '4rem' }}> {/* Set a minimum width */}
-        <div className="text-base font-semibold">
-            {Math.max(0, Number(formatNumber(profileUserDetails?.followers || 0)) + increaseFollow)}
-        </div>
-        <div className="text-xs text-gray-600">Followers</div>
-    </div>
-    <div style={{ minWidth: '4rem' }}> {/* Set a minimum width */}
-        <div className="text-base font-semibold">
-            {formatNumber(profileUserDetails?.videosMade || 0)}
-        </div>
-        <div className="text-xs text-gray-600">Videos</div>
-    </div>
-    <div style={{ minWidth: '4rem' }}> {/* Set a minimum width */}
-        <div className="text-base font-semibold">
-            {formatNumber(profileUserDetails?.likeCount || 0)}
-        </div>
-        <div className="text-xs text-gray-600">Likes</div>
-    </div>
-</div>
+            <div className="flex justify-around text-center mb-8">
+                <div style={{ minWidth: '4rem' }}> {/* Set a minimum width */}
+                    <div className="text-base font-semibold">
+                        {Math.max(0, Number(formatNumber(profileUserDetails?.followers || 0)) + increaseFollow)}
+                    </div>
+                    <div className="text-xs text-gray-600">Followers</div>
+                </div>
+                <div style={{ minWidth: '4rem' }}> {/* Set a minimum width */}
+                    <div className="text-base font-semibold">
+                        {formatNumber(profileUserDetails?.videosMade || 0)}
+                    </div>
+                    <div className="text-xs text-gray-600">Videos</div>
+                </div>
+                <div style={{ minWidth: '4rem' }}> {/* Set a minimum width */}
+                    <div className="text-base font-semibold">
+                        {formatNumber(profileUserDetails?.likeCount || 0)}
+                    </div>
+                    <div className="text-xs text-gray-600">Likes</div>
+                </div>
+            </div>
 
             <div className="flex justify-between items-center mb-4 mx-2">
                 {/* Container for centering the Follow Button */}
@@ -329,7 +329,11 @@ export default function User() {
 
             <div className="flex justify-center items-center text-sm mb-4">
                 <Civitai size={32} />
-                <AppLink link={`https://civitai.com/user/${profileUserDetails?.username}`} displayText='Civitai' />
+                <AppLink
+                    link={`https://civitai.com/user/${profileUserDetails?.username}`}
+                    displayText='Civitai'
+                    className="mr-4"
+                />
             </div>
 
             <InfiniteScroll

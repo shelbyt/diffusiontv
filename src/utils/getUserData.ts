@@ -24,7 +24,7 @@ export async function getUserData(username: string) {
     // Query to get the total number of followers
     const followers = await prisma.follow.count({
       where: {
-        followerId: userProfile.id,
+        followingId: userProfile.id,
         status: true, // Assuming status true means a current following relationship
       },
     });

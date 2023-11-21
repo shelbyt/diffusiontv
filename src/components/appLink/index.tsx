@@ -4,9 +4,10 @@ import { useRouter } from 'next/router';
 interface AppLinkProps {
     displayText: string;
     link: string;
+    className?: string; // Add a className prop
 }
 
-const AppLink: React.FC<AppLinkProps> = ({ displayText, link }) => {
+const AppLink: React.FC<AppLinkProps> = ({ displayText, link, className }) => {
     const router = useRouter();
 
     const handleNavigation = () => {
@@ -20,10 +21,11 @@ const AppLink: React.FC<AppLinkProps> = ({ displayText, link }) => {
             router.push(link, undefined, { shallow: true });
         }
     };
+    const combinedClassName = `flex items-center text-base font-bold cursor-pointer ${className || ''}`;
 
     return (
         <div
-            className="flex items-center text-base font-semibold cursor-pointer"
+            className={combinedClassName}
             onClick={handleNavigation}
         >
             {displayText}
