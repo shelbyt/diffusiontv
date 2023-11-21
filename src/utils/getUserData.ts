@@ -1,4 +1,3 @@
-// utils/getUserData.ts
 import prisma from './prismaClient';
 
 export async function getUserData(username: string) {
@@ -9,7 +8,6 @@ export async function getUserData(username: string) {
         username: true,
         id: true,
         imageUrl: true,
-
       },
     });
 
@@ -23,10 +21,19 @@ export async function getUserData(username: string) {
       return null;
     }
 
+    // Query to get the total number of followers
+    const followers = await prisma.follow.count({
+      where: {
+        followerId: userProfile.id,
+        status: true, // Assuming status true means a current following relationship
+      },
+    });
+
     return {
       ...userProfile,
       likeCount: userStats._sum.likeCount || 0,
       videosMade: userStats._count._all,
+      followers, // Include the total followers in the return object
     };
   } catch (error) {
     throw error;

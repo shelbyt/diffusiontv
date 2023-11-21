@@ -102,7 +102,7 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
                 throw new Error('Invalid action');
             }
 
-            const response = await fetch('/api/engagement/toggle', {
+            const response = await fetch('/api/engagement/toggleLike', {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -114,13 +114,10 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             if (response.status === 200) {
-                console.log("xxx Engagement toggled successfully");
                 setLiked(!liked);
             }
 
-
             const data = await response.json();
-            console.log("xxx data is = ", data)
             return data;
         } catch (error) {
             console.error('Error toggling engagement:', error);

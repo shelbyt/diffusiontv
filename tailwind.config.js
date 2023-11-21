@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const daisyUIThemes = require("daisyui/src/theming/themes");
+
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
@@ -7,7 +9,15 @@ module.exports = {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["light", "dark", "cupcake", "garden"],
+    themes: [
+      {
+        garden: {                          // Extending the garden theme
+           ...daisyUIThemes["[data-theme=garden]"],
+           primary: "#ff0050"
+        },
+      },
+    ],
+
   },
 
 }

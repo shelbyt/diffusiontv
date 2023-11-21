@@ -16,7 +16,7 @@ async function getRandomItemFromCategory(categoryId: number, uuid: string) {
         where: {
             category: categoryId,
             likeCount: {
-                gt: 10 // Only select items with more than 10 likes
+                gt: 0 // Only select items with more than 10 likes
             }
         },
 
@@ -27,7 +27,7 @@ async function getRandomItemFromCategory(categoryId: number, uuid: string) {
         where: {
             category: categoryId,
             likeCount: {
-                gt: 10 // Only select items with more than 1 like
+                gt: 0 // Only select items with more than 1 like
             }
         },
         take: 1,
@@ -159,7 +159,7 @@ function selectRandomItemsFromArray(array: string | any[], numberOfItems: number
 
 async function getRandomItemsFromAllCategories(pageSize: number, uuid: string) {
     const categories = [0, 1, 2, 3, 4, 5, 6];
-    const weights = [0, 0, 0, 6, 4, 0, 0]; // Higher weight for category 3
+    const weights = [1, 1, 6, 1, 4, 1, 1]; // Higher weight for category
 
     const weightedDistribution = createWeightedDistribution(categories, weights);
     const selectedCategories = selectRandomItemsFromArray(weightedDistribution, pageSize); // Select 5 items, allowing duplicates

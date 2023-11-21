@@ -27,7 +27,29 @@ model User {
   images     Image[]
   engagement UserEngagement[]
   reports    Report[]
+  following  Follow[] @relation("UserFollowing")
+  followers  Follow[] @relation("UserFollowers")
+
 }
+
+model Follow {
+  id              String   @id @default(cuid())
+  followerId      String    // ID of the user who is following
+  followingId     String    // ID of the user being followed
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  status          Boolean  @default(true) // true for following, false for unfollowed
+
+  follower        User     @relation("UserFollowers", fields: [followerId], references: [id])
+  following       User     @relation("UserFollowing", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId], name: "followerId_followingId")
+
+  @@index([followerId])
+  @@index([followingId])
+
+}
+
 
 model Video {
   id          String   @id @default(cuid())

@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { user, page } = req.query;
 
     const pageNumber = Number(page) || 1;
-    const recordsPerPage = 6; // Adjust as per your requirement
+    const recordsPerPage = 9; // Adjust as per your requirement
     const recordsToSkip = pageNumber === 1 ? 3 : (pageNumber - 1) * recordsPerPage;
 
     try {

@@ -1,0 +1,27 @@
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-200%);
+  }
+}
+
+.slideDown {
+  animation: slideDown 0.5s ease forwards;
+  z-index: 1000;
+}
+
+.slideUp {
+  animation: slideUp 0.5s ease forwards;
+  z-index: 1000;
+}
