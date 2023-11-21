@@ -87,9 +87,7 @@ export default function User() {
         fetchUserData();
     }, [user]);
 
-
     const [userThumbs, setUserThumbs] = useState<IUserThumb[]>([]);
-    const [selectedImage, setSelectedImage] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeVideoIndex, setActiveVideoIndex] = useState(0);
     const openModal = (index: number) => {
@@ -98,7 +96,6 @@ export default function User() {
     };
 
     const closeModal = () => {
-        setSelectedImage("");
         setIsModalOpen(false);
     };
 
@@ -109,17 +106,6 @@ export default function User() {
             router.push('/');
         }
     };
-
-    const [sortBy, setSortBy] = useState('date');
-
-    const toggleSort = () => {
-        setSortBy(sortBy === 'popular' ? 'date' : 'popular');
-    };
-
-    const sortedThumbs = sortBy === 'popular'
-        ? [...userThumbs].sort((a, b) => b.likeCount - a.likeCount)
-        : [...userThumbs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
 
     return (
         <>
@@ -218,7 +204,7 @@ export default function User() {
                 </div>
             </InfiniteScroll>
             <VideoModal
-                url={sortedThumbs[activeVideoIndex]?.videoUrl}
+                url={userThumbs[activeVideoIndex]?.videoUrl}
                 isOpen={isModalOpen}
                 closeModal={closeModal}
             />
