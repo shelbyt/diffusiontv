@@ -6,38 +6,47 @@ const prisma = new PrismaClient();
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'PATCH') {
     try {
-      const { userId, imageId, liked = undefined, bookmarked = undefined } = req.body;
+      const { userId, imageId } = req.body;
 
 
-      const updateData: { liked?: boolean; bookmarked?: boolean } = {};
-      if (liked !== undefined) {
-        updateData.liked = liked;
-      }
-      if (bookmarked !== undefined) {
-        updateData.bookmarked = bookmarked;
+      if (!userId || !imageId) {
+        return res.status(400).json({ error: 'userId and imageId are required' });
       }
 
-      // Check if there's at least one field to update
-      if (Object.keys(updateData).length === 0) {
-        return res.status(400).json({ error: 'No valid fields provided for update' });
-      }
-
-      const engagement = await prisma.userEngagement.upsert({
+      // Fetch the current bookmark state
+      const existingLike = await prisma.userEngagement.findUnique({
         where: {
           userId_imageId: {
             userId: userId,
             imageId: imageId,
           },
         },
-        update: updateData,
+      });
+
+      const isLiked = existingLike ? !existingLike.liked : true;
+      const currentTime = new Date(); // Get the current date and time
+
+      // Update or create the bookmark record
+      const like = await prisma.userEngagement.upsert({
+        where: {
+          userId_imageId: {
+            userId: userId,
+            imageId: imageId,
+          },
+        },
+        update: {
+          liked: isLiked,
+          updatedAt: currentTime, // Update the updatedAt field
+        },
         create: {
           userId: userId,
           imageId: imageId,
-          ...updateData,
+          liked: isLiked,
         },
       });
 
-      return res.status(200).json(engagement);
+
+      return res.status(200).json({ isLiked: like.liked });
     } catch (error) {
       return res.status(500).json({ error: 'Something went wrong' });
     }

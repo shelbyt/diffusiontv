@@ -24,7 +24,6 @@ interface ISidebarProps {
 
 const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Element => {
     const { drawerOpen, setDrawerOpen } = useVideoFeed();
-    const [liked, setLiked] = useState(false);
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [incrementBookmarked, setIncrementBookmarked] = useState(0);
@@ -46,6 +45,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
             }
             if (response.status === 200) {
                 const data = await response.json();
+                console.log('get eng data = ', data);
                 setIsLiked(data.liked);
                 setIsBookmarked(data.bookmarked);
             }
@@ -56,6 +56,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
 
     useEffect(() => {
         if (viewer && viewer !== 'unauth') {
+            console.log("calling get engagement with", viewer, video?.data?.dbData?.id);
             getEngagementInfo(viewer, video?.data?.dbData?.id);
         }
     }, [viewer])
@@ -137,22 +138,26 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
 
             if (viewer && video) {
 
-                if (liked) {
+                if (isLiked) {
                     setincrementLiked(-1);
                 }
-                if (!liked) {
+                if (!isLiked) {
                     setincrementLiked(1);
                 }
-                setLiked(!liked);
+                setIsLiked(!isLiked);
+
+                console.log(`passing in ${viewer} and ${video?.data?.dbData?.id}`)
                 const data = await toggleLike(viewer, video?.data?.dbData?.id);
+                console.log("data from is liked = ", data)
 
                 if (data.isLiked) {
                     setincrementLiked(1);
                 }
-                else if (!data.isBookmarked) {
+                if(!data.isLiked) {
                     setincrementLiked(-1);
                 }
-            } else {
+            } 
+        else {
                 // Handle the case when userState.prismaUUID or video.id is null
             }
         }
@@ -165,7 +170,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                 imageId: imageId,
             };
 
-            const response = await fetch('/api/engagement/toggleBookmark', {
+            const response = await fetch('/api/engagement/toggleLike', {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -190,7 +195,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
             <div className="flex flex-col items-center space-y-1"> {/* Adjust vertical spacing here */}
                 <label className="swap swap-rotate cursor-pointer">
                     {/* <input type="checkbox" checked={liked} onChange={() => toggleEngagement(video?.data?.dbData?.user.id, video?.data?.dbData?.id, 'like', !liked)} /> */}
-                    <input type="checkbox" checked={liked} onChange={handleLike} />
+                    <input type="checkbox" checked={isLiked} onChange={handleLike} />
 
                     {/* <input type="checkbox" checked={video.data.dbData ? video?.data?.dbData?.engagement?.liked : false} onChange={handleLike} /> */}
 
