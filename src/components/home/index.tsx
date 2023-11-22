@@ -60,6 +60,7 @@ const Home: React.FC = () => {
 	const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(null); // Done through localstorage don't remember why vs. contextapi
 	const [reportComplete, setReportComplete] = useState(false);
 	const { userState } = useUserUUID();
+	const [swiperKey, setSwiperKey] = useState(0);
 
 
 	useEffect(() => {
@@ -79,7 +80,6 @@ const Home: React.FC = () => {
 			// Use the Swiper API to go to the saved slide
 			swiperInstance.slideTo(index, 0, false);
 		}
-		// Assuming swiperInstance is a reference to your Swiper instance
 	}, [swiperInstance]);
 
 
@@ -89,6 +89,35 @@ const Home: React.FC = () => {
 		console.log("fetching videos again", currentPage)
 		console.log("video length = ", videos.length)
 		async function fetchVideos() {
+
+			// if (currentPage % 3 === 0) {
+			// 	// Remove the first n elements from the videos state
+			// 	setVideos(prevVideos => prevVideos.slice(5));
+
+			// 	// Remove the first n slides from the Swiper instance
+			// 	if (swiperInstance) {
+			// 		for (let i = 0; i < 5; i++) {
+			// 			swiperInstance?.removeSlide(0);
+			// 		}
+			// 	}
+			// }
+
+			if (currentPage % 2 === 0) {
+				// Reset the videos state
+				setVideos([]);
+
+				// Re-initialize the Swiper instance
+				//TODO: small bug whre thumbnail is wrong
+				if (swiperInstance) {
+					swiperInstance.destroy(true, true);
+					setSwiperInstance(null);
+				}
+
+				// Increment swiperKey to force a re-render of the Swiper component
+				setSwiperKey(prevKey => prevKey + 1);
+			}
+
+
 			try {
 				console.log("In Fetch = ", userState)
 				const baseUrl = `/api/videos/feed?method=get&currentPage=${currentPage}`;
@@ -156,7 +185,7 @@ const Home: React.FC = () => {
 		// If the current index is len-2, fetch the next set of videos by incrementing currentpage? 
 
 		console.log('active and length = ', swiper.activeIndex, videosList.length)
-		if (swiper.activeIndex === videosList.length - 2) {
+		if (swiper.activeIndex === videosList.length - 1) {
 			console.log("time to fetch")
 			setCurrentPage(prevPage => prevPage + 1);
 			//fetchMoreVideos();
@@ -233,6 +262,7 @@ const Home: React.FC = () => {
 			<div className="bg-black flex flex-col fixed inset-0" id="videos__container">
 				<div className="flex-grow relative max-h-[calc(100%-64px)]">
 					<Swiper
+						key={swiperKey}
 						onSwiper={(swiper: SwiperClass) => setSwiperInstance(swiper)} // Sets swiper's active index
 						style={{ height: '100%', zIndex: 4 }}  // Setting height to 100% of its parent
 						direction="vertical"
@@ -306,6 +336,31 @@ const Home: React.FC = () => {
 
 					)}
 				</div>
+
+            {
+                (!swiperInstance || !videos.length)   && (
+                    <div style={{
+                        position: 'fixed',
+                        top: '50%',
+                        left: '50%',
+                        zIndex: 999,
+                        backgroundColor: 'rgba(0, 0, 0, 0.0)' // This gives a faded background
+                    }}
+                    >
+                        <span
+
+                            style={{
+                                position: 'absolute',
+                                // top: '50%',
+                                // left: '33%',
+                                fontSize: '1em',
+                                padding: '10px 20px'
+                            }}
+                        className="loading text-accent loading-bars loading-sm"></span>
+                    </div>
+                )
+            }
+
 				{
 
 					<div style={{
@@ -326,6 +381,8 @@ const Home: React.FC = () => {
 						<span> {(activeVideoIndex === activeVideoIndex) || firstPlay === false || buffered} </span>
 						<span> {activeVideoData?.videoUrl} </span>
 						<span> {muted ? 'Mtrue' : 'Mfalse'} </span>
+						<br />
+						<span> {`CP: ${currentPage}`} </span>
 
 						{/* <span> {"(LS)NavAway:"} </span>
                     <span> {localStorage.getItem('hasNavigatedAway') } </span>
@@ -375,7 +432,7 @@ const Home: React.FC = () => {
 
 
 				{
-					firstPlay && (
+					firstPlay && swiperInstance && (
 						<div style={{
 							position: 'fixed',
 							top: 0,

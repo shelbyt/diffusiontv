@@ -135,7 +135,7 @@ function formatVideoData(videos: any[]): FeedVideoList[] {
 // Next.js API handler
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const { method, uuid } = req.query;
-    const pageSize = 5;
+    const pageSize = 7;
 
     if (method === 'get') {
         try {
