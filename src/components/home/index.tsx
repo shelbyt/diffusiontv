@@ -276,13 +276,13 @@ const Home: React.FC = () => {
 						onTouchEnd={() => setIsSwiping(false)} // this is ok but sidebar kind of messed 
 						onSlideChangeTransitionEnd={() => setIsSwiping(false)}
 						onSlideChangeTransitionStart={() => setIsVideoPaused(false)}
-						onTap={() => setIsVideoPaused(!isVideoPaused)}
 					>
 						{videos.map((video, index) => (
 							<SwiperSlide
 								key={video.data.dbData.videoId}
 								data-video-id={video.data.dbData.videoId}
 								style={{ height: 'calc(100vh - 64px)' }}
+				     			onClick={() => setIsVideoPaused(!isVideoPaused)} // Toggle the video pause state when the user clicks on the slide
 							>
 								{/* Logic to display thumbnails for previous, current, and next slides */}
 								{/* {(video.data.storage.videoUrl === activeVideoData?.videoUrl) && ( */}

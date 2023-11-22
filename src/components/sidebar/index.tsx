@@ -155,9 +155,8 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                 }
                 if(!data.isLiked) {
                     setincrementLiked(-1);
-                }
-            } 
-        else {
+                } 
+            } else {
                 // Handle the case when userState.prismaUUID or video.id is null
             }
         }
@@ -195,7 +194,8 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
             <div className="flex flex-col items-center space-y-1"> {/* Adjust vertical spacing here */}
                 <label className="swap swap-rotate cursor-pointer">
                     {/* <input type="checkbox" checked={liked} onChange={() => toggleEngagement(video?.data?.dbData?.user.id, video?.data?.dbData?.id, 'like', !liked)} /> */}
-                    <input type="checkbox" checked={isLiked} onChange={handleLike} />
+                    <input type="checkbox" checked={isLiked} onChange={handleLike}
+                        onClick={(e) => e.stopPropagation()} />
 
                     {/* <input type="checkbox" checked={video.data.dbData ? video?.data?.dbData?.engagement?.liked : false} onChange={handleLike} /> */}
 
@@ -207,6 +207,9 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                         stroke='black'
                         strokeWidth={15}
                         className="swap-off text-white hover:text-red-500"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
                     />
 
                     {/* Heart icon when liked */}
@@ -216,6 +219,9 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                         className="swap-on text-orange-500"
                         stroke='black'
                         strokeWidth={15}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
                     />
                 </label>
 
@@ -227,7 +233,12 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
 
             <div className="flex flex-col items-center space-y-1"> {/* Adjust vertical spacing here */}
                 <label className="swap swap-flip cursor-pointer">
-                    <input type="checkbox" checked={isBookmarked} onChange={handleBookmark} />
+                    <input type="checkbox" checked={isBookmarked} onChange={handleBookmark}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
+
+                    />
 
                     {/* Heart icon when not liked */}
                     <BookmarkSimple
@@ -236,6 +247,9 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                         stroke='black'
                         strokeWidth={15}
                         className="swap-off text-white"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
                     />
 
                     {/* Heart icon when liked */}
@@ -245,6 +259,9 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                         className="swap-on text-green-500"
                         stroke='black'
                         strokeWidth={15}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                        }}
                     />
                 </label>
                 {/* Displaying the number of hearts */}
@@ -259,7 +276,11 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                 className="cursor-pointer hover:text-red-500 text-white"
                 stroke='black'
                 strokeWidth={15}
-                onClick={toggleDrawer} // Toggle drawer on click
+                onClick={(e) => {
+                    toggleDrawer();
+                    e.stopPropagation();
+                } // Toggle drawer on click
+                }
             />
 
         </div>

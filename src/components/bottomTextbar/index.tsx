@@ -48,8 +48,9 @@ const BottomText: FC<BottomTextProps> = ({ username, image, meta }) => {
                 onMouseUp={handlePressUp}
                 onTouchStart={handlePressDown}
                 onTouchEnd={handlePressUp}
-                onClick={() => {
+                onClick={(e) => {
                     handleNavigationAway();
+                    e.stopPropagation();
                     router.push('/u/' + username, undefined, { shallow: true })
                 }}
             >
