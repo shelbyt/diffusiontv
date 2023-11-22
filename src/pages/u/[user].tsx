@@ -61,7 +61,7 @@ export default function User() {
         if (!profileUserDetails) return; // Exit early if userDetails is not available
 
         fetchMoreData(); // Fetch the first page of data on initial load
-    }, [profileUserDetails]);
+    }, [profileUserDetails?.id]);
 
     const fetchMoreData = async () => {
         if (!hasMore) return; // Exit if no more data to load
@@ -71,8 +71,8 @@ export default function User() {
             const res = await fetch(`/api/thumbs/getUserVideoThumbs?method=get&user=${profileUserDetails?.username}&page=${nextPage}`);
             const newThumbs = await res.json();
 
-            if (newThumbs.length > 0) {
-                setUserThumbs(prevThumbs => [...prevThumbs, ...newThumbs]);
+            if (newThumbs.userThumbLinks.length > 0) {
+                setUserThumbs(prevThumbs => [...prevThumbs, ...newThumbs.userThumbLinks]);
                 setCurrentPage(nextPage);
             } else {
                 setHasMore(false); // No more data to load

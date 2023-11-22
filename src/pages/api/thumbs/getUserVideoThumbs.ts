@@ -17,10 +17,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
         let userVideos;
+        let totalVideosCount;
+
+        totalVideosCount = await prisma.image.count({
+            where: { username: user as string }
+        });
+
 
         if (pageNumber === 1) {
-            // Fetch top 3 most popular videos separately
-
             // TODO: We can't efficient sum the engagmetnlikes AND this
             // to get the top popular videos
             const topPopularVideos = await prisma.image.findMany({
@@ -29,15 +33,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 take: 3
             });
 
-            // Fetch the rest of the videos for the first page by date
+            // Fetch the rest of the videos for the first page, excluding the top 3
             const remainingVideos = await prisma.image.findMany({
-                where: { username: user as string },
+                where: {
+                    username: user as string,
+                    NOT: topPopularVideos.map(video => ({ id: video.id }))
+                },
                 orderBy: { createdAt: 'desc' },
                 take: recordsPerPage - topPopularVideos.length
             });
 
             userVideos = [...topPopularVideos, ...remainingVideos];
-        } else {
+        }
+
+
+        else {
             // Fetch videos by date for pages other than the first
             userVideos = await prisma.image.findMany({
                 where: { username: user as string },
@@ -49,6 +59,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
         }
+
+        // Calculate the number of videos already shown
+        const shownVideos = (pageNumber - 1) * recordsPerPage + userVideos.length;
+        // Calculate the remaining videos
+        const remaining = Math.max(0, totalVideosCount - shownVideos);
+
 
         // const userThumbLinks = userVideos.map(video => ({
         //     const userLikesCount = await prisma.userEngagement.count({
@@ -85,7 +101,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }));
 
 
-        res.status(200).json(userThumbLinks);
+        res.status(200).json({ userThumbLinks, remaining });
     } catch (error) {
         console.error('Error fetching user videos:', error);
         res.status(500).json({ error: 'Internal server error' });
