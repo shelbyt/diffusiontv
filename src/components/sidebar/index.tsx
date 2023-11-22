@@ -249,7 +249,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                 </label>
                 {/* Displaying the number of hearts */}
                 <div className="text-xs text-white">
-                    {Math.max(0, Number(formatNumber(video?.data?.dbData?.book || 0)) + (isBookmarked ? 1 : 0))}
+                    {Math.max(0, Number(formatNumber(video?.data?.dbData?.bookmark || 0)) + (isBookmarked ? 1 : 0))}
 
                 </div>
             </div>
