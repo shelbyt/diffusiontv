@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import Navbar from '../../components/navbar';
 import ReactPlayer from 'react-player';
 import styles from './index.module.css'
-import { SpeakerSimpleX } from '@phosphor-icons/react';
+import { SpeakerSimpleX, Play } from '@phosphor-icons/react';
 import Sidebar from '../../components/sidebar';
 import { useVideoFeed } from '../../state/VideoFeedProvider';
 import { handleNavigationReturn, checkHasNavigatedAway } from '../../state/localStorageHelpers'
@@ -59,6 +59,7 @@ const Home: React.FC = () => {
 	const [isPlayClicked, setIsPlayClicked] = useState(true);
 	const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(null); // Done through localstorage don't remember why vs. contextapi
 	const [reportComplete, setReportComplete] = useState(false);
+	const [isVideoPaused, setIsVideoPaused] = useState<boolean>(true);
 	const { userState } = useUserUUID();
 	const [swiperKey, setSwiperKey] = useState(0);
 
@@ -274,6 +275,8 @@ const Home: React.FC = () => {
 						onSliderMove={() => setIsSwiping(true)}
 						onTouchEnd={() => setIsSwiping(false)} // this is ok but sidebar kind of messed 
 						onSlideChangeTransitionEnd={() => setIsSwiping(false)}
+						onSlideChangeTransitionStart={() => setIsVideoPaused(false)}
+						onTap={() => setIsVideoPaused(!isVideoPaused)}
 					>
 						{videos.map((video, index) => (
 							<SwiperSlide
@@ -300,6 +303,31 @@ const Home: React.FC = () => {
 								{index !== activeVideoIndex - 1 && index !== activeVideoIndex && index !== activeVideoIndex + 1 && (
 									<div className={styles.DivFakeVideoSlide} />
 								)}
+								{
+									isVideoPaused && (
+										<div style={{
+											position: 'absolute',
+											top: 0,
+											left: 0,
+											right: 0,
+											bottom: 0,
+											display: 'flex',
+											justifyContent: 'center',
+											alignItems: 'center',
+											backgroundColor: 'rgba(0, 0, 0, 0.5)',
+										}}>
+											<button
+												className='btn'
+												style={{
+													fontSize: '1em',
+													padding: '10px 20px'
+												}}
+											>
+												<Play size={20} color="#140000" weight="fill" />
+											</button>
+										</div>
+									)
+								}
 
 								<Sidebar video={video} viewer={userState?.prismaUUID} />
 								{/* Add the BottomText component here */}
@@ -317,7 +345,7 @@ const Home: React.FC = () => {
 							height="100%"
 							// objectFit="fill"
 							url={activeVideoData?.videoUrl} // state managed URL of the currently playing video
-							playing={!isSwiping}
+							playing={!isSwiping && !isVideoPaused}
 							// config={{
 							// 	file: {
 							// 		attributes: {
@@ -337,29 +365,29 @@ const Home: React.FC = () => {
 					)}
 				</div>
 
-            {
-                (!swiperInstance || !videos.length)   && (
-                    <div style={{
-                        position: 'fixed',
-                        top: '50%',
-                        left: '50%',
-                        zIndex: 999,
-                        backgroundColor: 'rgba(0, 0, 0, 0.0)' // This gives a faded background
-                    }}
-                    >
-                        <span
+				{
+					(!swiperInstance || !videos.length) && (
+						<div style={{
+							position: 'fixed',
+							top: '50%',
+							left: '50%',
+							zIndex: 999,
+							backgroundColor: 'rgba(0, 0, 0, 0.0)' // This gives a faded background
+						}}
+						>
+							<span
 
-                            style={{
-                                position: 'absolute',
-                                // top: '50%',
-                                // left: '33%',
-                                fontSize: '1em',
-                                padding: '10px 20px'
-                            }}
-                        className="loading text-accent loading-bars loading-sm"></span>
-                    </div>
-                )
-            }
+								style={{
+									position: 'absolute',
+									// top: '50%',
+									// left: '33%',
+									fontSize: '1em',
+									padding: '10px 20px'
+								}}
+								className="loading text-accent loading-bars loading-sm"></span>
+						</div>
+					)
+				}
 
 				{
 
@@ -428,44 +456,6 @@ const Home: React.FC = () => {
 						<button onClick={() => setDrawerOpen(false)}>close</button>
 					</form>
 				</dialog>
-
-
-
-				{
-					firstPlay && swiperInstance && (
-						<div style={{
-							position: 'fixed',
-							top: 0,
-							left: 0,
-							width: '100vw',
-							height: '100vh',
-							zIndex: 1000,
-							backgroundColor: 'rgba(0, 0, 0, 0.4)' // This gives a faded background
-						}}
-							onClick={() => {
-								setMuted(false);  // Assuming setMuted is the setter for your muted state
-								setFirstPlay(false);
-							}}
-						>
-							<button
-								className='btn'
-								style={{
-									position: 'absolute',
-									top: '50%',
-									left: '33%',
-									fontSize: '1em',
-									padding: '10px 20px'
-								}}
-							>
-								Unmute
-								<SpeakerSimpleX size={20} color="#140000" weight="fill" />
-							</button>
-						</div>
-					)
-				}
-
-
-
 			</div>
 		</>
 	);
