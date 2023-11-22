@@ -1,8 +1,6 @@
 import React, { useState, FC, useEffect } from 'react';
 import { Warning, BookmarkSimple, ArrowFatUp } from "@phosphor-icons/react";
 import { useVideoFeed } from '../../state/VideoFeedProvider';
-import { useUser } from '@auth0/nextjs-auth0/client';
-import { useRouter } from 'next/router';
 import useUserUUID from '../../hooks/useUserUUID';
 import { usePopup } from '../../state/PopupContext';
 import { formatNumber } from '../../utils/formatNumber';
@@ -26,11 +24,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
     const { drawerOpen, setDrawerOpen } = useVideoFeed();
     const [isBookmarked, setIsBookmarked] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
-    const [incrementBookmarked, setIncrementBookmarked] = useState(0);
-    const [incrementLiked, setincrementLiked] = useState(0);
-    const { user, isLoading, error } = useUser();
     const { userState, fetchUserData } = useUserUUID();
-    const router = useRouter();
     const { handleLogin } = usePopup(); // Use the custom hook
 
 
@@ -82,19 +76,19 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
             if (viewer && video) {
 
                 if (isBookmarked) {
-                    setIncrementBookmarked(-1);
+                    setIsBookmarked(false);
                 }
                 if (!isBookmarked) {
-                    setIncrementBookmarked(1);
+                    setIsBookmarked(true);
                 }
                 setIsBookmarked(!isBookmarked);
                 const data = await toggleBookmark(viewer, video?.data?.dbData?.id);
 
                 if (data.isBookmarked) {
-                    setIncrementBookmarked(1);
+                    setIsBookmarked(true);
                 }
                 else if (!data.isBookmarked) {
-                    setIncrementBookmarked(-1);
+                    setIsBookmarked(false);
                 }
             } else {
                 // Handle the case when userState.prismaUUID or video.id is null
@@ -139,10 +133,10 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
             if (viewer && video) {
 
                 if (isLiked) {
-                    setincrementLiked(-1);
+                    setIsLiked(false);
                 }
                 if (!isLiked) {
-                    setincrementLiked(1);
+                    setIsLiked(true);
                 }
                 setIsLiked(!isLiked);
 
@@ -151,10 +145,10 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                 console.log("data from is liked = ", data)
 
                 if (data.isLiked) {
-                    setincrementLiked(1);
+                    setIsLiked(true);
                 }
                 if(!data.isLiked) {
-                    setincrementLiked(-1);
+                    setIsLiked(false);
                 } 
             } else {
                 // Handle the case when userState.prismaUUID or video.id is null
