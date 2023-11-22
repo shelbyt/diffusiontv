@@ -221,7 +221,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
 
                 {/* Displaying the number of hearts */}
                 <div className="text-xs text-white"> {/* Adjust text size here */}
-                    {Math.max(0, Number(formatNumber(video?.data?.dbData?.likeHeartEngageCount || 0)) + incrementLiked)}
+                    {Math.max(0, Number(formatNumber(video?.data?.dbData?.likeHeartEngageCount || 0)) + (isLiked ? 1 : 0))}
                 </div>
             </div>
 
@@ -249,7 +249,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                 </label>
                 {/* Displaying the number of hearts */}
                 <div className="text-xs text-white">
-                    {Math.max(0, Number(formatNumber(video?.data?.dbData?.book || 0)) + incrementBookmarked)}
+                    {Math.max(0, Number(formatNumber(video?.data?.dbData?.book || 0)) + (isBookmarked ? 1 : 0))}
 
                 </div>
             </div>
