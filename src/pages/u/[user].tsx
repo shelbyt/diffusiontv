@@ -4,29 +4,22 @@ import Image from 'next/image';
 import { formatNumber } from '../../utils/formatNumber';
 import { useRouter } from 'next/router';
 import { ArrowLeft, ShareFat, Heart, Palette } from '@phosphor-icons/react';
-import { GetServerSideProps } from 'next';
-import { getUserData } from '../../utils/getUserData';
 import VideoModal from './../../components/videoModal/index';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import useUserUUID from '../../hooks/useUserUUID';
-import TopAlert from '../../components/topAlert';
 import { usePopup } from '../../state/PopupContext';
 import { useAlert } from '../../state/AlertContext';
 import AppLink from '../../components/appLink';
-import App from 'next/app';
 import Civitai from '../../icons/civitai';
-
-
-
-
 
 export interface IUserDetails {
     username: string
     imageUrl: string
-    likeCount: number
     videosMade: number
     id: string
     followers: number
+    totalLikeHeartEngageCount: number
+
 }
 
 interface IUserThumb {
@@ -34,6 +27,7 @@ interface IUserThumb {
     videoUrl: string;
     likeCount: number;
     createdAt: Date;
+    totalLikeHeartEngageCount: number;
 }
 
 
@@ -309,7 +303,7 @@ export default function User() {
                 </div>
                 <div style={{ minWidth: '4rem' }}> {/* Set a minimum width */}
                     <div className="text-base font-semibold">
-                        {formatNumber(profileUserDetails?.likeCount || 0)}
+                        {formatNumber(profileUserDetails?.totalLikeHeartEngageCount || 0)}
                     </div>
                     <div className="text-xs text-gray-600">Likes</div>
                 </div>
@@ -331,7 +325,7 @@ export default function User() {
                 <Civitai size={32} />
                 <AppLink
                     link={`https://civitai.com/user/${profileUserDetails?.username}`}
-                    displayText='Civitai'
+                    displayText='Civitai Profile'
                     className="mr-4"
                 />
             </div>
@@ -360,7 +354,7 @@ export default function User() {
                                 <div className="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white p-2 flex items-center">
 
                                     <Heart size={16} color="white" className="mr-2" />
-                                    <span>{image?.likeCount}</span>
+                                    <span>{image?.totalLikeHeartEngageCount}</span>
                                 </div>
                                 {/* Conditionally render 'Popular' badge for the first three images */}
                                 {index < 3 && (

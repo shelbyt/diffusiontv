@@ -1,10 +1,11 @@
 import React, { useState, FC, useEffect } from 'react';
-import {Warning, BookmarkSimple, ArrowFatUp } from "@phosphor-icons/react";
+import { Warning, BookmarkSimple, ArrowFatUp } from "@phosphor-icons/react";
 import { useVideoFeed } from '../../state/VideoFeedProvider';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { useRouter } from 'next/router';
 import useUserUUID from '../../hooks/useUserUUID';
 import { usePopup } from '../../state/PopupContext';
+import { formatNumber } from '../../utils/formatNumber';
 
 interface ISidebarProps { video: any }
 
@@ -14,58 +15,54 @@ interface EngagementRequestBody {
     liked?: boolean;
     bookmarked?: boolean;
 }
+interface ISidebarProps {
+    video: any;
+    viewer: string | undefined | null;
+}
 
 
-const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
+
+const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Element => {
     const { drawerOpen, setDrawerOpen } = useVideoFeed();
     const [liked, setLiked] = useState(false);
-    const [incresentLike, setIncreaseLike] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(false);
+    const [isLiked, setIsLiked] = useState(false);
+    const [incrementBookmarked, setIncrementBookmarked] = useState(0);
+    const [incrementLiked, setincrementLiked] = useState(0);
     const { user, isLoading, error } = useUser();
     const { userState, fetchUserData } = useUserUUID();
     const router = useRouter();
     const { handleLogin } = usePopup(); // Use the custom hook
 
 
-    useEffect(() => {
-        if (video) {
-            setLiked(video?.data?.dbData?.engagement?.liked);
-        }
-    }, [])
+    async function getEngagementInfo(userId: string, imageId: string) {
+        try {
+            const response = await fetch(`/api/engagement/getEngagementInfo?userId=${encodeURIComponent(userId)}&imageId=${encodeURIComponent(imageId)}`, {
+                method: 'GET',
+            });
 
-    console.log("video = ", video)
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            if (response.status === 200) {
+                const data = await response.json();
+                setIsLiked(data.liked);
+                setIsBookmarked(data.bookmarked);
+            }
+        } catch (error) {
+            console.error('Error toggling engagement:', error);
+        }
+    }
+
+    useEffect(() => {
+        if (viewer && viewer !== 'unauth') {
+            getEngagementInfo(viewer, video?.data?.dbData?.id);
+        }
+    }, [viewer])
+
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen);
-    };
-
-    const handleLike = async () => {
-        if (!userState?.isAuthenticated) {
-            console.log("User needs to login")
-            handleLogin(); // Use handleLogin from PopupContext
-
-
-            // Redirect to the login page
-            // router.push('/api/auth/login');
-        } else {
-            console.log("in else")
-            console.log("userState = ", userState)
-            console.log("video = ", video.id)
-            // Perform the action since the user is already authenticated
-            if (userState && userState.prismaUUID && video) {
-                const data = toggleEngagement(userState.prismaUUID, video?.data?.dbData?.id, 'like', !liked);
-                console.log('data = ', data)
-                if (!liked) {
-                    setIncreaseLike(true);
-                }
-                else {
-                    setIncreaseLike(false);
-                }
-
-                setLiked(!liked);
-            } else {
-                // Handle the case when userState.prismaUUID or video.id is null
-            }
-        }
     };
 
     React.useEffect(() => {
@@ -75,34 +72,43 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
         }
     }, [userState?.isAuthenticated, userState?.prismaUUID, fetchUserData]);
 
+    const handleBookmark = async () => {
+        if (!userState?.isAuthenticated) {
+            handleLogin(); // Use handleLogin from PopupContext
 
-    // const handleLike = () => {
-    //     console.log("User = ", userState)
-    //     if(!userState?.isAuthenticated) {
-    //         router.push('/api/auth/login');
-    //         return
-    //     }
-    //     setLiked(!liked);
-    // }
+        } else {
 
+            if (viewer && video) {
 
-    async function toggleEngagement(userId: string, imageId: string, action: string, value: boolean) {
+                if (isBookmarked) {
+                    setIncrementBookmarked(-1);
+                }
+                if (!isBookmarked) {
+                    setIncrementBookmarked(1);
+                }
+                setIsBookmarked(!isBookmarked);
+                const data = await toggleBookmark(viewer, video?.data?.dbData?.id);
+
+                if (data.isBookmarked) {
+                    setIncrementBookmarked(1);
+                }
+                else if (!data.isBookmarked) {
+                    setIncrementBookmarked(-1);
+                }
+            } else {
+                // Handle the case when userState.prismaUUID or video.id is null
+            }
+        }
+    };
+
+    async function toggleBookmark(userId: string, imageId: string) {
         try {
             const requestBody: EngagementRequestBody = {
                 userId: userId,
                 imageId: imageId,
             };
 
-            // Add only the specified field to the request body
-            if (action === 'like') {
-                requestBody.liked = value;
-            } else if (action === 'bookmark') {
-                requestBody.bookmarked = value;
-            } else {
-                throw new Error('Invalid action');
-            }
-
-            const response = await fetch('/api/engagement/toggleLike', {
+            const response = await fetch('/api/engagement/toggleBookmark', {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -114,17 +120,70 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             if (response.status === 200) {
-                setLiked(!liked);
+                const data = await response.json();
+                return data
             }
-
-            const data = await response.json();
-            return data;
         } catch (error) {
             console.error('Error toggling engagement:', error);
         }
     }
 
 
+    const handleLike = async () => {
+        if (!userState?.isAuthenticated) {
+            handleLogin(); // Use handleLogin from PopupContext
+
+        } else {
+
+            if (viewer && video) {
+
+                if (liked) {
+                    setincrementLiked(-1);
+                }
+                if (!liked) {
+                    setincrementLiked(1);
+                }
+                setLiked(!liked);
+                const data = await toggleLike(viewer, video?.data?.dbData?.id);
+
+                if (data.isLiked) {
+                    setincrementLiked(1);
+                }
+                else if (!data.isBookmarked) {
+                    setincrementLiked(-1);
+                }
+            } else {
+                // Handle the case when userState.prismaUUID or video.id is null
+            }
+        }
+    };
+
+    async function toggleLike(userId: string, imageId: string) {
+        try {
+            const requestBody: EngagementRequestBody = {
+                userId: userId,
+                imageId: imageId,
+            };
+
+            const response = await fetch('/api/engagement/toggleBookmark', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            if (response.status === 200) {
+                const data = await response.json();
+                return data
+            }
+        } catch (error) {
+            console.error('Error toggling engagement:', error);
+        }
+    }
 
     return (
         <div className="fixed right-0 top-3/4 transform -translate-y-3/4 bg-tranparent p-4 rounded-l-lg flex flex-col items-center space-y-4">
@@ -157,13 +216,13 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
 
                 {/* Displaying the number of hearts */}
                 <div className="text-xs text-white"> {/* Adjust text size here */}
-                    {video.data.dbData ? (video?.data?.dbData?.likeCount + incresentLike) : 0}
+                    {Math.max(0, Number(formatNumber(video?.data?.dbData?.likeHeartEngageCount || 0)) + incrementLiked)}
                 </div>
             </div>
 
             <div className="flex flex-col items-center space-y-1"> {/* Adjust vertical spacing here */}
                 <label className="swap swap-flip cursor-pointer">
-                    <input type="checkbox" />
+                    <input type="checkbox" checked={isBookmarked} onChange={handleBookmark} />
 
                     {/* Heart icon when not liked */}
                     <BookmarkSimple
@@ -184,8 +243,9 @@ const Sidebar: FC<ISidebarProps> = ({ video }: ISidebarProps): JSX.Element => {
                     />
                 </label>
                 {/* Displaying the number of hearts */}
-                <div className="text-xs text-white"> {/* Adjust text size here */}
-                    0 {/* Replace with your state variable or logic */}
+                <div className="text-xs text-white">
+                    {Math.max(0, Number(formatNumber(video?.data?.dbData?.book || 0)) + incrementBookmarked)}
+
                 </div>
             </div>
             <Warning

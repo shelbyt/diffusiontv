@@ -27,29 +27,28 @@ model User {
   images     Image[]
   engagement UserEngagement[]
   reports    Report[]
-  following  Follow[] @relation("UserFollowing")
-  followers  Follow[] @relation("UserFollowers")
+  following  Follow[]         @relation("UserFollowing")
+  followers  Follow[]         @relation("UserFollowers")
 
+  UserBookmarks UserBookmarks[]
+  UserPlays     UserPlays[]
 }
 
 model Follow {
-  id              String   @id @default(cuid())
-  followerId      String    // ID of the user who is following
-  followingId     String    // ID of the user being followed
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  status          Boolean  @default(true) // true for following, false for unfollowed
+  id          String   @id @default(cuid())
+  followerId  String // ID of the user who is following
+  followingId String // ID of the user being followed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  status      Boolean  @default(true) // true for following, false for unfollowed
 
-  follower        User     @relation("UserFollowers", fields: [followerId], references: [id])
-  following       User     @relation("UserFollowing", fields: [followingId], references: [id])
+  follower  User @relation("UserFollowers", fields: [followerId], references: [id])
+  following User @relation("UserFollowing", fields: [followingId], references: [id])
 
   @@unique([followerId, followingId], name: "followerId_followingId")
-
   @@index([followerId])
   @@index([followingId])
-
 }
-
 
 model Video {
   id          String   @id @default(cuid())
@@ -112,7 +111,7 @@ model Image {
   commentCount Int?
   stats        Json // Stats as JSON string
 
-  category Int?
+  category Int?    @default(99)
   // Fields from Meta
   model    String?
   meta     Json // Meta as JSON string
@@ -120,22 +119,59 @@ model Image {
   engagement UserEngagement[]
   reports    Report[]
 
+  UserBookmarks UserBookmarks[]
+  UserPlays     UserPlays[]
 }
 
+// Likes Table
+
+//bookmarked   Boolean  @default(false)
+//playCount    Int      @default(0)
+//playDuration Int      @default(0)
 model UserEngagement {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  userId    String
+  imageId   String
+  liked     Boolean  @default(false)
+  user      User     @relation(fields: [userId], references: [id])
+  image     Image    @relation(fields: [imageId], references: [id])
+
+  @@unique([userId, imageId], name: "userId_imageId")
+  @@index([userId])
+  @@index([imageId])
+}
+
+model UserBookmarks {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now())
+  userId     String
+  imageId    String
+  bookmarked Boolean  @default(false)
+  user       User     @relation(fields: [userId], references: [id])
+  image      Image    @relation(fields: [imageId], references: [id])
+
+  @@unique([userId, imageId], name: "userId_imageId_bookmark")
+  @@index([userId])
+  @@index([imageId])
+}
+
+model UserPlays {
   id           String   @id @default(cuid())
   createdAt    DateTime @default(now())
   updatedAt    DateTime @default(now())
   userId       String
   imageId      String
-  liked        Boolean  @default(false)
-  bookmarked   Boolean  @default(false)
   playCount    Int      @default(0)
   playDuration Int      @default(0)
   user         User     @relation(fields: [userId], references: [id])
   image        Image    @relation(fields: [imageId], references: [id])
 
-  @@unique([userId, imageId], name: "userId_imageId")
+  @@unique([userId, imageId], name: "userId_imageId_play")
+  @@index([userId])
+  @@index([imageId])
 }
 
 enum REPORTTYPE {
@@ -149,14 +185,14 @@ enum REPORTTYPE {
 }
 
 model Report {
-  id        String   @id @default(cuid())
-  type      REPORTTYPE      // Integer representing the type of report (e.g., bad content, missing, etc.)
-  imageId   String   // References the Image table
-  userId    String?  // Optional, references the User table
+  id      String     @id @default(cuid())
+  type    REPORTTYPE // Integer representing the type of report (e.g., bad content, missing, etc.)
+  imageId String // References the Image table
+  userId  String? // Optional, references the User table
 
   // Relations
-  image     Image    @relation(fields: [imageId], references: [id])
-  user      User?    @relation(fields: [userId], references: [id])
+  image Image @relation(fields: [imageId], references: [id])
+  user  User? @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -164,4 +200,3 @@ model Report {
   @@index([imageId])
   @@index([userId])
 }
-

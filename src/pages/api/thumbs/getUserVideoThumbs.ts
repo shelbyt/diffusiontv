@@ -20,6 +20,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         if (pageNumber === 1) {
             // Fetch top 3 most popular videos separately
+
+            // TODO: We can't efficient sum the engagmetnlikes AND this
+            // to get the top popular videos
             const topPopularVideos = await prisma.image.findMany({
                 where: { username: user as string },
                 orderBy: { likeCount: 'desc' },
@@ -42,14 +45,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 take: recordsPerPage,
                 skip: recordsToSkip
             });
+
+
+
         }
 
-        const userThumbLinks = userVideos.map(video => ({
-            thumbUrl: `${THUMBS_BASE_URL}${video.videoId}.jpg`,
-            videoUrl: `${VIDEO_BASE_URL}${video.videoId}.mp4`,
-            likeCount: video.likeCount,
-            createdAt: video.createdAt
+        // const userThumbLinks = userVideos.map(video => ({
+        //     const userLikesCount = await prisma.userEngagement.count({
+        //         where: {
+        //             imageId: video.id,
+        //             liked: true
+        //         },
+        //     });
+
+        //     thumbUrl: `${THUMBS_BASE_URL}${video.videoId}.jpg`,
+        //     videoUrl: `${VIDEO_BASE_URL}${video.videoId}.mp4`,
+        //     likeCount: video.likeCount,
+        //     createdAt: video.createdAt
+        // }));
+
+        const userThumbLinks = await Promise.all(userVideos.map(async (video) => {
+            const userLikesCount = await prisma.userEngagement.count({
+                where: {
+                    imageId: video.id,
+                    liked: true
+                },
+            });
+
+            return {
+                thumbUrl: `${THUMBS_BASE_URL}${video.videoId}.jpg`,
+                videoUrl: `${VIDEO_BASE_URL}${video.videoId}.mp4`,
+                likeCount: video.likeCount,
+                heartCount: video.heartCount, // Assuming you have this field in your Image model
+                userLikesCount: userLikesCount,
+                // totalEngagementCount: video.likeCount + video.heartCount + userLikesCount,
+                totalLikeHeartEngageCount: (video.likeCount ? video.likeCount : 0) + (video.heartCount ? video.heartCount : 0) + (userLikesCount ? userLikesCount : 0),
+                createdAt: video.createdAt
+            };
         }));
+
 
         res.status(200).json(userThumbLinks);
     } catch (error) {

@@ -48,84 +48,34 @@ async function getRandomItemFromCategory(categoryId: number, uuid: string) {
                     id: true
                 },
             },
-            // Conditionally add this part
-            ...(uuid !== 'unauth' && {
-                engagement: {
-                    where: {
-                        userId: uuid
-                    },
-                    select: {
-                        liked: true,
-                        // other fields if needed
-                    }
-                }
-            })
         },
     };
+
     const ree = await prisma.image.findMany(query);
-    // Construct the raw SQL query
-    // Use tagged template literals for the raw query
+    for (const item of ree) {
+        const engagementCount = await prisma.userEngagement.count({
+            where: { imageId: item.id, liked: true },
+        });
+        const bookmarkCount = await prisma.userBookmarks.count({
+            where: { imageId: item.id, bookmarked: true },
+        });
+        (item as any)['bookmarkCount'] = Number(bookmarkCount || 0);
+        (item as any)['likeHeartEngageCount'] = Number(item.likeCount || 0) +
+            Number(item.heartCount || 0) +
+            Number(engagementCount || 0);
+    }
 
-    // uuid = "clo0wrpcf0000umd818ziecrp"
-    // const sqlQuery = prisma.$queryRaw`
-    //     SELECT 
-    //         img.id,
-    //         img.category,
-    //         img.videoId,
-    //         img.remoteId,
-    //         img.likeCount,
-    //         img.heartCount,
-    //         img.commentCount,
-    //         img.username,
-    //         img.meta,
-    //         usr.imageUrl AS user_imageUrl,
-    //         usr.id AS user_id,
-    //         eng.liked,
-    //         eng.bookmarked
+    // ree.forEach((item: any) => {
+    //     item['likeHeartEngageCount'] = Number(item.likeCount || 0) +
+    //         Number(item.heartCount || 0) +
+    //         Number(item?.totalEngagements ? (item.totalEngagements as { _count: number })._count : 0);
+    //     delete item.totalEngagements;
+    // });
 
-    //     FROM 
-    //         Image img
-    //     LEFT JOIN 
-    //         User usr ON img.username = usr.username
-    //     LEFT JOIN 
-    //         (SELECT 
-    //             ue.liked,
-    //             ue.bookmarked,
-    //             ue.imageId
-    //         FROM 
-    //             UserEngagement ue
-    //         WHERE 
-    //             ue.userId = ${uuid === 'unauth' ? null : uuid}
-    //         ) AS eng ON img.id = eng.imageId
-    //     WHERE 
-    //         img.category = ${categoryId} AND 
-    //         img.likeCount > 1
-    //     LIMIT 1
-    //     OFFSET ${randomOffset}
-    // `;
-
-    // const rawResults = await sqlQuery as RawResult[];
-
-    // // Organize data as required
-    // const organizedResults = rawResults.map(item => ({
-    //     id: item.id,
-    //     category: item.category,
-    //     videoId: item.videoId,
-    //     remoteId: item.remoteId,
-    //     likeCount: item.likeCount,
-    //     heartCount: item.heartCount,
-    //     commentCount: item.commentCount,
-    //     username: item.username,
-    //     meta: item.meta,
-    //     user: {
-    //         imageUrl: item.user_imageUrl,
-    //         id: item.user_id
-    //     },
-    //     engagement: {
-    //         liked: item.liked === 1,
-    //         bookmarked: item.bookmarked === 1
-    //     }
-    // }));
+    // ree.forEach((item: any) => {
+    //     item['bookmarkCount'] = item.UserBookmarks._count;
+    //     delete item.UserBookmarks;
+    // });
 
     return ree;
 }
@@ -158,8 +108,8 @@ function selectRandomItemsFromArray(array: string | any[], numberOfItems: number
 }
 
 async function getRandomItemsFromAllCategories(pageSize: number, uuid: string) {
-    const categories = [0, 1, 2, 3, 4, 5, 6];
-    const weights = [1, 1, 6, 1, 4, 1, 1]; // Higher weight for category
+    const categories = [0, 1, 2, 3, 4, 5, 6, 99];
+    const weights = [1, 1, 6, 1, 4, 1, 1, 1]; // Higher weight for category
 
     const weightedDistribution = createWeightedDistribution(categories, weights);
     const selectedCategories = selectRandomItemsFromArray(weightedDistribution, pageSize); // Select 5 items, allowing duplicates

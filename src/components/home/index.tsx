@@ -271,7 +271,7 @@ const Home: React.FC = () => {
 									<div className={styles.DivFakeVideoSlide} />
 								)}
 
-								<Sidebar video={video} />
+								<Sidebar video={video} viewer={userState?.prismaUUID} />
 								{/* Add the BottomText component here */}
 								<BottomText username={video.data.dbData.username} image={video.data.dbData.user?.imageUrl} meta={video.data.dbData.meta} />
 							</SwiperSlide>

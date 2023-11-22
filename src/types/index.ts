@@ -10,8 +10,8 @@ export interface RawResult {
     meta: string;
     user_imageUrl: string;
     user_id: string;
-    liked: number;
-    bookmarked: number;
+    likeHeartEngageCount: number;
+    bookmarkCount: number
 }
 export interface Storage {
     videoUrl: string;

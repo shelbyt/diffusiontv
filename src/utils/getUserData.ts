@@ -11,13 +11,38 @@ export async function getUserData(username: string) {
       },
     });
 
+    if (!userProfile) {
+      return null;
+    }
+
+    // const userStats = await prisma.image.aggregate({
+    //   where: { username },
+    //   _sum: { likeCount: true },
+    //   _count: { _all: true },
+    // });
+
     const userStats = await prisma.image.aggregate({
       where: { username },
-      _sum: { likeCount: true },
+      _sum: {
+        likeCount: true,
+        heartCount: true, // Assuming heartCount is the field you want to sum
+      },
       _count: { _all: true },
     });
 
-    if (!userProfile) {
+    if (!userStats) {
+      return null;
+    }
+
+    const userLikes = await prisma.userEngagement.aggregate({
+      where: {
+        userId: userProfile?.id,
+        liked: true
+      },
+      _count: { _all: true },
+    });
+
+    if (!userLikes) {
       return null;
     }
 
@@ -31,7 +56,7 @@ export async function getUserData(username: string) {
 
     return {
       ...userProfile,
-      likeCount: userStats._sum.likeCount || 0,
+      totalLikeHeartEngageCount: (userStats._sum.likeCount || 0) + (userStats._sum.heartCount || 0) + userLikes._count._all,
       videosMade: userStats._count._all,
       followers, // Include the total followers in the return object
     };
