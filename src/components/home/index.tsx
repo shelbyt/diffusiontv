@@ -282,7 +282,7 @@ const Home: React.FC = () => {
 								key={video.data.dbData.videoId}
 								data-video-id={video.data.dbData.videoId}
 								style={{ height: 'calc(100vh - 64px)' }}
-				     			onClick={() => setIsVideoPaused(!isVideoPaused)} // Toggle the video pause state when the user clicks on the slide
+								onClick={() => setIsVideoPaused(!isVideoPaused)} // Toggle the video pause state when the user clicks on the slide
 							>
 								{/* Logic to display thumbnails for previous, current, and next slides */}
 								{/* {(video.data.storage.videoUrl === activeVideoData?.videoUrl) && ( */}

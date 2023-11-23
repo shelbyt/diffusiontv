@@ -17,9 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
         let userVideos;
-        let totalVideosCount;
-
-        totalVideosCount = await prisma.image.count({
+        const totalVideosCount = await prisma.image.count({
             where: { username: user as string }
         });
 
