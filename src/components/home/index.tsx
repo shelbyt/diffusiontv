@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import 'swiper/swiper-bundle.css';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import Navbar from '../../components/navbar';
@@ -62,7 +62,34 @@ const Home: React.FC = () => {
 	const [isVideoPaused, setIsVideoPaused] = useState<boolean>(true);
 	const { userState } = useUserUUID();
 	const [swiperKey, setSwiperKey] = useState(0);
+	const [pro, setPro] = useState({
+		playedSeconds: 0,
+		loadedSeconds: 0,
+		played: 0,
+		loaded: 0,
+	});
+	const [isLandscape, setIsLandscape] = useState<boolean | null>(false);
+	const [ratio, setRatio] = useState(0);
 
+	const playerRef = useRef<ReactPlayer | null>(null);
+	useEffect(() => {
+		if (playerRef.current) {
+			const videoElement = playerRef.current.getInternalPlayer() as HTMLVideoElement;
+			if (videoElement && videoElement.tagName === 'VIDEO') {
+				console.log("xxx setting object fit", videoElement);
+				videoElement.style.objectFit = isLandscape ? 'contain' : 'cover';
+			}
+		}
+	}, [isLandscape]);
+
+
+	useEffect(() => {
+		if (activeVideoData?.width && activeVideoData?.height) {
+			setIsLandscape(activeVideoData?.width >= activeVideoData?.height);
+			setRatio(activeVideoData?.width / activeVideoData?.height);
+		}
+
+	}, [activeVideoData?.width, activeVideoData?.height, isLandscape])
 
 	useEffect(() => {
 		// Set isClient to true only on client-side (after mounting)
@@ -137,7 +164,10 @@ const Home: React.FC = () => {
 						index: 0,
 						iid: newData[0].data.dbData.id,
 						videoUrl: newData[0].data.storage.videoUrl,
-						thumbUrl: newData[0].data.storage.thumbUrl
+						thumbUrl: newData[0].data.storage.thumbUrl,
+						width: newData[0].data.dbData.width,
+						height: newData[0].data.dbData.height
+
 					});
 					setIsClient(true);
 				}
@@ -180,7 +210,9 @@ const Home: React.FC = () => {
 			index: swiper.activeIndex,
 			videoUrl: videosList[swiper.activeIndex].data.storage.videoUrl,
 			thumbUrl: videosList[swiper.activeIndex].data.storage.thumbUrl,
-			iid: videosList[swiper.activeIndex].data.dbData.id
+			iid: videosList[swiper.activeIndex].data.dbData.id,
+			width: videosList[swiper.activeIndex].data.dbData.width,
+			height: videosList[swiper.activeIndex].data.dbData.height
 		})
 
 		// If the current index is len-2, fetch the next set of videos by incrementing currentpage? 
@@ -220,6 +252,7 @@ const Home: React.FC = () => {
 		setCurrentPage(prevPage => prevPage + 1);
 	};
 
+	// TODO: This is printing a lot when idle
 	const activeVideoIndex = videos.findIndex(video => video.data.dbData.videoId === activeVideoId);
 	console.log("XXX Active video index = ", activeVideoIndex)
 
@@ -275,7 +308,11 @@ const Home: React.FC = () => {
 						onSliderMove={() => setIsSwiping(true)}
 						onTouchEnd={() => setIsSwiping(false)} // this is ok but sidebar kind of messed 
 						onSlideChangeTransitionEnd={() => setIsSwiping(false)}
-						onSlideChangeTransitionStart={() => setIsVideoPaused(false)}
+						onSlideChangeTransitionStart={() => {
+							setIsLandscape(null)
+							setIsVideoPaused(false)
+						}
+						}
 					>
 						{videos.map((video, index) => (
 							<SwiperSlide
@@ -292,9 +329,10 @@ const Home: React.FC = () => {
 										<img src={video.data.storage.thumbUrl}
 											style={{
 												width: '100%',
-												maxHeight: 'calc(100vh - 64px)',
+												height: 'calc(100vh - 64px)',
 												display: (isSwiping || !buffered) ? 'block' : 'none',
-												objectFit: 'cover'
+												objectFit: isLandscape ? 'contain' : 'cover',
+
 											}} />
 									</div>
 								)}
@@ -338,9 +376,11 @@ const Home: React.FC = () => {
 					</Swiper>
 					{isClient && (
 						<ReactPlayer
+							// style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100%', zIndex: 3, opacity: (isSwiping || !buffered) ? 0 : 1, pointerEvents: 'none' }}
 							style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100%', zIndex: 3, opacity: (isSwiping || !buffered) ? 0 : 1, pointerEvents: 'none' }}
+							ref={playerRef}
 							// style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', overflow: 'hidden', zIndex: 3, opacity: (isSwiping || !buffered) ? 0 : 1, pointerEvents: 'none' }}
-							className="webapp-mobile-player-container"
+							className='webappMobilePlayerContainer'
 							width="100%"
 							height="100%"
 							// objectFit="fill"
@@ -353,6 +393,16 @@ const Home: React.FC = () => {
 							// 		},
 							// 	},
 							// }}
+							onProgress={(progress) => {
+								setPro({
+									playedSeconds: progress.playedSeconds,
+									loadedSeconds: progress.loadedSeconds,
+									played: progress.played,
+									loaded: progress.loaded
+								})
+
+
+							}}
 							muted={muted}
 							loop={true}
 							playsinline={true}
@@ -411,6 +461,29 @@ const Home: React.FC = () => {
 						<span> {muted ? 'Mtrue' : 'Mfalse'} </span>
 						<br />
 						<span> {`CP: ${currentPage}`} </span>
+						<br />
+						<span> {`ProPlay: ${pro.played}`} </span>
+						<br />
+						<span> {`ISLANDSCAPE?: ${isLandscape}`} </span>
+						<br />
+
+						<span> {`W & H = : ${activeVideoData?.width} x ${activeVideoData?.height}`} </span>
+						<br />
+						<span> {`Ratio: ${ratio}`} </span>
+
+
+						<br />
+						<span> {`[PL]: ${pro.loaded}`} </span>
+
+						<br />
+						<span> {`[PP]: ${pro.played}`} </span>
+
+						<br />
+						<span> {`[PLS]: ${pro.loadedSeconds}`} </span>
+
+						<br />
+						<span> {`[PPS]: ${pro.playedSeconds}`} </span>
+
 
 						{/* <span> {"(LS)NavAway:"} </span>
                     <span> {localStorage.getItem('hasNavigatedAway') } </span>

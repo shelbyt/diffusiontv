@@ -40,6 +40,8 @@ async function getRandomItemFromCategory(categoryId: number, uuid: string) {
             likeCount: true,
             heartCount: true,
             commentCount: true,
+            width: true,
+            height: true,
             username: true,
             meta: true,
             user: {
@@ -109,7 +111,10 @@ function selectRandomItemsFromArray(array: string | any[], numberOfItems: number
 
 async function getRandomItemsFromAllCategories(pageSize: number, uuid: string) {
     const categories = [0, 1, 2, 3, 4, 5, 6, 99];
-    const weights = [1, 1, 6, 1, 4, 1, 1, 1]; // Higher weight for category
+    const weights =    [1, 1, 6, 1, 4, 1, 1, 1]; // Higher weight for category
+
+    // const categories = [100];
+    // const weights = [1]; // Higher weight for category
 
     const weightedDistribution = createWeightedDistribution(categories, weights);
     const selectedCategories = selectRandomItemsFromArray(weightedDistribution, pageSize); // Select 5 items, allowing duplicates

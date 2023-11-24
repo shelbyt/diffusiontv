@@ -4,6 +4,8 @@ export interface RawResult {
     videoId: string;
     remoteId: string;
     likeCount: number;
+    width: number;
+    height: number;
     heartCount: number;
     commentCount: number;
     username: string;
