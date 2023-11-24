@@ -160,7 +160,7 @@ const Home: React.FC = () => {
 					return [...prevVideos, ...newVideos];
 				});
 				if (currentPage === 1 || (currentPage % 3 === 0)) {
-				// if (currentPage === 1) {
+					// if (currentPage === 1) {
 					setActiveVideoData({
 						index: 0,
 						iid: newData[0].data.dbData.id,
@@ -319,7 +319,7 @@ const Home: React.FC = () => {
 						{videos.map((video, index) => (
 							<SwiperSlide
 								key={video.data.dbData.videoId}
-						       virtualIndex={video.data.dbData.videoId}
+								virtualIndex={video.data.dbData.videoId}
 								data-video-id={video.data.dbData.videoId}
 								style={{ height: 'calc(100vh - 64px)' }}
 								onClick={() => setIsVideoPaused(!isVideoPaused)} // Toggle the video pause state when the user clicks on the slide
