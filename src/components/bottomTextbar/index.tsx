@@ -68,7 +68,12 @@ const BottomText: FC<BottomTextProps> = ({ username, image, meta }) => {
 
             {/* "See More" Button */}
             {isTruncated && (
-                <button onClick={toggleExpanded} className="text-xs mt-2">
+                <button onClick={
+                   (e) => {
+                    toggleExpanded()
+                    e.stopPropagation()
+                   } 
+                    } className="text-xs mt-2">
                     {isExpanded ? 'See Less' : 'See More'}
                 </button>
             )}
