@@ -13,7 +13,7 @@ import BottomText from '../../components/bottomTextbar';
 import useUserUUID from '../../hooks/useUserUUID';
 import { submitReport } from '../../utils/submitReport';
 import { REPORTTYPE } from '@prisma/client';
-
+import TopNavbar from '../../components/topNavbar';
 
 
 const Home: React.FC = () => {
@@ -130,7 +130,7 @@ const Home: React.FC = () => {
 			// 	}
 			// }
 
-			if (currentPage % 2 === 0) {
+			if (currentPage % 3 === 0) {
 				// Reset the videos state
 				setVideos([]);
 
@@ -159,7 +159,8 @@ const Home: React.FC = () => {
 						!prevVideos.some(prevVideo => prevVideo.data.dbData.videoId === newVideo.data.dbData.videoId));
 					return [...prevVideos, ...newVideos];
 				});
-				if (currentPage === 1 || (currentPage % 2 === 0)) {
+				if (currentPage === 1 || (currentPage % 3 === 0)) {
+				// if (currentPage === 1) {
 					setActiveVideoData({
 						index: 0,
 						iid: newData[0].data.dbData.id,
@@ -295,6 +296,7 @@ const Home: React.FC = () => {
 		<>
 			<div className="bg-black flex flex-col fixed inset-0" id="videos__container">
 				<div className="flex-grow relative max-h-[calc(100%-64px)]">
+					<TopNavbar />
 					<Swiper
 						key={swiperKey}
 						onSwiper={(swiper: SwiperClass) => setSwiperInstance(swiper)} // Sets swiper's active index
@@ -453,7 +455,7 @@ const Home: React.FC = () => {
 						color: 'white',
 					}}>
 
-						<span>{isSwiping ? "Swiping" : "Not Swiping"}</span>
+						{/* <span>{isSwiping ? "Swiping" : "Not Swiping"}</span>
 						<span>{buffered ? "Buffered" : "Not Buffered"}</span>
 						<span>{checkHasNavigatedAway() ? "| N-Yes" : "| N-Not "}</span>
 						<span>{isClient ? "| Client-Yes" : "| Client-Not "}</span>
@@ -483,7 +485,7 @@ const Home: React.FC = () => {
 						<span> {`[PLS]: ${pro.loadedSeconds}`} </span>
 
 						<br />
-						<span> {`[PPS]: ${pro.playedSeconds}`} </span>
+						<span> {`[PPS]: ${pro.playedSeconds}`} </span> */}
 
 
 						{/* <span> {"(LS)NavAway:"} </span>
