@@ -1,9 +1,10 @@
 // pages/api/user/[sl_id].ts
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
+// import { PrismaClient } from '@prisma/client';
+import prisma from '../../../utils/prismaClient'
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	const { sl_id } = req.query;
 	if (!sl_id) {

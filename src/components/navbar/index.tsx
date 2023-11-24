@@ -29,22 +29,22 @@ const Navbar: React.FC = () => {
     const handleLogout = () => {
         router.push('/api/auth/logout');
     }
-
-    return (
-        <div className="h-16 flex justify-between items-start bg-black px-16" style={{ borderTop: '0.5px solid rgba(255, 255, 255, 0.1)' }}>
-            <div className="flex flex-col items-center text-white" onClick={navigateToHome}>
-                {router.pathname === '/' ? <House size={32} weight='fill' color="#fff" /> : <House size={32} color="#fff" />}
-                <p className="text-xs mt-1">Home</p>
-            </div>
-            <div className="flex flex-col items-center text-white">
-                <PaintBrushHousehold size={32} color="#fff" weight="fill" onClick={handleLogout} />
-            </div>
-            <div className="flex flex-col items-center text-white" onClick={navigateToProfile}>
-                {router.pathname === '/profile' ? <User size={32} weight='fill' color="#fff" /> : <User size={32} color="#fff" />}
-                <p className="text-xs mt-1">Profile</p>
-            </div>
+return (
+    <div className="h-16 flex justify-between items-start bg-black px-16" style={{ borderTop: '0.5px solid rgba(255, 255, 255, 0.1)' }}>
+        <div className="flex flex-col items-center text-white mt-2" onClick={navigateToHome}>
+            {router.pathname === '/' ? <House size={28} weight='fill' color="#fff" /> : <House size={32} color="#fff" />}
+            <p className="text-xs mt-1">Home</p>
         </div>
-    );
+        <div className="flex flex-col items-center text-white mt-2">
+            <PaintBrushHousehold size={28} color="#fff" weight="fill" onClick={handleLogout} />
+        </div>
+        <div className="flex flex-col items-center text-white mt-2" onClick={navigateToProfile}>
+            {router.pathname === '/profile' ? <User size={28} weight='fill' color="#fff" /> : <User size={32} color="#fff" />}
+            <p className="text-xs mt-1">Profile</p>
+        </div>
+    </div>
+);
 }
+
 
 export default Navbar;

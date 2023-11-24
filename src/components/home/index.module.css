@@ -13,6 +13,73 @@
 	right: 0px;
 } */
 
+/* .webappMobilePlayerContainer {
+padding-bottom: 56.25%;
+}  */
+
+/* .webappMobilePlayerContainerPortrait video {
+	object-fit: cover !important;
+}
+*/
+
+/* .webappMobilePlayerContainer video {
+	width: 100%;
+	height: 100%;
+	z-index: 3;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+} */
+
+/* .react-player.landscape video {
+    object-fit: cover;
+}
+
+.react-player.portrait video {
+    object-fit: contain;
+} */
+
+
+/* .webappMobilePlayerContainer.port video {
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
+	z-index: 3;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+
+.webappMobilePlayerContainer.land video {
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
+	z-index: 3;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+ */
+
+/* .webappMobilePlayerContainerPort video {
+	object-fit: cover;
+	width: 100%;
+	height: 100%;
+	z-index: 3;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+.webappMobilePlayerContainerLand video {
+	object-fit: contain;
+	width: 100%;
+	height: 100%;
+	z-index: 3;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+} */
+
 .DivSlideOverlay {
 	height: 100%;
 	width: 100%;
