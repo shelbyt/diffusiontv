@@ -159,7 +159,7 @@ const Home: React.FC = () => {
 						!prevVideos.some(prevVideo => prevVideo.data.dbData.videoId === newVideo.data.dbData.videoId));
 					return [...prevVideos, ...newVideos];
 				});
-				if (currentPage === 1) {
+				if (currentPage === 1 || (currentPage % 2 === 0)) {
 					setActiveVideoData({
 						index: 0,
 						iid: newData[0].data.dbData.id,
@@ -218,7 +218,7 @@ const Home: React.FC = () => {
 		// If the current index is len-2, fetch the next set of videos by incrementing currentpage? 
 
 		console.log('active and length = ', swiper.activeIndex, videosList.length)
-		if (swiper.activeIndex === videosList.length - 1) {
+		if (swiper.activeIndex === videosList.length - 2) {
 			console.log("time to fetch")
 			setCurrentPage(prevPage => prevPage + 1);
 			//fetchMoreVideos();
@@ -317,6 +317,7 @@ const Home: React.FC = () => {
 						{videos.map((video, index) => (
 							<SwiperSlide
 								key={video.data.dbData.videoId}
+						       virtualIndex={video.data.dbData.videoId}
 								data-video-id={video.data.dbData.videoId}
 								style={{ height: 'calc(100vh - 64px)' }}
 								onClick={() => setIsVideoPaused(!isVideoPaused)} // Toggle the video pause state when the user clicks on the slide
