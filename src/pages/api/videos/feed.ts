@@ -1,8 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+// import { PrismaClient } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { FeedVideoList, RawResult } from '../../../types'
-
-const prisma = new PrismaClient();
+import prisma from '../../../utils/prismaClient'
+// const prisma = new PrismaClient();
 const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
 //const VIDEO_BASE_URL = 'https://psv-uttzefxkok.s3.us-west-2.amazonaws.com/'
 //const THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
