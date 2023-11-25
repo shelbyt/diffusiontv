@@ -1,7 +1,5 @@
 // pages/api/user/[sl_id].ts
-
 import type { NextApiRequest, NextApiResponse } from 'next';
-// import { PrismaClient } from '@prisma/client';
 import prisma from '../../../utils/prismaClient'
 
 // const prisma = new PrismaClient();

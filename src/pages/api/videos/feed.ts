@@ -1,8 +1,6 @@
-// import { PrismaClient } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { FeedVideoList, RawResult } from '../../../types'
 import prisma from '../../../utils/prismaClient'
-// const prisma = new PrismaClient();
 const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
 //const VIDEO_BASE_URL = 'https://psv-uttzefxkok.s3.us-west-2.amazonaws.com/'
 //const THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
@@ -111,7 +109,7 @@ function selectRandomItemsFromArray(array: string | any[], numberOfItems: number
 
 async function getRandomItemsFromAllCategories(pageSize: number, uuid: string) {
     const categories = [0, 1, 2, 3, 4, 5, 6, 99];
-    const weights =    [1, 1, 6, 1, 4, 1, 1, 1]; // Higher weight for category
+    const weights =    [2, 2, 6, 1, 1, 1, 1, 2]; // Higher weight for category
 
     // const categories = [100];
     // const weights = [1]; // Higher weight for category
