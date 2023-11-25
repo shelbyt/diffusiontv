@@ -27,3 +27,11 @@ export interface Data {
 export interface FeedVideoList {
     data: Data;
 }
+
+export interface IUserThumb {
+    thumbUrl: string;
+    videoUrl: string;
+    likeCount: number;
+    createdAt: Date;
+    totalLikeHeartEngageCount: number;
+}

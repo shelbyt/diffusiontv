@@ -16,21 +16,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
         // First, get the total number of engagements
-        const totalEngagements = await prisma.userEngagement.count({
-            where: {
-                userId: user as string,
-                liked: true
-            },
-        });
+        // const totalEngagements = await prisma.userEngagement.count({
+        //     where: {
+        //         userId: user as string,
+        //         liked: true
+        //     },
+        // });
+
+		const totalBookmarks = await prisma.userBookmarks.count({
+			where: {
+				userId: user as string,
+				bookmarked: true
+			}
+		})
 
         // Calculate the offset for pagination
         const offset = (pageNumber - 1) * pageSize;
 
         // Get the paginated user engagements
-        const userLikes = await prisma.userEngagement.findMany({
+        const userLikes = await prisma.userBookmarks.findMany({
             where: {
                 userId: user as string,
-                liked: true
+                bookmarked: true
             },
             select: {
                 image: {
@@ -74,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Calculate the number of videos already shown
         const shownVideos = (pageNumber - 1) * pageSize + userLikes.length;
         // Calculate the remaining videos
-        const remaining = Math.max(0, totalEngagements - shownVideos);
+        const remaining = Math.max(0, totalBookmarks - shownVideos);
 
         if (userThumbLinks) {
             res.status(200).json({ userThumbLinks, remaining });
