@@ -1,9 +1,9 @@
 // pages/profile.js
-import { useEffect, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { formatNumber } from '../../utils/formatNumber';
 import { useRouter } from 'next/router';
-import { ArrowLeft, ShareFat, Heart, Calendar } from '@phosphor-icons/react';
+import { BookmarkSimple, ArrowLeft, ShareFat, Heart, UserList, Calendar } from '@phosphor-icons/react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 // import useUserUUID from '../../hooks/useUserUUID';
 import { usePopup } from '../../state/PopupContext';
@@ -11,8 +11,10 @@ import { GetServerSideProps } from 'next';
 import { getSession } from '@auth0/nextjs-auth0';
 import { getUserData } from '../../utils/getUserData'; // Assuming getUserData fetches the user profile
 import { getPrivateUserData } from '../../utils/getPrivateUserData';
-import ReactPlayer from 'react-player';
-import VideoModal from './../../components/videoModal/index';
+import InfiniteImageScroll from '../../components/infiniteImageScroll'; // Adjust the path as per your project structure
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { IUserThumb } from "../../types/index";
+import AppLink from '../../components/appLink';
 
 
 export interface IUserDetails {
@@ -23,49 +25,100 @@ export interface IUserDetails {
     id: string
 }
 
-interface IUserThumb {
-    videoUrl: string;
-    thumbUrl: string;
-    likeCount: number;
-    createdAt: Date;
-}
-
-
 export default function Profile({ userDetails }: { userDetails: IUserDetails }) {
     const [userAuth, setUserAuth] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
     const router = useRouter();
     const { user } = router.query
     // const { userState, fetchUserData } = useUserUUID();
 
+
+    const fetchMoreData = async () => {
+        if (!hasMore) return; // Exit if no more data to load
+
+        try {
+            const nextPage = currentPage + 1;
+            const res = await fetch(`/api/private/getLikes?method=get&user=${userDetails.id}&page=${nextPage}`);
+            const newThumbs = await res.json();
+            console.log('newThumbs = ', newThumbs);
+
+            if (newThumbs.userThumbLinks.length > 0) {
+                setUserThumbs(prevThumbs => [...prevThumbs, ...newThumbs.userThumbLinks]);
+                setCurrentPage(nextPage);
+            } else {
+                setHasMore(false); // No more data to load
+            }
+        } catch (error) {
+            console.error("Error fetching more thumbnails:", error);
+            setHasMore(false); // Stop trying after an error
+        }
+    };
+
+    const fetchMoreDataBM = async () => {
+        if (!hasMoreBM) return; // Exit if no more data to load
+
+        try {
+            const nextPage = currentPageBM + 1;
+            const res = await fetch(`/api/private/getBookmarks?method=get&user=${userDetails.id}&page=${nextPage}`);
+            const newThumbs = await res.json();
+            console.log('newThumbs = ', newThumbs);
+
+            if (newThumbs.userThumbLinks.length > 0) {
+                setUserThumbsBM(prevThumbs => [...prevThumbs, ...newThumbs.userThumbLinks]);
+                setCurrentPageBM(nextPage);
+            } else {
+                setHasMore(false); // No more data to load
+            }
+        } catch (error) {
+            console.error("Error fetching more thumbnails:", error);
+            setHasMoreBM(false); // Stop trying after an error
+        }
+    };
+
+
+    const fetchMoreDataF = async () => {
+        if (!hasMoreF) return; // Exit if no more data to load
+
+        try {
+            const nextPage = currentPageF + 1;
+            const res = await fetch(`/api/private/getFollowing?method=get&user=${userDetails.id}&page=${nextPage}`);
+            const newThumbs = await res.json();
+            console.log('newThumbsF = ', newThumbs);
+
+            if (newThumbs.length > 0) {
+                setUserThumbsF(prevThumbs => [...prevThumbs, ...newThumbs]);
+                setCurrentPageF(nextPage);
+            } else {
+                setHasMoreF(false); // No more data to load
+            }
+        } catch (error) {
+            console.error("Error fetching more thumbnails:", error);
+            setHasMoreF(false); // Stop trying after an error
+        }
+    };
+
     useEffect(() => {
         // if (!user) return; // Exit early if username is not available
-        async function fetchUserThumbs() {
-            if (!userDetails.id) return;
-            try {
-                console.log("passing this into the getLikes = ", userDetails.id)
-                const res = await fetch(`/api/private/getLikes?method=get&user=${userDetails.id}`);
-                console.log("res = ", res)
-
-                if (!res.ok) {
-                    //TODO: handle error
-                    // throw new Error('Failed to fetch user thumbnails');
-                }
-                const thumbs = await res.json();
-                console.log(thumbs)
-                setUserThumbs(thumbs);
-            } catch (error: unknown) {
-                //TODO: Handle Error
-                // setError(error.message);
-            }
-        }
         // fetchUserData();
-        fetchUserThumbs();
+        fetchMoreData();
     }, [userDetails]);
 
     const [userThumbs, setUserThumbs] = useState<IUserThumb[]>([]);
     const [selectedImage, setSelectedImage] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
+
+
+    const [currentPageBM, setCurrentPageBM] = useState(0);
+    const [userThumbsBM, setUserThumbsBM] = useState<IUserThumb[]>([]);
+    const [hasMoreBM, setHasMoreBM] = useState(true);
+
+
+    const [currentPageF, setCurrentPageF] = useState(0);
+    const [userThumbsF, setUserThumbsF] = useState<any[]>([]);
+    const [hasMoreF, setHasMoreF] = useState(true);
+
     const openModal = (index: number) => {
         setActiveVideoIndex((index));
         setIsModalOpen(true);
@@ -90,9 +143,20 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
         setSortBy(sortBy === 'popular' ? 'date' : 'popular');
     };
 
-    // const sortedThumbs = sortBy === 'popular'
-    //     ? [...userThumbs].sort((a, b) => b.likeCount - a.likeCount)
-    //     : [...userThumbs].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const [activeTab, setActiveTab] = useState('likes'); // State to track active tab
+    // ... other state and variables
+
+    // Function to change the active tab
+    const handleTabChange = (tab: string) => {
+        if (tab === 'bookmarks' && userThumbsBM.length === 0) {
+            fetchMoreDataBM();
+        }
+        if (tab === 'following' && userThumbsF.length === 0) {
+            fetchMoreDataF();
+        }
+
+        setActiveTab(tab);
+    };
 
     return (
         <>
@@ -134,7 +198,7 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
             <div className="flex justify-around text-center mb-8">
                 <div>
                     <div className="text-base font-semibold">{0}</div>
-                    <div className="text-xs text-gray-600">Following</div>
+                    <div className="text-xs text-gray-600">Followers</div>
                 </div>
                 <div>
                     <div className="text-base font-semibold">{formatNumber(userDetails?.videosMade || 0)}</div>
@@ -146,54 +210,54 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
                 </div>
             </div>
 
-            <div className="flex justify-between items-center mb-4 mx-2">
-                {/* Container for centering the Follow Button */}
-                <div className="flex-grow flex justify-center">
-                    <button className="btn btn-primary w-32">Follow</button>
+            {/* Tabs for Likes and Bookmarks */}
+            <div className="flex justify-end">
+                <div className="tabs">
+                    <a className={`tab ${activeTab === 'following' ? 'tab-active text-black' : ''}`} onClick={() => handleTabChange('following')}>
+                        <UserList size={24} /> Following
+                    </a>
+                    <a className={`tab ${activeTab === 'likes' ? 'tab-active text-black' : ''}`} onClick={() => handleTabChange('likes')}>
+                        <Heart size={24} /> Likes
+                    </a>
+                    <a className={`tab ${activeTab === 'bookmarks' ? 'tab-active text-black' : ''}`} onClick={() => handleTabChange('bookmarks')}>
+                        <BookmarkSimple size={24} /> Bookmarks
+                    </a>
                 </div>
-
-                {/* Sort Toggle Button - Right Aligned */}
-                <button className="btn btn-outline bg-neutral text-white" onClick={toggleSort}>
-                    {sortBy === 'popular' ? <Calendar size={24} /> : <Heart size={24} />}
-                </button>
             </div>
 
 
-            <div className="mt-4 px-1">
-                <div className="grid grid-cols-3 gap-1">
-                    {userThumbs.map((image, index) => (
-                        <div key={index} className="w-full h-48 overflow-hidden rounded-lg cursor-pointer relative">
-                            <img
-                                src={image?.thumbUrl}
-                                className="w-full h-full object-cover"
-                                onClick={() => openModal(index)}
-                            />
+            {/* Conditional rendering of Infinite Scroll components */}
+            {activeTab === 'likes' && (
 
-                            {/* <div className="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white p-2 flex items-center">
-                                <Heart size={16} color="white" className="mr-2" />
-                                <span>{image?.likeCount}</span>
-                            </div> */}
+                <InfiniteImageScroll
+                    initialImages={userThumbs}
+                    fetchMoreData={fetchMoreData}
+                    hasMore={hasMore}
+                />
+            )}
+            {activeTab === 'bookmarks' && (
+
+                <InfiniteImageScroll
+                    initialImages={userThumbsBM}
+                    fetchMoreData={fetchMoreDataBM}
+                    hasMore={hasMoreBM}
+                />
+            )}
+
+            {activeTab === 'following' && (
+                <div className="flex flex-col space-y-4 items-start ml-auto mr-auto w-3/4 mt-4">
+                    {userThumbsF.map((user: any) => (
+                        <div key={user.username} className="flex items-center cursor-pointer" onClick={() => router.push(`/u/${user.username}`)}>
+                            <img src={user.imageUrl} alt={user.username} className="w-10 h-10 rounded-full" />
+                            <AppLink className='ml-2' link={`/u/${user.username}`} displayText={user.username} />
+                            {/* <span className="ml-2">{user.username}</span> */}
                         </div>
                     ))}
                 </div>
-            </div>
-            <VideoModal
-                url={userThumbs[activeVideoIndex]?.videoUrl}
-                isOpen={isModalOpen}
-                closeModal={closeModal}
-            />
+            )}
 
 
 
-            {/* <div
-                className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 transition-opacity duration-300 ease-in-out ${isModalOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-                onClick={closeModal} >
-                <img
-                    src={selectedImage}
-                    className="max-h-full max-w-full w-auto h-auto object-contain p-4 transition duration-300 rounded-3xl ease-in-out"
-                    onClick={(e) => e.stopPropagation()} // Prevent click inside from closing the modal
-                />
-            </div> */}
         </>
     )
 }

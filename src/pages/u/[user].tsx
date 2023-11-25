@@ -5,13 +5,13 @@ import { formatNumber } from '../../utils/formatNumber';
 import { useRouter } from 'next/router';
 import { ArrowLeft, ShareFat, Heart, Palette } from '@phosphor-icons/react';
 import VideoModal from './../../components/videoModal/index';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import useUserUUID from '../../hooks/useUserUUID';
 import { usePopup } from '../../state/PopupContext';
 import { useAlert } from '../../state/AlertContext';
 import AppLink from '../../components/appLink';
 import Civitai from '../../icons/civitai';
-
+import InfiniteImageScroll from '../../components/infiniteImageScroll'; // Adjust the path as per your project structure
+import { IUserThumb } from '../../types';
 export interface IUserDetails {
     username: string
     imageUrl: string
@@ -22,22 +22,6 @@ export interface IUserDetails {
 
 }
 
-interface IUserThumb {
-    thumbUrl: string;
-    videoUrl: string;
-    likeCount: number;
-    createdAt: Date;
-    totalLikeHeartEngageCount: number;
-}
-
-
-const SkeletonLoader = () => {
-    return (
-        <div className="w-full h-48 bg-gray-300 rounded-lg animate-pulse"></div>
-    );
-};
-
-// export default function User() {
 export default function User() {
     const { showTopAlert } = useAlert();
 
@@ -82,32 +66,6 @@ export default function User() {
             setHasMore(false); // Stop trying after an error
         }
     };
-
-    // useEffect(() => {
-    //     async function fetchUserData() {
-
-    //             console.log(" in fetch user data userState", userState)
-    //             console.log(" in fetch user data user", user)
-    //         if (!user) return;
-    //         try {
-    //             setIsLoading(true);
-    //             const res = await fetch(`/api/user/${user}?viewerId=${userState?.prismaUUID}`);
-    //             if (!res.ok) {
-    //                 throw new Error('Failed to fetch user data');
-    //             }
-    //             const userData = await res.json();
-    //             console.log("user data = ", userData)
-    //             setProfileUserDetails(userData);
-    //             setIsFollowing(userData.isFollowedByViewer);
-    //         } catch (error) {
-    //             // handle error
-    //         } finally {
-    //             setIsLoading(false);
-    //         }
-    //     }
-
-    //     fetchUserData();
-    // }, [user]);
 
     const loadUserData = async () => {
         if (!user || !userState) return;
@@ -159,10 +117,6 @@ export default function User() {
 
         }
     }, [user, userState?.prismaUUID, profileUserDetails]); // Added userState to dependency array
-
-
-
-
 
     const [userThumbs, setUserThumbs] = useState<IUserThumb[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -244,17 +198,6 @@ export default function User() {
 
     return (
         <>
-            {/* {isFollowing && (
-                <TopAlert
-                    message="Enjoying the app? Star DTV on Github!"
-                    goButtonText="Go"
-                    goButtonUrl="https://github.com/shelbyt/diffusiontv"
-                    // onClose={() => {
-                    //     setIsFollowing(false);
-                    // }}
-                />
-
-            )} */}
             <div className="navbar bg-base-100">
                 <div className="flex-1">
                     <button className="btn btn-ghost" onClick={handleBackClick}>
@@ -330,44 +273,12 @@ export default function User() {
                 />
             </div>
 
-            <InfiniteScroll
-                dataLength={userThumbs.length}
-                next={fetchMoreData}
+            <InfiniteImageScroll
+                initialImages={userThumbs}
+                fetchMoreData={fetchMoreData}
                 hasMore={hasMore}
-                loader={<div className="grid grid-cols-3 gap-1">
-                    {Array.from({ length: 6 }, (_, index) => (
-                        <SkeletonLoader key={index} />
-                    ))}
-                </div>}
-            // ... other props
-            >
-                <div className="mt-4 px-1">
-                    <div className="grid grid-cols-3 gap-1">
-                        {userThumbs.map((image, index) => (
-                            <div key={index} className="w-full h-48 overflow-hidden rounded-lg cursor-pointer relative transition-opacity duration-500">
-                                <img
-                                    src={image?.thumbUrl}
-                                    className="w-full h-full object-cover opacity-0 transition-opacity duration-500"
-                                    onClick={() => openModal(index)}
-                                    onLoad={(e) => e.currentTarget.classList.replace('opacity-0', 'opacity-100')}
-                                />
-                                <div className="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white p-2 flex items-center">
-
-                                    <Heart size={16} color="white" className="mr-2" />
-                                    <span>{image?.totalLikeHeartEngageCount}</span>
-                                </div>
-                                {/* Conditionally render 'Popular' badge for the first three images */}
-                                {index < 3 && (
-                                    <div className="badge badge-accent absolute top-2 left-2">
-                                        Popular
-                                    </div>
-                                )}
-
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </InfiniteScroll>
+                highlightTop={true}
+            />
             <VideoModal
                 url={userThumbs[activeVideoIndex]?.videoUrl}
                 isOpen={isModalOpen}
