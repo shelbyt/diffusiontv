@@ -26,6 +26,8 @@ The content in DiffusionTV based 100% on [Civitai's API](https://github.com/civi
 | Push notifications when artists upload to Civitai  | ⚒ |  ❌| 
 | Directly upload videos  | ⚒ |  ✅| 
 | Like and bookmark prompts and videos  | ✅ |  ✅| 
+| 3,000+ Videos  | ✅ |  ✅| 
+
 
 ## Support the Project with Stars 🤩 
 
@@ -68,6 +70,7 @@ tl;dr NextJS front-end. Node and Python backend.
 | AWS S3 | Data Hosting
 | Auth | Auth0
 | Civitai | Civitai APIs
+| Cursor + Custom GPT4 | Code Buddy 
 
 
 
