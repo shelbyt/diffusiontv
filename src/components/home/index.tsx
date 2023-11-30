@@ -14,6 +14,7 @@ import useUserUUID from '../../hooks/useUserUUID';
 import { submitReport } from '../../utils/submitReport';
 import { REPORTTYPE } from '@prisma/client';
 import TopNavbar from '../../components/topNavbar';
+import { useActiveTab } from '../../state/ActiveTabContext';
 
 
 const Home: React.FC = () => {
@@ -70,6 +71,25 @@ const Home: React.FC = () => {
 	});
 	const [isLandscape, setIsLandscape] = useState<boolean | null>(false);
 	const [ratio, setRatio] = useState(0);
+	const { activeTab } = useActiveTab();
+
+	const firstUpdateActiveTab = useRef(true);
+	useEffect(() => {
+		if (firstUpdateActiveTab.current) {
+			firstUpdateActiveTab.current = false;
+			return;
+		}
+
+		setVideos([]);
+		if (swiperInstance) {
+			swiperInstance.destroy(true, true);
+			setSwiperInstance(null);
+		}
+		// Increment swiperKey to force a re-render of the Swiper component
+		setSwiperKey(prevKey => prevKey + 1);
+		setCurrentPage(1);
+
+	}, [activeTab]);
 
 	const playerRef = useRef<ReactPlayer | null>(null);
 	useEffect(() => {
@@ -118,37 +138,25 @@ const Home: React.FC = () => {
 		console.log("video length = ", videos.length)
 		async function fetchVideos() {
 
-			// if (currentPage % 3 === 0) {
-			// 	// Remove the first n elements from the videos state
-			// 	setVideos(prevVideos => prevVideos.slice(5));
-
-			// 	// Remove the first n slides from the Swiper instance
-			// 	if (swiperInstance) {
-			// 		for (let i = 0; i < 5; i++) {
-			// 			swiperInstance?.removeSlide(0);
-			// 		}
-			// 	}
-			// }
-
-			if (currentPage % 3 === 0) {
-				// Reset the videos state
-				setVideos([]);
-
-				// Re-initialize the Swiper instance
-				//TODO: small bug whre thumbnail is wrong
-				if (swiperInstance) {
-					swiperInstance.destroy(true, true);
-					setSwiperInstance(null);
-				}
-
-				// Increment swiperKey to force a re-render of the Swiper component
-				setSwiperKey(prevKey => prevKey + 1);
+			// To reset videos array and keep memory usage low
+			//*********************** */
+			setVideos(prevVideos => prevVideos.slice(-1));
+			// Re-initialize the Swiper instance
+			if (swiperInstance) {
+				swiperInstance.destroy(true, true);
+				setSwiperInstance(null);
 			}
-
+			// Increment swiperKey to force a re-render of the Swiper component
+			setSwiperKey(prevKey => prevKey + 1);
+			//*********************** */
 
 			try {
 				console.log("In Fetch = ", userState)
-				const baseUrl = `/api/videos/feed?method=get&currentPage=${currentPage}`;
+
+				let baseUrl = `/api/videos/feed?method=get&type=recommended&currentPage=${currentPage}`;
+				if (activeTab === 'latest') {
+					baseUrl = `/api/videos/feed?method=get&type=latest&currentPage=${currentPage}`
+				}
 				const userUuidParam = userState?.prismaUUID ? `&uuid=${userState.prismaUUID}` : `&uuid=unauth`;
 				const finalUrl = baseUrl + userUuidParam;
 
@@ -159,8 +167,7 @@ const Home: React.FC = () => {
 						!prevVideos.some(prevVideo => prevVideo.data.dbData.videoId === newVideo.data.dbData.videoId));
 					return [...prevVideos, ...newVideos];
 				});
-				if (currentPage === 1 || (currentPage % 3 === 0)) {
-					// if (currentPage === 1) {
+				if (currentPage === 1) {
 					setActiveVideoData({
 						index: 0,
 						iid: newData[0].data.dbData.id,
@@ -191,7 +198,7 @@ const Home: React.FC = () => {
 		else {
 			fetchVideos();
 		}
-	}, [currentPage]);
+	}, [currentPage, activeTab]);
 
 	const handleSlideChange = (swiper: any) => {
 		// Cleanup from prev
@@ -219,7 +226,7 @@ const Home: React.FC = () => {
 		// If the current index is len-2, fetch the next set of videos by incrementing currentpage? 
 
 		console.log('active and length = ', swiper.activeIndex, videosList.length)
-		if (swiper.activeIndex === videosList.length - 2) {
+		if (swiper.activeIndex === videosList.length - 1) {
 			console.log("time to fetch")
 			setCurrentPage(prevPage => prevPage + 1);
 			//fetchMoreVideos();

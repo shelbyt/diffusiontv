@@ -4,6 +4,7 @@ import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { AppUserProvider } from '../state/UserContext';
 import { PopupProvider } from '../state/PopupContext';
 import { AlertProvider } from '../state/AlertContext';
+import { ActiveTabProvider } from '../state/ActiveTabContext';
 
 import Layout from '../components/layout'
 import { VideoFeedProvider } from '../state/VideoFeedProvider';
@@ -14,11 +15,13 @@ function MyApp({ Component, pageProps }: AppProps) {
             <AppUserProvider>
                 <PopupProvider>
                     <AlertProvider>
-                    <VideoFeedProvider>
-                        <Layout>
-                            <Component {...pageProps} />
-                        </Layout>
-                    </VideoFeedProvider>
+                        <VideoFeedProvider>
+                            <ActiveTabProvider>
+                                <Layout>
+                                    <Component {...pageProps} />
+                                </Layout>
+                            </ActiveTabProvider>
+                        </VideoFeedProvider>
                     </AlertProvider>
                 </PopupProvider>
             </AppUserProvider>

@@ -1,46 +1,67 @@
-import { CSSProperties, useState } from 'react';
+import React from 'react';
+import { useActiveTab } from '../../state/ActiveTabContext'; // Adjust the import path as necessary
 
-const TopNavbar = () => {
-  const [activeTab, setActiveTab] = useState('forYou');
+const TopNavbar: React.FC = () => {
+  const { activeTab, setActiveTab } = useActiveTab();
 
-  const getTabStyle = (tab: string) => {
-    if (activeTab === tab) {
-      return "cursor-pointer p-2 text-lg font-bold text-white opacity-90 pb-1";
-    }
-    return "cursor-pointer p-2 text-gray-400 pb-1";
+  const getTabStyle = (tab: string): string => {
+    return activeTab === tab
+      ? "cursor-pointer p-2 text-lg font-bold text-white opacity-90 pb-1"
+      : "cursor-pointer p-2 text-lg font-bold text-gray-400 pb-1";
   };
 
-  const getUnderlineStyle = (tab: string): CSSProperties => {
-    if (activeTab === tab) {
-      return {
-        position: 'relative',
-        display: 'inline-block'
-      };
-    }
-    return {};
+  const getUnderlineStyle = (tab: string): React.CSSProperties => {
+    return activeTab === tab
+      ? { position: 'relative', display: 'inline-block' }
+      : {};
   };
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-transparent">
       <div className="flex justify-center items-center px-2 pb-2 pt-4">
         <div
-          className={getTabStyle('forYou')}
-          style={getUnderlineStyle('forYou')}
-          onClick={() => setActiveTab('forYou')}
+          className={getTabStyle('inspire')}
+          style={getUnderlineStyle('inspire')}
+          onClick={() => setActiveTab('inspire')}
         >
-         Inspire 
-         {activeTab === 'forYou' && 
-           <div style={{
-             content: '""',
-             position: 'absolute',
-             bottom: '0',
-             left: '50%',
-             transform: 'translateX(-50%)',
-             height: '1px',
-             width: '50%',
-             backgroundColor: 'white'
-           }}></div>
-         }
+          Inspire
+          {activeTab === 'inspire' && (
+            <div style={{
+              content: '""',
+              position: 'absolute',
+              bottom: '0',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              height: '1px',
+              width: '50%',
+              backgroundColor: 'white'
+            }}></div>
+          )}
+        </div>
+        <div
+          className={getTabStyle('latest')}
+          style={getUnderlineStyle('latest')}
+          onClick={() => 
+            {
+              console.log("bbb active was : ", activeTab)
+              setActiveTab('latest')
+            console.log("bbb latest clicked in comp")
+          
+          }}
+        >
+          Latest
+          {activeTab === 'latest' && (
+            <div style={{
+              content: '""',
+              position: 'absolute',
+              bottom: '0',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              height: '1px',
+              width: '50%',
+              backgroundColor: 'white'
+            }}></div>
+          )}
         </div>
       </div>
     </div>
