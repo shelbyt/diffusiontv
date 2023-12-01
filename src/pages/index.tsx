@@ -3,9 +3,38 @@ import Image from 'next/image';
 import { Export } from '@phosphor-icons/react';
 import useStandaloneCheck from '../hooks/useStandaloneCheck'; // Import the hook
 import Home from '../components/home'; // Assuming this is your Home component
+import useWindowWidth from '../hooks/useWindowWidth';
+import { BrowserView, MobileView, isBrowser, isMobile } from 'react-device-detect';
+
 
 const IndexPage: React.FC = () => {
+
     const isStandalone = useStandaloneCheck(); // Use the hook to check for standalone mode
+    const windowWidth = useWindowWidth();
+
+    // if (isBrowser) {
+    //     return (
+    //         <div className="flex flex-col items-center justify-center h-screen bg-black">
+
+    //             <Image
+    //                 src="/qr.png"
+    //                 alt="QR Code"
+    //                 width={512}
+    //                 height={512}
+    //                 layout="fixed"
+    //             />
+    //             <p className="text-white mt-4 text-3xl">📱</p>
+
+    //         </div>
+    //     );
+    // }
+    // else {
+
+    //     return <Home />;
+    // }
+
+        return <Home />;
+
 
     // Render the Home component if in standalone mode
     // if (isStandalone ) {
@@ -14,7 +43,6 @@ const IndexPage: React.FC = () => {
     // if(isStandalone === null) {
     //     return null;
     // }
-    return <Home />;
 
     // Render the installation instructions if not in standalone mode
     // return (
