@@ -7,7 +7,7 @@ import styles from './index.module.css'
 import { SpeakerSimpleX, Play } from '@phosphor-icons/react';
 import Sidebar from '../../components/sidebar';
 import { useVideoFeed } from '../../state/VideoFeedProvider';
-import { handleNavigationReturn, checkHasNavigatedAway } from '../../state/localStorageHelpers'
+import { handleNavigationReturn, checkHasNavigatedAway, getPendingAction, getPendingItem } from '../../state/localStorageHelpers'
 import { Swiper as SwiperClass } from 'swiper';
 import BottomText from '../../components/bottomTextbar';
 import useUserUUID from '../../hooks/useUserUUID';
@@ -16,6 +16,9 @@ import { REPORTTYPE } from '@prisma/client';
 import TopNavbar from '../../components/topNavbar';
 import { useActiveTab } from '../../state/ActiveTabContext';
 
+import { isPendingAction, deletePendingAction } from '../../state/localStorageHelpers';
+import { toggleBookmark, toggleLike } from '../../utils/apiHelpers';
+import { useAlert } from '../../state/AlertContext';
 
 const Home: React.FC = () => {
 	const {
@@ -129,6 +132,23 @@ const Home: React.FC = () => {
 			swiperInstance.slideTo(index, 0, false);
 		}
 	}, [swiperInstance]);
+
+	const { showTopAlert } = useAlert();
+	useEffect(() => {
+		if (!userState?.prismaUUID) return;
+		if (!isPendingAction()) return;
+		if (getPendingAction() === 'like') {
+			toggleLike(userState?.prismaUUID || "", getPendingItem() || "");
+		}
+		else if (getPendingAction() === 'bookmark') {
+			toggleBookmark(userState?.prismaUUID || "", getPendingItem() || "");
+		}
+
+		showTopAlert("Find your likes and bookmark in your profile");
+		deletePendingAction();
+
+
+	}, [userState?.prismaUUID]);
 
 
 	useEffect(() => {

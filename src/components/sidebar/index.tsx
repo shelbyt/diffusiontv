@@ -4,6 +4,7 @@ import { useVideoFeed } from '../../state/VideoFeedProvider';
 import useUserUUID from '../../hooks/useUserUUID';
 import { usePopup } from '../../state/PopupContext';
 import { formatNumber } from '../../utils/formatNumber';
+import { setPendingAction } from '../../state/localStorageHelpers';
 
 interface ISidebarProps { video: any }
 
@@ -69,6 +70,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
 
     const handleBookmark = async () => {
         if (!userState?.isAuthenticated) {
+            setPendingAction('bookmark', video?.data?.dbData?.id);
             handleLogin(); // Use handleLogin from PopupContext
 
         } else {
@@ -126,6 +128,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
 
     const handleLike = async () => {
         if (!userState?.isAuthenticated) {
+            setPendingAction('like', video?.data?.dbData?.id);
             handleLogin(); // Use handleLogin from PopupContext
 
         } else {
