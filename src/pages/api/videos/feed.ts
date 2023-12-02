@@ -3,6 +3,7 @@ import { FeedVideoList } from '../../../types'
 import prisma from '../../../utils/prismaClient'
 const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
 const THUMBS_BASE_URL = 'https://d10bxkdso1dzcx.cloudfront.net/';
+import { NSFWLevel } from '@prisma/client';
 
 // Function to fetch a random item from a category
 async function getRandomItemFromCategory(categoryId: number, uuid: string) {
@@ -22,6 +23,9 @@ async function getRandomItemFromCategory(categoryId: number, uuid: string) {
             category: categoryId,
             likeCount: {
                 gt: 0 // Only select items with more than 1 like
+            },
+            nsfwLevel: {
+                in: [NSFWLevel.None, NSFWLevel.Soft]
             }
         },
         take: 1,
@@ -92,7 +96,7 @@ function selectRandomItemsFromArray(array: string | any[], numberOfItems: number
 
 async function getRandomItemsFromAllCategories(pageSize: number, uuid: string) {
     const categories = [0, 1, 2, 3, 4, 5, 6];
-    const weights =    [20, 40, 1, 1, 20, 20, 20]; // Higher weight for category
+    const weights = [20, 40, 1, 1, 20, 20, 20]; // Higher weight for category
 
     // const categories = [100];
     // const weights = [1]; // Higher weight for category
@@ -137,7 +141,7 @@ async function getLatestVideos(pageSize: number, currentPage: number, uuid: stri
                 gt: 0 // Only select items with more than 1 like
             },
             nsfwLevel: {
-                not: "X"
+                in: [NSFWLevel.None, NSFWLevel.Soft]
             }
         },
         take: pageSize,
@@ -186,7 +190,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             }
 
             if (type === 'latest') {
-                const latestVideos = await getLatestVideos(pageSize, currentPage as number, uuid as string );
+                const latestVideos = await getLatestVideos(pageSize, currentPage as number, uuid as string);
                 const formattedLatestVideos = formatVideoData(latestVideos);
                 result = formattedLatestVideos
             }
