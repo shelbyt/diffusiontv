@@ -30,7 +30,7 @@ The content in DiffusionTV based 100% on [Civitai's API](https://github.com/civi
 
 ## Support the Project with Stars 🤩 
 
-I am running this project purely out of my pocket. If you appreciate what I'm doing and would like to support the cause, consider making a donation or giving a ⭐ on GitHub. Your support helps me continue to highlight the work of these hidden talents and keep up with the rapidly evolving world of AI video technology. Thank you!
+I am running this project out of pocket at the moment. Costs are daily transcoding, storage and serving images and videos, and CDNs for this content. If you appreciate what I'm doing start me ⭐ on GitHub, send feedback and share with friends. Thank you!
 
 | Star Milestone  | Feature  | Status
 |----------------|---------|-------|
