@@ -52,6 +52,9 @@ The videos and engagement data comes from Civitai, however while Civitai is a gr
 
 I am running this project out of pocket at the moment. Costs are daily transcoding, storage and serving images and videos, and CDNs for this content. If you appreciate what I'm doing start me ⭐ on GitHub, send feedback and share with friends. Thank you!
 
+![image](https://github.com/shelbyt/diffusiontv/assets/1332316/fb15a084-d359-4ae1-b5e1-e1fefcc9fcc4)
+
+
 | Star Milestone  | Feature  | Status
 |----------------|---------|-------|
 | 0 stars          | 🎉 Serve application and open source |  ✅
