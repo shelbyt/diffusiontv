@@ -1,21 +1,16 @@
 // pages/profile.js
-import { SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { formatNumber } from '../../utils/formatNumber';
 import { useRouter } from 'next/router';
-import { BookmarkSimple, ArrowLeft, ShareFat, Heart, UserList, Calendar } from '@phosphor-icons/react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { BookmarkSimple, ArrowLeft, ShareFat, Heart, UserList } from '@phosphor-icons/react';
 // import useUserUUID from '../../hooks/useUserUUID';
-import { usePopup } from '../../state/PopupContext';
 import { GetServerSideProps } from 'next';
 import { getSession } from '@auth0/nextjs-auth0';
-import { getUserData } from '../../utils/getUserData'; // Assuming getUserData fetches the user profile
 import { getPrivateUserData } from '../../utils/getPrivateUserData';
 import InfiniteImageScroll from '../../components/infiniteImageScroll'; // Adjust the path as per your project structure
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { IUserThumb } from "../../types/index";
 import AppLink from '../../components/appLink';
-
 
 export interface IUserDetails {
     username: string
@@ -26,12 +21,8 @@ export interface IUserDetails {
 }
 
 export default function Profile({ userDetails }: { userDetails: IUserDetails }) {
-    const [userAuth, setUserAuth] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const router = useRouter();
-    const { user } = router.query
-    // const { userState, fetchUserData } = useUserUUID();
-
 
     const fetchMoreData = async () => {
         if (!hasMore) return; // Exit if no more data to load
@@ -40,7 +31,6 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
             const nextPage = currentPage + 1;
             const res = await fetch(`/api/private/getLikes?method=get&user=${userDetails.id}&page=${nextPage}`);
             const newThumbs = await res.json();
-            console.log('newThumbs = ', newThumbs);
 
             if (newThumbs.userThumbLinks.length > 0) {
                 setUserThumbs(prevThumbs => [...prevThumbs, ...newThumbs.userThumbLinks]);
@@ -61,7 +51,6 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
             const nextPage = currentPageBM + 1;
             const res = await fetch(`/api/private/getBookmarks?method=get&user=${userDetails.id}&page=${nextPage}`);
             const newThumbs = await res.json();
-            console.log('newThumbs = ', newThumbs);
 
             if (newThumbs.userThumbLinks.length > 0) {
                 setUserThumbsBM(prevThumbs => [...prevThumbs, ...newThumbs.userThumbLinks]);
@@ -83,8 +72,6 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
             const nextPage = currentPageF + 1;
             const res = await fetch(`/api/private/getFollowing?method=get&user=${userDetails.id}&page=${nextPage}`);
             const newThumbs = await res.json();
-            console.log('newThumbsF = ', newThumbs);
-
             if (newThumbs.length > 0) {
                 setUserThumbsF(prevThumbs => [...prevThumbs, ...newThumbs]);
                 setCurrentPageF(nextPage);
@@ -104,9 +91,6 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
     }, [userDetails]);
 
     const [userThumbs, setUserThumbs] = useState<IUserThumb[]>([]);
-    const [selectedImage, setSelectedImage] = useState("");
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [activeVideoIndex, setActiveVideoIndex] = useState(0);
     const [hasMore, setHasMore] = useState(true);
 
 
@@ -119,16 +103,6 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
     const [userThumbsF, setUserThumbsF] = useState<any[]>([]);
     const [hasMoreF, setHasMoreF] = useState(true);
 
-    const openModal = (index: number) => {
-        setActiveVideoIndex((index));
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setSelectedImage("");
-        setIsModalOpen(false);
-    };
-
     const handleBackClick = () => {
         if (window.history.length > 1) {
             router.back();
@@ -136,15 +110,7 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
             router.push('/');
         }
     };
-
-    const [sortBy, setSortBy] = useState('date');
-
-    const toggleSort = () => {
-        setSortBy(sortBy === 'popular' ? 'date' : 'popular');
-    };
-
     const [activeTab, setActiveTab] = useState('likes'); // State to track active tab
-    // ... other state and variables
 
     // Function to change the active tab
     const handleTabChange = (tab: string) => {
@@ -274,8 +240,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         };
     }
 
-    console.log("passing this into user data : ", session.user)
-    // const userData = await getUserData(session.user.sub); // Fetch user data using the Auth0 session
     const userData = await getPrivateUserData(session.user.sub);
 
     return {

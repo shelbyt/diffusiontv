@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { formatNumber } from '../../utils/formatNumber';
 import { useRouter } from 'next/router';
-import { ArrowLeft, ShareFat, Heart, Palette } from '@phosphor-icons/react';
+import { ArrowLeft, ShareFat } from '@phosphor-icons/react';
 import VideoModal from './../../components/videoModal/index';
 import useUserUUID from '../../hooks/useUserUUID';
 import { usePopup } from '../../state/PopupContext';
-import { useAlert } from '../../state/AlertContext';
 import AppLink from '../../components/appLink';
 import Civitai from '../../icons/civitai';
 import InfiniteImageScroll from '../../components/infiniteImageScroll'; // Adjust the path as per your project structure
@@ -23,23 +22,15 @@ export interface IUserDetails {
 }
 
 export default function User() {
-    const { showTopAlert } = useAlert();
-
     const router = useRouter();
     const { user } = router.query;
     const [profileUserDetails, setProfileUserDetails] = useState<IUserDetails | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
     const [currentPage, setCurrentPage] = useState(0);
     const [increaseFollow, setIncreaseFollow] = useState<number>(0);
     const { userState } = useUserUUID();
 
     const { handleLogin } = usePopup(); // Use the custom hook
-
-    useEffect(() => {
-        console.log("user state = ", userState)
-
-    }, [userState])
 
     useEffect(() => {
         if (!profileUserDetails) return; // Exit early if userDetails is not available
@@ -70,32 +61,25 @@ export default function User() {
     const loadUserData = async () => {
         if (!user || !userState) return;
         try {
-            setIsLoading(true);
             const res = await fetch(`/api/user/${user}`);
             if (!res.ok) {
                 throw new Error('Failed to fetch user data');
             }
             const userData = await res.json();
-            console.log("profile user data = ", userData)
             setProfileUserDetails(userData);
             setIsFollowing(userData.isFollowedByViewer);
         } catch (error) {
             console.error('Error fetching user data:', error);
             // Handle the error appropriately here
-        } finally {
-            setIsLoading(false);
         }
     };
 
     const getIsFollowing = async () => {
         if (!user || !userState) return;
-        console.log("INSIDE GET IS FOLLOWIN")
         try {
 
-            console.log("INSIDE TRY GET IS FOLLOWIN")
             const res = await fetch(`/api/isFollowing?followerId=${userState.prismaUUID}&followingId=${profileUserDetails?.id}`);
             const data = await res.json();
-            console.log("data = ", data);
             setIsFollowing(data.isFollowing);
 
         } catch (error) {
@@ -105,14 +89,10 @@ export default function User() {
     }
 
     useEffect(() => {
-
-        console.log(`user = ${user}, userState = ${userState?.prismaUUID}, profileUserDetails = ${profileUserDetails}`)
         if (user && !profileUserDetails) {
-            console.log("calling loaduserdata")
             loadUserData();
         }
         if (user && userState?.prismaUUID) {
-            console.log("calling getfollowing")
             getIsFollowing();
 
         }
@@ -122,11 +102,6 @@ export default function User() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeVideoIndex, setActiveVideoIndex] = useState(0);
     const [isFollowing, setIsFollowing] = useState(false);
-
-    const openModal = (index: number) => {
-        setActiveVideoIndex((index));
-        setIsModalOpen(true);
-    };
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -141,7 +116,6 @@ export default function User() {
     };
 
     async function toggleFollow(followerId: string | undefined, followingId: string | undefined) {
-        console.log("toglefolow called", followerId, followingId)
         if (!followingId) return;
         if (!followerId) {
             handleLogin();
@@ -152,10 +126,6 @@ export default function User() {
                 followerId: followerId,
                 followingId: followingId,
             };
-
-            // Determine the appropriate method based on the current follow status
-            // const method = isFollowing ? 'PATCH' : 'POST'; // Assuming 'isFollowing' is a state indicating current follow status
-            // console.log("Method = ", method)
             if (isFollowing) {
                 setIncreaseFollow(-1);
             }
@@ -176,17 +146,8 @@ export default function User() {
             }
 
             const data = await response.json();
-            console.log("data = ", data)
             // Update local state to reflect the new follow status
             setIsFollowing(data.isFollowing); // Assuming 'setIsFollowing' updates the follow status in your component's state
-            if (!isFollowing) {
-                showTopAlert("Enjoying the app? Star DTV on Github!", "Go", "https://github.com/shelbyt/diffusiontv");
-            }
-
-            // showTopAlert(
-            //     "Enjoying the app? Star DTV on Github!",
-            //     "Go",
-            //     "https://github.com/shelbyt/diffusiontv")
             return data;
         } catch (error) {
 

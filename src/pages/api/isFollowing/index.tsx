@@ -4,7 +4,6 @@ import getIsFollowing from '../../../utils/getIsFollowing'; // Adjust the import
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const { followerId, followingId } = req.query;
-    console.log(`followerId = ${followerId}, followingId = ${followingId}`)
     if (!followerId || !followingId) {
         res.status(400).json({ error: 'followerId or followingId is missing' });
         return;

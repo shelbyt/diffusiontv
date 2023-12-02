@@ -40,7 +40,6 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
             }
             if (response.status === 200) {
                 const data = await response.json();
-                console.log('get eng data = ', data);
                 setIsLiked(data.liked);
                 setIsBookmarked(data.bookmarked);
             }
@@ -51,7 +50,6 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
 
     useEffect(() => {
         if (viewer && viewer !== 'unauth') {
-            console.log("calling get engagement with", viewer, video?.data?.dbData?.id);
             getEngagementInfo(viewer, video?.data?.dbData?.id);
         }
     }, [viewer])
@@ -62,7 +60,6 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
     };
 
     React.useEffect(() => {
-        console.log("userState = ", userState);
         if (userState?.isAuthenticated && !userState.prismaUUID) {
             fetchUserData(); // Fetch user data after successful login
         }
@@ -143,10 +140,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                 }
                 setIsLiked(!isLiked);
 
-                console.log(`passing in ${viewer} and ${video?.data?.dbData?.id}`)
                 const data = await toggleLike(viewer, video?.data?.dbData?.id);
-                console.log("data from is liked = ", data)
-
                 if (data.isLiked) {
                     setIsLiked(true);
                 }

@@ -1,12 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { FeedVideoList, RawResult } from '../../../types'
+import { FeedVideoList } from '../../../types'
 import prisma from '../../../utils/prismaClient'
 const VIDEO_BASE_URL = 'https://civ-all-encoded.media-storage.us-west.qencode.com/';
-//const VIDEO_BASE_URL = 'https://psv-uttzefxkok.s3.us-west-2.amazonaws.com/'
-//const THUMBS_BASE_URL = 'https://thumbs-all.media-storage.us-west.qencode.com/';
-//const THUMBS_BASE_URL = 'https://ps-lofiagihab.s3.us-west-2.amazonaws.com/';
 const THUMBS_BASE_URL = 'https://d10bxkdso1dzcx.cloudfront.net/';
-//const THUMBS_BASE_URL = 'https://ps-wp-avcvmtusbw.s3.us-west-2.amazonaws.com/';
 
 // Function to fetch a random item from a category
 async function getRandomItemFromCategory(categoryId: number, uuid: string) {
@@ -64,19 +60,6 @@ async function getRandomItemFromCategory(categoryId: number, uuid: string) {
             Number(item.heartCount || 0) +
             Number(engagementCount || 0);
     }
-
-    // ree.forEach((item: any) => {
-    //     item['likeHeartEngageCount'] = Number(item.likeCount || 0) +
-    //         Number(item.heartCount || 0) +
-    //         Number(item?.totalEngagements ? (item.totalEngagements as { _count: number })._count : 0);
-    //     delete item.totalEngagements;
-    // });
-
-    // ree.forEach((item: any) => {
-    //     item['bookmarkCount'] = item.UserBookmarks._count;
-    //     delete item.UserBookmarks;
-    // });
-
     return ree;
 }
 
@@ -108,8 +91,8 @@ function selectRandomItemsFromArray(array: string | any[], numberOfItems: number
 }
 
 async function getRandomItemsFromAllCategories(pageSize: number, uuid: string) {
-    const categories = [0, 1, 2, 3, 4, 5, 6, 99];
-    const weights =    [2, 2, 6, 1, 1, 1, 1, 2]; // Higher weight for category
+    const categories = [0, 1, 2, 3, 4, 5, 6];
+    const weights =    [20, 40, 1, 1, 20, 20, 20]; // Higher weight for category
 
     // const categories = [100];
     // const weights = [1]; // Higher weight for category
@@ -126,6 +109,18 @@ async function getRandomItemsFromAllCategories(pageSize: number, uuid: string) {
 function formatVideoData(videos: any[]): FeedVideoList[] {
     return videos.map((item: any) => ({
         data: {
+            dbData: item, // Since the result is an array with one item
+            storage: {
+                videoUrl: `${VIDEO_BASE_URL}${item.videoId}.mp4`,
+                thumbUrl: `${THUMBS_BASE_URL}${item.videoId}.jpg`
+            }
+        }
+    }));
+}
+
+function formatVideoDataRecommended(videos: any[]): FeedVideoList[] {
+    return videos.map((item: any) => ({
+        data: {
             dbData: item[0], // Since the result is an array with one item
             storage: {
                 videoUrl: `${VIDEO_BASE_URL}${item[0].videoId}.mp4`,
@@ -135,17 +130,69 @@ function formatVideoData(videos: any[]): FeedVideoList[] {
     }));
 }
 
+async function getLatestVideos(pageSize: number, currentPage: number, uuid: string) {
+    return await prisma.image.findMany({
+        where: {
+            likeCount: {
+                gt: 0 // Only select items with more than 1 like
+            },
+            nsfwLevel: {
+                not: "X"
+            }
+        },
+        take: pageSize,
+        skip: pageSize * (currentPage - 1),
+        orderBy: {
+            createdAt: 'desc'
+        },
+        select: {
+            id: true,
+            category: true,
+            videoId: true,
+            remoteId: true,
+            likeCount: true,
+            heartCount: true,
+            commentCount: true,
+            width: true,
+            height: true,
+            username: true,
+            meta: true,
+            user: {
+                select: {
+                    imageUrl: true,
+                    id: true
+                },
+            },
+        },
+    });
+}
 // Next.js API handler
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-    const { method, uuid } = req.query;
+    const { method, uuid, type = 'recommended', currentPage = 1 } = req.query;
     const pageSize = 7;
+    console.log({ method, uuid, type });
+    console.log("type = ", type)
+
 
     if (method === 'get') {
         try {
-            const randomItemsResults = await getRandomItemsFromAllCategories(pageSize, uuid as string);
-            const formattedRandomVideos = formatVideoData(randomItemsResults);
+            let result;
 
-            return res.status(200).json(formattedRandomVideos);
+            if (type === 'recommended') {
+                console.log("inside recommended")
+                const randomItemsResults = await getRandomItemsFromAllCategories(pageSize, uuid as string);
+                const formattedRandomVideos = formatVideoDataRecommended(randomItemsResults);
+                result = formattedRandomVideos;
+            }
+
+            if (type === 'latest') {
+                const latestVideos = await getLatestVideos(pageSize, currentPage as number, uuid as string );
+                const formattedLatestVideos = formatVideoData(latestVideos);
+                result = formattedLatestVideos
+            }
+            console.log('result = ', result)
+
+            return res.status(200).json(result);
         } catch (error) {
             console.error('Error:', error);
             return res.status(500).json({ message: 'Internal Server Error' });

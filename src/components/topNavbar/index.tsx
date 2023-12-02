@@ -41,12 +41,8 @@ const TopNavbar: React.FC = () => {
         <div
           className={getTabStyle('latest')}
           style={getUnderlineStyle('latest')}
-          onClick={() => 
-            {
-              console.log("bbb active was : ", activeTab)
-              setActiveTab('latest')
-            console.log("bbb latest clicked in comp")
-          
+          onClick={() => {
+            setActiveTab('latest')
           }}
         >
           Latest

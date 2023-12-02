@@ -19,18 +19,15 @@ export default function Info() {
 
 				<div className="mt-8 text-gray-600 text-md max-w-2xl mx-auto text-center">
 					<p>
-						Hello! Diffusion TV is Tiktok for AI generated videos. It is a mobile first PWA application build with NextJS/Tailwind/Prisma inspired by short video platforms. This project was born out of a desire to stay on the cutting edge of AI video technology and to shine a light on the amazing work being done by many talented individuals. The best part is, it's open source so everyone can learn how to build this themselves.
+						Hello! Diffusion TV is Tiktok for AI generated videos. It is a mobile first PWA application build with NextJS/Tailwind/Prisma inspired by short video platforms. This project was born out of a desire to stay on the cutting edge of AI video technology and to shine a light on the amazing work being done by many talented individuals. The best part is, its open source so everyone can learn how to build this themselves.
 					</p>
 					<br />
 					<p>
 						I am running this project purely out pocket. If you want to support the project give a ⭐ on GitHub and leave issues and feedback. More information can be found there. Thank you!
 					</p>
-
 					<br />
 					<p>
-						Disclaimer: The content in DiffusionTV based 100% on Civitai's API. None of the content is scraped from their website in order to remain compliant to their Terms of Service. All content belongs to the respective owners.
-
-
+						Disclaimer: The content in DiffusionTV based 100% on Civitais API. None of the content is scraped from their website in order to remain compliant to their Terms of Service. All content belongs to the respective owners.
 					</p>
 					{/* Add more paragraphs as needed */}
 				</div>

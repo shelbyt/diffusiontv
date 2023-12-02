@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import Navbar from '../../components/navbar';
 import ReactPlayer from 'react-player';
 import styles from './index.module.css'
-import { SpeakerSimpleX, Play } from '@phosphor-icons/react';
+import { Play } from '@phosphor-icons/react';
 import Sidebar from '../../components/sidebar';
 import { useVideoFeed } from '../../state/VideoFeedProvider';
 import { handleNavigationReturn, checkHasNavigatedAway, getPendingAction, getPendingItem } from '../../state/localStorageHelpers'
@@ -29,7 +29,6 @@ const Home: React.FC = () => {
 		activeVideoId,
 		activeVideoData,
 		isSwiping,
-		firstPlay,
 		buffered,
 		drawerOpen,
 		setVideos,
@@ -54,13 +53,6 @@ const Home: React.FC = () => {
 	// const [firstPlay, setFirstPlay] = useState(true); //keep
 	// const [buffered, setBuffered] = useState(false); //keep
 
-	const [videoRefs, setVideoRefs] = useState<Record<string, any>>({});
-	const [lastSlideIndex, setLastSlideIndex] = useState<number | null>(null);
-	const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
-	const [touched, setTouched] = useState(false);
-	const [tmpUrl, setTmpUrl] = useState<string | string>("");
-	const [nextVideoId, setNextVideoId] = useState<string | null>(null);
-	const [isPlayClicked, setIsPlayClicked] = useState(true);
 	const [swiperInstance, setSwiperInstance] = useState<SwiperClass | null>(null); // Done through localstorage don't remember why vs. contextapi
 	const [reportComplete, setReportComplete] = useState(false);
 	const [isVideoPaused, setIsVideoPaused] = useState<boolean>(true);
@@ -99,7 +91,6 @@ const Home: React.FC = () => {
 		if (playerRef.current) {
 			const videoElement = playerRef.current.getInternalPlayer() as HTMLVideoElement;
 			if (videoElement && videoElement.tagName === 'VIDEO') {
-				console.log("xxx setting object fit", videoElement);
 				videoElement.style.objectFit = isLandscape ? 'contain' : 'cover';
 			}
 		}
@@ -116,15 +107,12 @@ const Home: React.FC = () => {
 
 	useEffect(() => {
 		// Set isClient to true only on client-side (after mounting)
-		console.log("isclient = ", isClient);
-		// localStorage.removeItem('activeSwiperIndex');
 		// localStorage.removeItem('hasNavigatedAway');
 		setIsClient(typeof window !== 'undefined');
 
 	}, []);
 
 	useEffect(() => {
-		console.log("swiper instance = ", swiperInstance);
 		const savedIndex = localStorage.getItem('activeSwiperIndex');
 		if (swiperInstance && savedIndex !== null) {
 			const index = parseInt(savedIndex, 10);
@@ -152,10 +140,6 @@ const Home: React.FC = () => {
 
 
 	useEffect(() => {
-
-		console.log("Check Nav top of UE: ", checkHasNavigatedAway())
-		console.log("fetching videos again", currentPage)
-		console.log("video length = ", videos.length)
 		async function fetchVideos() {
 
 			// To reset videos array and keep memory usage low
@@ -171,8 +155,6 @@ const Home: React.FC = () => {
 			//*********************** */
 
 			try {
-				console.log("In Fetch = ", userState)
-
 				let baseUrl = `/api/videos/feed?method=get&type=recommended&currentPage=${currentPage}`;
 				if (activeTab === 'latest') {
 					baseUrl = `/api/videos/feed?method=get&type=latest&currentPage=${currentPage}`
@@ -205,10 +187,6 @@ const Home: React.FC = () => {
 		}
 
 		if (checkHasNavigatedAway()) {
-			console.log("yes, has moved away: ", checkHasNavigatedAway())
-			console.log("active vid = ", activeVideoId)
-			console.log("video set = ", videos)
-			console.log("Video url = ", activeVideoData?.videoUrl)
 			setIsSwiping(false);
 			setMuted(true)
 			setFirstPlay(true)
@@ -230,9 +208,7 @@ const Home: React.FC = () => {
 		localStorage.setItem('activeSwiperIndex', swiper.activeIndex);
 
 
-		const prevVideoId = swiper.slides[swiper.previousIndex].getAttribute('data-video-id');
 		const activeVideoId = swiper.slides[swiper.activeIndex].getAttribute('data-video-id');
-		const activeIndex = swiper.activeIndex;
 		setActiveVideoId(activeVideoId);
 		setActiveVideoData({
 			index: swiper.activeIndex,
@@ -244,45 +220,14 @@ const Home: React.FC = () => {
 		})
 
 		// If the current index is len-2, fetch the next set of videos by incrementing currentpage? 
-
-		console.log('active and length = ', swiper.activeIndex, videosList.length)
 		if (swiper.activeIndex === videosList.length - 1) {
-			console.log("time to fetch")
 			setCurrentPage(prevPage => prevPage + 1);
 			//fetchMoreVideos();
 		}
 	};
 
-	// const handleSlideChange = (swiper: any) => {
-	//     console.log("Inside handle");
-	//     const videosList = videos;
-
-	//     const prevVideoId = swiper.slides[swiper.previousIndex].getAttribute('data-video-id');
-	//     const activeVideoId = swiper.slides[swiper.activeIndex].getAttribute('data-video-id');
-	//     const activeIndex = swiper.activeIndex;
-	//     setActiveVideoId(activeVideoId);
-	//     setActiveVideoData({
-	//         index: swiper.activeIndex,
-	//         videoUrl: videosList[swiper.activeIndex].data.storage.videoUrl,
-	//         thumbUrl: videosList[swiper.activeIndex].data.storage.thumbUrl
-	//     })
-
-	//     if (swiper.activeIndex > swiper.previousIndex) {
-	//         // User swiped to the next slide (down)
-	//         setTmpUrl(mockFetch[1]);  // For simplicity, using mockFetch[1] as example
-	//     } else if (swiper.activeIndex < swiper.previousIndex) {
-	//         // User swiped to the previous slide (up)
-	//         setTmpUrl(mockFetch[0]);  // Use the URL for the previous video
-	//     }
-	// };
-
-	const fetchMoreVideos = () => {
-		setCurrentPage(prevPage => prevPage + 1);
-	};
-
 	// TODO: This is printing a lot when idle
 	const activeVideoIndex = videos.findIndex(video => video.data.dbData.videoId === activeVideoId);
-	console.log("XXX Active video index = ", activeVideoIndex)
 
 	useEffect(() => {
 		if (activeVideoIndex === -1) {
@@ -293,30 +238,13 @@ const Home: React.FC = () => {
 	}, [activeVideoIndex])
 
 	const handleReportAndClose = async (reportType: REPORTTYPE, iid: string, uuid = 'unauth') => {
-		console.log("active = ", activeVideoData)
 		try {
-			const res = await submitReport(reportType, iid, uuid);
+			submitReport(reportType, iid, uuid);
 			setReportComplete(true); // Close the modal after submitting the report
 		} catch (error) {
 			console.error('Failed to submit report:', error);
 		}
 	};
-
-
-	// useEffect(() => {
-
-	//     if(isSwiping){
-
-	// console.log("IS SWIPING Next video url is ", videos[activeVideoIndex + 1]?.data.storage.videoUrl)
-	// const unpreload = preloadVideo(
-	//     videos[activeVideoIndex + 1]?.data.storage.videoUrl
-	// );
-
-	// console.log("unpreload = ", unpreload)
-	//     }
-
-	// }, [isSwiping])
-
 
 
 	return (
