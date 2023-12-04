@@ -2,12 +2,27 @@
 
 import React, { createContext, useState } from 'react';
 
+type UserInfoType = {
+  createdAt: string;
+  email: string;
+  fromCiv: boolean;
+  id: string;
+  imageUrl: string;
+  insertedAt: string;
+  provider: string;
+  sl_id: string;
+  username: string;
+  verified: boolean;
+  verifiedAt: string | null;
+};
+
+
 type UserStateType = {
   isAuthenticated: boolean;
   prismaUUID: null;
-  userInfo: null;
+  userInfo: UserInfoType | null;
   isProcessing: boolean;
-  error:boolean;
+  error: boolean;
 } | null;
 
 export const UserContext = createContext<{

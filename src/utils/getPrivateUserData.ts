@@ -1,5 +1,6 @@
-// utils/getUserData.ts
-import prisma from './prismaClient';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function getPrivateUserData(sl_id: string) {
   try {
@@ -9,15 +10,11 @@ export async function getPrivateUserData(sl_id: string) {
         username: true,
         id: true,
         imageUrl: true,
-
       },
     });
-
-    if (!userProfile) {
-      return null;
+    if (!userProfile || userProfile.username === null) {
+      throw new Error('User not found or username is null');
     }
-    console.log("In private username =", userProfile.username)
-
 
     const userStats = await prisma.image.aggregate({
       where: { username: userProfile.username },
@@ -26,7 +23,7 @@ export async function getPrivateUserData(sl_id: string) {
     });
 
     if (!userStats) {
-      return null;
+      throw new Error('User statistics not found');
     }
 
     return {

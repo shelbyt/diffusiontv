@@ -6,11 +6,11 @@ import { useRouter } from 'next/router';
 import { BookmarkSimple, ArrowLeft, ShareFat, Heart, UserList } from '@phosphor-icons/react';
 // import useUserUUID from '../../hooks/useUserUUID';
 import { GetServerSideProps } from 'next';
-import { getSession } from '@auth0/nextjs-auth0';
 import { getPrivateUserData } from '../../utils/getPrivateUserData';
 import InfiniteImageScroll from '../../components/infiniteImageScroll'; // Adjust the path as per your project structure
 import { IUserThumb } from "../../types/index";
 import AppLink from '../../components/appLink';
+import useUserUUID from '../../hooks/useUserUUID';
 
 export interface IUserDetails {
     username: string
@@ -20,12 +20,37 @@ export interface IUserDetails {
     id: string
 }
 
-export default function Profile({ userDetails }: { userDetails: IUserDetails }) {
+export default function Profile() {
     const [currentPage, setCurrentPage] = useState(0);
+    const [userDetails, setUserDetails] = useState<IUserDetails | null>(null);
+    const { userState } = useUserUUID();
+
     const router = useRouter();
 
+    useEffect(() => {
+        if (!userState?.prismaUUID) return;
+        if (userDetails) return;
+        fetchUserDetails(userState?.userInfo?.sl_id || "");
+
+    }, [userState?.userInfo?.sl_id]);
+
+    const fetchUserDetails = async (privateUUID: string) => {
+        try {
+            const res = await fetch(`/api/private/getUserDetails?method=get&sl_id=${privateUUID}`);
+            const userDetailsRes = await res.json();
+            console.log("xxx res = ", userDetailsRes);
+            setUserDetails(userDetailsRes);
+
+        }
+        catch (error) {
+            console.error("Error fetching user details:", error);
+        }
+
+    }
+
+
     const fetchMoreData = async () => {
-        if (!hasMore) return; // Exit if no more data to load
+        if (!hasMore || !userDetails)  return; // Exit if no more data to load
 
         try {
             const nextPage = currentPage + 1;
@@ -45,7 +70,8 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
     };
 
     const fetchMoreDataBM = async () => {
-        if (!hasMoreBM) return; // Exit if no more data to load
+        if (!hasMoreBM || !userDetails) return; // Exit if no more data to load or userDetails is null
+
 
         try {
             const nextPage = currentPageBM + 1;
@@ -66,7 +92,7 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
 
 
     const fetchMoreDataF = async () => {
-        if (!hasMoreF) return; // Exit if no more data to load
+        if (!hasMoreF || !userDetails) return; // Exit if no more data to load or userDetails is null
 
         try {
             const nextPage = currentPageF + 1;
@@ -228,23 +254,23 @@ export default function Profile({ userDetails }: { userDetails: IUserDetails }) 
     )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    const session = await getSession(context.req, context.res);
+// export const getServerSideProps: GetServerSideProps = async (context) => {
+//     const session = await getSession(context.req, context.res);
 
-    if (!session || !session.user) {
-        return {
-            redirect: {
-                destination: '/api/auth/login', // Redirect to the login page
-                permanent: false,
-            },
-        };
-    }
+//     if (!session || !session.user) {
+//         return {
+//             redirect: {
+//                 destination: '/api/auth/login', // Redirect to the login page
+//                 permanent: false,
+//             },
+//         };
+//     }
 
-    const userData = await getPrivateUserData(session.user.sub);
+//     const userData = await getPrivateUserData(session.user.sub);
 
-    return {
-        props: {
-            userDetails: userData,
-        },
-    };
-};
+//     return {
+//         props: {
+//             userDetails: userData,
+//         },
+//     };
+// };
