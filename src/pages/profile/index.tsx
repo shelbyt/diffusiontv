@@ -4,10 +4,7 @@ import Image from 'next/image';
 import { formatNumber } from '../../utils/formatNumber';
 import { useRouter } from 'next/router';
 import { BookmarkSimple, ArrowLeft, ShareFat, Heart, UserList } from '@phosphor-icons/react';
-// import useUserUUID from '../../hooks/useUserUUID';
-import { GetServerSideProps } from 'next';
-import { getPrivateUserData } from '../../utils/getPrivateUserData';
-import InfiniteImageScroll from '../../components/infiniteImageScroll'; // Adjust the path as per your project structure
+import InfiniteImageScroll from '../../components/infiniteImageScroll'; 
 import { IUserThumb } from "../../types/index";
 import AppLink from '../../components/appLink';
 import useUserUUID from '../../hooks/useUserUUID';
@@ -225,6 +222,7 @@ export default function Profile() {
                     initialImages={userThumbs}
                     fetchMoreData={fetchMoreData}
                     hasMore={hasMore}
+                    trackingString='profile likes'
                 />
             )}
             {activeTab === 'bookmarks' && (
@@ -233,6 +231,7 @@ export default function Profile() {
                     initialImages={userThumbsBM}
                     fetchMoreData={fetchMoreDataBM}
                     hasMore={hasMoreBM}
+                    trackingString='profile bookmarks'
                 />
             )}
 
