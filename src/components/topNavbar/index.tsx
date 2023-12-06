@@ -17,17 +17,23 @@ const TopNavbar: React.FC = () => {
       : {};
   };
 
+  const handleSetActiveTabInspire = () => {
+    setActiveTab('inspire');
+  };
+
+  const handleSetActiveTabLatest = () => {
+    setActiveTab('latest');
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-transparent">
       <div className="flex justify-center items-center px-2 pb-2 pt-4">
         <div
           className={getTabStyle('inspire')}
           style={getUnderlineStyle('inspire')}
-          onClick={() => {
-            withTracking(() => {
-              setActiveTab('inspire')
-            }, 'topNavbar: inspire')
-          }}
+          onClick={
+            withTracking(handleSetActiveTabInspire, 'topNavBar: inspire')
+          }
         >
           Inspire
           {activeTab === 'inspire' && (
@@ -46,11 +52,9 @@ const TopNavbar: React.FC = () => {
         <div
           className={getTabStyle('latest')}
           style={getUnderlineStyle('latest')}
-          onClick={() => {
-            withTracking(() => {
-              setActiveTab('latest')
-            }, 'topNavbar: latest')
-          }}
+          onClick={
+            withTracking(handleSetActiveTabLatest, 'topNavBar: latest')
+          }
         >
           Latest
           {activeTab === 'latest' && (

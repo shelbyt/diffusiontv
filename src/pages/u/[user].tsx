@@ -186,7 +186,7 @@ export default function User() {
                     <>
                         <div className="avatar">
                             <div className="w-24 rounded-full">
-                                <Image src={profileUserDetails?.imageUrl || '/'} alt="User Avatar" width={96} height={96} layout="fixed" />
+                                <Image src={profileUserDetails?.imageUrl || 'https://avatars.githubusercontent.com/u/117393426?s=128&v=4'} alt="User Avatar" width={96} height={96} layout="fixed" />
                             </div>
                         </div>
                         <h2 className="text-base font-bold my-2">{profileUserDetails?.username}</h2>
