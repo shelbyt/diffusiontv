@@ -18,8 +18,6 @@ const IndexPage: React.FC = () => {
     }, []);
 
     if (isClient) {
-        mixpanel.track('Onboard: Debug')
-        return <Home />;
         if (isBrowser) {
             mixpanel.track('Onboard: Browser View')
             return (
