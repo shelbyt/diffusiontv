@@ -58,14 +58,14 @@ I am running this project out of pocket at the moment. Costs are daily transcodi
 | Star Milestone  | Feature  | Status
 |----------------|---------|-------|
 | 0 stars          | 🎉 Serve application and open source |  ✅
-| 20 stars        |  🤝 Claim profile feature  [^1] | 
-| 25 stars        |⚡ Keep the party going for 30 days  [^2] | 
-| 50 stars        | 👀 Double dataset with fewer content filters[^3]  |
-| 75 stars        | ⚡Keep the party going for 60 days [^2] |
-| 250 stars       | 📀Improved loading time with better trancoder and CDN [^4] |
-| 500 stars       | 🚀Realtime update video and personal upload [^5] |
-| 1000 stars      | 📱Create iOS + Andriod App  [^6] |
-| 5000 stars      |🔥 Open Source my updated Civitai API for Videos[^7] |
+| 10 stars        |  🤝 Claim profile feature  [^1] | 
+| 15 stars        |⚡ Keep the party going for 30 days  [^2] | 
+| 30 stars        | 👀 Double dataset with fewer content filters[^3]  |
+| 50 stars        | ⚡Keep the party going for 60 days [^2] |
+| 100 stars       | 📀Improved loading time with better trancoder and CDN [^4] |
+| 250 stars       | 🚀Realtime update video and personal upload [^5] |
+| 500 stars      | 📱Create iOS + Andriod App  [^6] |
+| 1000 stars      |🔥 Open Source my updated Civitai API for Videos[^7] |
 
 [^1]: The next feature on the roadmap is to enable Civitai users to "claim" their profiles. This is challenging because Civitai has no "Login with Civitai". I have found a couple of ways around this to securely claim and verify ownership but it will take a couple weeks. 
 [^2]: Costs include daily jobs for transcoding, serving, and recommendation algorithms. Serving video is very expensive. 
