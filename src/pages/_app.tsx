@@ -13,12 +13,13 @@ import { VideoFeedProvider } from '../state/VideoFeedProvider';
 import mixpanel from '../utils/mixpanel';
 import { useEffect } from 'react';
 import Router from 'next/router';
+import Script from 'next/script'; // Import the Script component
 
 
 function MyApp({ Component, pageProps }: AppProps) {
     // Track page views
     useEffect(() => {
-        const handleRouteChange = (url : string) => {
+        const handleRouteChange = (url: string) => {
             mixpanel.track("Page Viewed", { page: url });
         };
 
@@ -30,21 +31,36 @@ function MyApp({ Component, pageProps }: AppProps) {
     }, []);
 
     return (
-        <UserProvider>
-            <AppUserProvider>
-                <PopupProvider>
-                    <AlertProvider>
-                        <VideoFeedProvider>
-                            <ActiveTabProvider>
-                                <Layout>
-                                    <Component {...pageProps} />
-                                </Layout>
-                            </ActiveTabProvider>
-                        </VideoFeedProvider>
-                    </AlertProvider>
-                </PopupProvider>
-            </AppUserProvider>
-        </UserProvider>
+        <>
+            <Script
+                src="https://www.googletagmanager.com/gtag/js?id=G-PPZBS5MHFX"
+                strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+                {`
+                          window.dataLayer = window.dataLayer || [];
+                          function gtag(){dataLayer.push(arguments);}
+                          gtag('js', new Date());
+
+                          gtag('config', 'G-PPZBS5MHFX');
+                        `}
+            </Script>
+            <UserProvider>
+                <AppUserProvider>
+                    <PopupProvider>
+                        <AlertProvider>
+                            <VideoFeedProvider>
+                                <ActiveTabProvider>
+                                    <Layout>
+                                        <Component {...pageProps} />
+                                    </Layout>
+                                </ActiveTabProvider>
+                            </VideoFeedProvider>
+                        </AlertProvider>
+                    </PopupProvider>
+                </AppUserProvider>
+            </UserProvider>
+        </>
     )
 }
 

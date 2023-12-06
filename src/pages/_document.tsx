@@ -1,6 +1,4 @@
 import Document, { Html, Head, Main, NextScript } from 'next/document';
-import Script from 'next/script'; // Import the Script component
-
 class MyDocument extends Document {
     render() {
         return (
@@ -13,21 +11,6 @@ class MyDocument extends Document {
                     />
                     <link rel="apple-touch-icon" href="/icon.png"></link>
                     <meta name="theme-color" content="#000" />
-
-                    {/* Google Analytics */}
-                    <Script
-                        src="https://www.googletagmanager.com/gtag/js?id=G-PPZBS5MHFX"
-                        strategy="afterInteractive"
-                    />
-                    <Script id="google-analytics" strategy="afterInteractive">
-                        {`
-                          window.dataLayer = window.dataLayer || [];
-                          function gtag(){dataLayer.push(arguments);}
-                          gtag('js', new Date());
-
-                          gtag('config', 'G-PPZBS5MHFX');
-                        `}
-                    </Script>
                 </Head>
                 <body>
                     <Main />
