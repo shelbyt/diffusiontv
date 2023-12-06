@@ -9,7 +9,26 @@ import { ActiveTabProvider } from '../state/ActiveTabContext';
 import Layout from '../components/layout'
 import { VideoFeedProvider } from '../state/VideoFeedProvider';
 
+// Import Mixpanel configuration
+import mixpanel from '../utils/mixpanel';
+import { useEffect } from 'react';
+import Router from 'next/router';
+
+
 function MyApp({ Component, pageProps }: AppProps) {
+    // Track page views
+    useEffect(() => {
+        const handleRouteChange = (url : string) => {
+            mixpanel.track("Page Viewed", { page: url });
+        };
+
+        Router.events.on('routeChangeComplete', handleRouteChange);
+
+        return () => {
+            Router.events.off('routeChangeComplete', handleRouteChange);
+        };
+    }, []);
+
     return (
         <UserProvider>
             <AppUserProvider>

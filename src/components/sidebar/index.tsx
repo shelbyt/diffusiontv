@@ -5,6 +5,8 @@ import useUserUUID from '../../hooks/useUserUUID';
 import { usePopup } from '../../state/PopupContext';
 import { formatNumber } from '../../utils/formatNumber';
 import { setPendingAction } from '../../state/localStorageHelpers';
+import { withTracking } from '../../utils/mixpanel';
+
 
 interface ISidebarProps { video: any }
 
@@ -55,8 +57,9 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
     }, [viewer])
 
 
-    const toggleDrawer = () => {
+    const toggleDrawer = (e: React.MouseEvent<SVGSVGElement>) => {
         setDrawerOpen(!drawerOpen);
+        e.stopPropagation();
     };
 
     React.useEffect(() => {
@@ -144,9 +147,9 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                 if (data.isLiked) {
                     setIsLiked(true);
                 }
-                if(!data.isLiked) {
+                if (!data.isLiked) {
                     setIsLiked(false);
-                } 
+                }
             } else {
                 // Handle the case when userState.prismaUUID or video.id is null
             }
@@ -185,7 +188,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
             <div className="flex flex-col items-center space-y-1"> {/* Adjust vertical spacing here */}
                 <label className="swap swap-rotate cursor-pointer">
                     {/* <input type="checkbox" checked={liked} onChange={() => toggleEngagement(video?.data?.dbData?.user.id, video?.data?.dbData?.id, 'like', !liked)} /> */}
-                    <input type="checkbox" checked={isLiked} onChange={handleLike}
+                    <input type="checkbox" checked={isLiked} onChange={withTracking(handleLike, "sidebar: liked")}
                         onClick={(e) => e.stopPropagation()} />
 
                     {/* <input type="checkbox" checked={video.data.dbData ? video?.data?.dbData?.engagement?.liked : false} onChange={handleLike} /> */}
@@ -224,7 +227,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
 
             <div className="flex flex-col items-center space-y-1"> {/* Adjust vertical spacing here */}
                 <label className="swap swap-flip cursor-pointer">
-                    <input type="checkbox" checked={isBookmarked} onChange={handleBookmark}
+                    <input type="checkbox" checked={isBookmarked} onChange={withTracking(handleBookmark, "sidebar: bookmarked")} //handleBookmark}
                         onClick={(e) => {
                             e.stopPropagation();
                         }}
@@ -267,11 +270,7 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
                 className="cursor-pointer hover:text-red-500 text-white"
                 stroke='black'
                 strokeWidth={15}
-                onClick={(e) => {
-                    toggleDrawer();
-                    e.stopPropagation();
-                } // Toggle drawer on click
-                }
+                onClick={withTracking(toggleDrawer, "sidebar: report opened")}
             />
 
         </div>

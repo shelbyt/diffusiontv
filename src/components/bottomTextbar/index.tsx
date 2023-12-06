@@ -1,6 +1,7 @@
 import React, { useState, FC } from 'react';
 import { useRouter } from 'next/router';
 import { handleNavigationAway } from '../../state/localStorageHelpers';
+import { withTracking } from '../../utils/mixpanel';
 
 interface BottomTextProps {
     username: string;
@@ -27,8 +28,9 @@ const BottomText: FC<BottomTextProps> = ({ username, image, meta }) => {
 
     const isTruncated = metaData?.prompt && metaData.prompt.length > charLimit;
 
-    const toggleExpanded = () => {
+    const toggleExpanded = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setIsExpanded(!isExpanded);
+        e.stopPropagation();
     };
 
     const handlePressDown = () => {
@@ -37,6 +39,12 @@ const BottomText: FC<BottomTextProps> = ({ username, image, meta }) => {
 
     const handlePressUp = () => {
         setIsPressed(false);
+    };
+
+    const handlePressUsername = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        handleNavigationAway();
+        e.stopPropagation();
+        router.push('/u/' + username, undefined, { shallow: true })
     };
 
     return (
@@ -48,11 +56,7 @@ const BottomText: FC<BottomTextProps> = ({ username, image, meta }) => {
                 onMouseUp={handlePressUp}
                 onTouchStart={handlePressDown}
                 onTouchEnd={handlePressUp}
-                onClick={(e) => {
-                    handleNavigationAway();
-                    e.stopPropagation();
-                    router.push('/u/' + username, undefined, { shallow: true })
-                }}
+                onClick={withTracking(handlePressUsername, 'bottomTextbar: username')}
             >
                 <div className="avatar mr-2" >
                     <div className="bg-neutral-focus text-neutral-content border border-black rounded-full w-8 h-8 flex items-center justify-center">
@@ -68,12 +72,11 @@ const BottomText: FC<BottomTextProps> = ({ username, image, meta }) => {
 
             {/* "See More" Button */}
             {isTruncated && (
-                <button onClick={
-                   (e) => {
-                    toggleExpanded()
-                    e.stopPropagation()
-                   } 
-                    } className="text-xs mt-2">
+                <button
+                    onClick={
+                        withTracking(toggleExpanded, 'bottomTextbar: seeMore')
+                    }
+                    className="text-xs mt-2">
                     {isExpanded ? 'See Less' : 'See More'}
                 </button>
             )}

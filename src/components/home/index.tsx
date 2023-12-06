@@ -19,6 +19,7 @@ import { useActiveTab } from '../../state/ActiveTabContext';
 import { isPendingAction, deletePendingAction } from '../../state/localStorageHelpers';
 import { toggleBookmark, toggleLike } from '../../utils/apiHelpers';
 import { useAlert } from '../../state/AlertContext';
+import mixpanel from '../../utils/mixpanel';
 
 const Home: React.FC = () => {
 	const {
@@ -199,6 +200,8 @@ const Home: React.FC = () => {
 	}, [currentPage, activeTab]);
 
 	const handleSlideChange = (swiper: any) => {
+		mixpanel.track("Slide Changed");
+
 		// Cleanup from prev
 		setBuffered(false);
 		setReportComplete(false);

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import VideoModal from '../videoModal';
 import { Heart } from '@phosphor-icons/react';
+import { withTracking } from '../../utils/mixpanel';
 
 interface InfiniteImageScrollProps {
 	initialImages: IUserThumb[];
 	fetchMoreData: () => void;
 	hasMore: boolean;
 	highlightTop?: boolean;
+	trackingString: string
 }
 
 interface IUserThumb {
@@ -18,7 +20,7 @@ interface IUserThumb {
 	totalLikeHeartEngageCount: number;
 }
 
-const InfiniteImageScroll: React.FC<InfiniteImageScrollProps> = ({ initialImages, fetchMoreData, hasMore, highlightTop }) => {
+const InfiniteImageScroll: React.FC<InfiniteImageScrollProps> = ({ initialImages, fetchMoreData, hasMore, highlightTop, trackingString }) => {
 
 	const SkeletonLoader = () => {
 		return (
@@ -61,7 +63,7 @@ const InfiniteImageScroll: React.FC<InfiniteImageScrollProps> = ({ initialImages
 							<img
 								src={image.thumbUrl}
 								className="w-full h-full object-cover opacity-0 transition-opacity duration-500"
-								onClick={() => openModal(index)}
+								onClick={withTracking(() => openModal(index), `${trackingString} video scroll: video opened   `)}
 								onLoad={(e) => e.currentTarget.classList.replace('opacity-0', 'opacity-100')}
 							/>
 							<div className="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white p-2 flex items-center">

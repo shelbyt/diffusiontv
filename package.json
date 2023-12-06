@@ -12,6 +12,7 @@
     "@auth0/nextjs-auth0": "^3.2.0",
     "@phosphor-icons/react": "^2.0.13",
     "@prisma/client": "^5.6.0",
+    "mixpanel-browser": "^2.48.1",
     "next": "12.1.6",
     "next-auth": "^4.24.5",
     "next-pwa": "^5.5.4",
@@ -24,6 +25,7 @@
     "vaul": "^0.7.9"
   },
   "devDependencies": {
+    "@types/mixpanel-browser": "^2.47.5",
     "@types/node": "17.0.42",
     "@types/react": "18.0.12",
     "@types/react-dom": "18.0.5",

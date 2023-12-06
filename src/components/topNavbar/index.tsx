@@ -1,5 +1,6 @@
 import React from 'react';
 import { useActiveTab } from '../../state/ActiveTabContext'; // Adjust the import path as necessary
+import { withTracking } from '../../utils/mixpanel';
 
 const TopNavbar: React.FC = () => {
   const { activeTab, setActiveTab } = useActiveTab();
@@ -22,7 +23,11 @@ const TopNavbar: React.FC = () => {
         <div
           className={getTabStyle('inspire')}
           style={getUnderlineStyle('inspire')}
-          onClick={() => setActiveTab('inspire')}
+          onClick={() => {
+            withTracking(() => {
+              setActiveTab('inspire')
+            }, 'topNavbar: inspire')
+          }}
         >
           Inspire
           {activeTab === 'inspire' && (
@@ -42,7 +47,9 @@ const TopNavbar: React.FC = () => {
           className={getTabStyle('latest')}
           style={getUnderlineStyle('latest')}
           onClick={() => {
-            setActiveTab('latest')
+            withTracking(() => {
+              setActiveTab('latest')
+            }, 'topNavbar: latest')
           }}
         >
           Latest

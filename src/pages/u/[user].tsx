@@ -11,6 +11,7 @@ import AppLink from '../../components/appLink';
 import Civitai from '../../icons/civitai';
 import InfiniteImageScroll from '../../components/infiniteImageScroll'; // Adjust the path as per your project structure
 import { IUserThumb } from '../../types';
+import { withTracking } from '../../utils/mixpanel';
 export interface IUserDetails {
     username: string
     imageUrl: string
@@ -217,7 +218,9 @@ export default function User() {
                 {/* Container for centering the Follow Button */}
                 <div className="flex-grow flex justify-center">
                     <button className={(isFollowing || increaseFollow == 1) ? "btn btn-outline btn-primary w-32" : "btn btn-primary w-32"}
-                        onClick={() => toggleFollow(userState?.prismaUUID || undefined, profileUserDetails?.id || undefined)} // Replace with actual IDs
+                        onClick={withTracking(() => {
+                            toggleFollow(userState?.prismaUUID || undefined, profileUserDetails?.id || undefined)
+                        }, 'user: follow')}
                     >
                         {(isFollowing || increaseFollow == 1) ? 'Following' : 'Follow'}
 
@@ -239,6 +242,7 @@ export default function User() {
                 fetchMoreData={fetchMoreData}
                 hasMore={hasMore}
                 highlightTop={true}
+                trackingString={'user videos'}
             />
             <VideoModal
                 url={userThumbs[activeVideoIndex]?.videoUrl}

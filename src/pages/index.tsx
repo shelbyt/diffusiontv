@@ -3,14 +3,13 @@ import Image from 'next/image';
 import { Export } from '@phosphor-icons/react';
 import useStandaloneCheck from '../hooks/useStandaloneCheck'; // Import the hook
 import Home from '../components/home'; // Assuming this is your Home component
-import useWindowWidth from '../hooks/useWindowWidth';
-import { BrowserView, MobileView, isBrowser, isMobile } from 'react-device-detect';
+import { isBrowser } from 'react-device-detect';
+import mixpanel from 'mixpanel-browser';
 
 
 const IndexPage: React.FC = () => {
 
     const isStandalone = useStandaloneCheck(); // Use the hook to check for standalone mode
-    const windowWidth = useWindowWidth();
     const [isClient, setIsClient] = useState(false);
 
 
@@ -20,6 +19,7 @@ const IndexPage: React.FC = () => {
 
     if (isClient) {
         if (isBrowser) {
+            mixpanel.track('Onboard: Browser View')
             return (
                 <div className="flex flex-col items-center justify-center h-screen bg-black">
                     <Image
@@ -29,11 +29,12 @@ const IndexPage: React.FC = () => {
                         height={512}
                         layout="fixed"
                     />
-                    <p className="text-white mt-4 text-3xl">📱</p>
+                    <p className="text-white mt-4 text-3xl">Mobile Exclusive 📱</p>
                 </div>
             );
         }
         else if (!isStandalone) {
+            mixpanel.track('Onboard: Mobile Not Standalone')
             return (
                 <div className="flex h-screen bg-gray-100">
                     <div className="m-auto text-center">
@@ -58,6 +59,7 @@ const IndexPage: React.FC = () => {
             );
         }
         else {
+            mixpanel.track('Onboard: Mobile Standalone')
             return <Home />;
         }
     }
