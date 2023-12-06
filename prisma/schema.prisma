@@ -159,15 +159,17 @@ model UserBookmarks {
 }
 
 model UserPlays {
-  id           String   @id @default(cuid())
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @default(now())
-  userId       String
-  imageId      String
-  playCount    Int      @default(0)
-  playDuration Int      @default(0)
-  user         User     @relation(fields: [userId], references: [id])
-  image        Image    @relation(fields: [imageId], references: [id])
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
+  userId         String
+  imageId        String
+  videoDuration  Float @default(0)
+  totalWatchTime Float @default(0)
+  videoLoops     Float @default(0)
+  agent          Json? // User agent data in JSON format
+  user           User     @relation(fields: [userId], references: [id])
+  image          Image    @relation(fields: [imageId], references: [id])
 
   @@unique([userId, imageId], name: "userId_imageId_play")
   @@index([userId])
