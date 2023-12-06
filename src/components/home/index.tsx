@@ -59,12 +59,21 @@ const Home: React.FC = () => {
 	const [isVideoPaused, setIsVideoPaused] = useState<boolean>(true);
 	const { userState } = useUserUUID();
 	const [swiperKey, setSwiperKey] = useState(0);
-	const [pro, setPro] = useState({
-		playedSeconds: 0,
-		loadedSeconds: 0,
-		played: 0,
-		loaded: 0,
-	});
+	const [videoDuration, setVideoDuration] = useState(0);
+	const [totalWatchTime, setTotalWatchTime] = useState(0);
+	const [lastPlayedSeconds, setLastPlayedSeconds] = useState(0);
+	const handleProgress = (progressState: any) => {
+		// Calculate the increment in watch time
+		if (progressState.playedSeconds > lastPlayedSeconds) {
+			const timeIncrement = progressState.playedSeconds - lastPlayedSeconds;
+			setTotalWatchTime(currentTime => currentTime + timeIncrement);
+		}
+		setLastPlayedSeconds(progressState.playedSeconds);
+	};
+
+	const handleDuration = (duration: number) => {
+		setVideoDuration(duration);
+	};
 	const [isLandscape, setIsLandscape] = useState<boolean | null>(false);
 	const [ratio, setRatio] = useState(0);
 	const { activeTab } = useActiveTab();
@@ -199,8 +208,59 @@ const Home: React.FC = () => {
 		}
 	}, [currentPage, activeTab]);
 
+	const sendPlays = async (userId: string, imageId: string, totalWatchTime = 0, videoDuration = 0) => {
+		try {
+			const response = await fetch('/api/engagement/plays', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					userId,
+					imageId,
+					videoDuration,
+					totalWatchTime,
+					//videoLoops = totalWatchTime / videoDuration;
+					agent: navigator.userAgent, // Example of capturing user agent
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+		} catch (error) {
+			console.error('Failed to send data:', error);
+		}
+	};
+
+
 	const handleSlideChange = (swiper: any) => {
-		mixpanel.track("Slide Changed");
+		try {
+			mixpanel.track("Slide Changed", {
+				videoId: swiper.slides[swiper.activeIndex].getAttribute('data-video-id'),
+				totalWatchTime: totalWatchTime,
+				lastPlayedSeconds: lastPlayedSeconds,
+				videoDuration: videoDuration,
+			});
+		} catch (error) {
+			console.error('Failed to track slide change:', error);
+		}
+
+		try {
+			if (userState?.prismaUUID) {
+				sendPlays(userState?.prismaUUID, swiper.slides[swiper.activeIndex].getAttribute('data-video-id'), totalWatchTime, videoDuration);
+			}
+		} catch (error) {
+			console.error('Failed to track plays in db:', error);
+		}
+		// console.log("AAA Pro: ", pro)
+
+		// sendPlays(user, video?.data?.dbData?.id, totalWatchTime, totalWatchs);
+		// setLoopCount(0)
+		setTotalWatchTime(0)
+		setLastPlayedSeconds(0)
+		setVideoDuration(0)
+
 
 		// Cleanup from prev
 		setBuffered(false);
@@ -347,6 +407,7 @@ const Home: React.FC = () => {
 							// objectFit="fill"
 							url={activeVideoData?.videoUrl} // state managed URL of the currently playing video
 							playing={!isSwiping && !isVideoPaused}
+							onDuration={handleDuration}
 							// config={{
 							// 	file: {
 							// 		attributes: {
@@ -354,16 +415,7 @@ const Home: React.FC = () => {
 							// 		},
 							// 	},
 							// }}
-							onProgress={(progress) => {
-								setPro({
-									playedSeconds: progress.playedSeconds,
-									loadedSeconds: progress.loadedSeconds,
-									played: progress.played,
-									loaded: progress.loaded
-								})
-
-
-							}}
+							onProgress={handleProgress}
 							muted={muted}
 							loop={true}
 							playsinline={true}
