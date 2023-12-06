@@ -2,7 +2,6 @@ import mixpanel from "mixpanel-browser";
 
 // Initialize Mixpanel
 mixpanel.init(process.env.NEXT_PUBLIC_MIXPANEL_TOKEN || '', { debug: true });
-console.log("Mixpanel initialized", process.env.NEXT_PUBLIC_MIXPANEL_TOKEN);
 
 // Generic type for event handlers
 type GenericEventHandler<E extends React.SyntheticEvent> = (event: E) => void;
