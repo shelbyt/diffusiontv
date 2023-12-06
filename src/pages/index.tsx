@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Export } from '@phosphor-icons/react';
+import { Export, DotsThreeVertical } from '@phosphor-icons/react';
 import useStandaloneCheck from '../hooks/useStandaloneCheck'; // Import the hook
 import Home from '../components/home'; // Assuming this is your Home component
 import { isBrowser } from 'react-device-detect';
@@ -47,11 +47,17 @@ const IndexPage: React.FC = () => {
                         />
                         <h1 className="text-xl font-bold mb-4">Install Web App</h1>
                         <p className="mb-8">
-                            Install this application to your home screen for the best experience
+                            Please open with Safari (iOS) or Chrome (Andriod) and add to home screen for a native experience. 
                         </p>
                         <div className="inline-block p-4 bg-gray-200 rounded-lg">
-                            <span className="align-middle">Just Tap </span>
+                            <span className="align-middle">iOS: Tap </span>
                             <Export className="inline-block align-middle text-lg" color="#007aff" />
+                            <span className="align-middle"> and click &apos;Add to Home Screen&apos;</span>
+                            <br/>
+                            <br/>
+
+                            <span className="align-middle">Andriod: Tap </span>
+                            <DotsThreeVertical className="inline-block align-middle text-lg" color="#007aff" />
                             <span className="align-middle"> and click &apos;Add to Home Screen&apos;</span>
                         </div>
                     </div>
