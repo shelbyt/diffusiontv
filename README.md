@@ -1,5 +1,6 @@
 # Diffusion TV
 
+
 ## About
 
 AI Generated video is taking off 🎉 Diffusion TV helps you stay on top of the latest AI generated videos with a user experience inspired by Tiktok/Reels. Always see fresh content, discover your favorite artists, and keep up with the latest AI Generated videos. 
