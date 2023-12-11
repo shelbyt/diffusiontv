@@ -19,20 +19,9 @@ My goal is to see if there is enough interest in this proof of concept to conver
 
 > [!NOTE]
 The content in DiffusionTV based 100% on [Civitai's API](https://github.com/civitai/civitai/wiki/REST-API-Reference). None of the content is scraped from their website in order to remain compliant to their Terms of Service. All video content belong to their respective owners and creators.
-
-## Installation
-
-Diffusion TV is a PWA or Progressive Web App. Meaning it will act and look like a native mobile application once saved to your home screen. Saving to home screen is simple:
-
-iOS:
-1. Open application in Safari
-2. Select the Share icon
-3. Select "Save to Home Screen"
-
-Andriod:
-1. Open application in Chrome
-2. Open Settings
-3. Select "Save to Home"
+## Recommendation Algorithm
+![image](https://github.com/shelbyt/diffusiontv/assets/1332316/b9e2a9fb-d7e5-443a-9f2f-95ca4de9755c)
+![image](https://github.com/shelbyt/diffusiontv/assets/1332316/ce774797-9281-421d-9d26-83e944a27e86)
 
 ## Features
 The videos and engagement data comes from Civitai, however while Civitai is a great place to share models and images, video content is underserved. I wanted a way where I could follow my favorite creators, stay on top of the latest videos, and watch videos that aren't normally surfaced on Civitai by creating a unique recommendation algorithm based on clusters of video content using [CLIP](https://arxiv.org/pdf/2103.00020.pdf) as a baseline.
@@ -48,7 +37,21 @@ The videos and engagement data comes from Civitai, however while Civitai is a gr
 | Like and bookmark prompts and videos  | ✅ |  ✅| 
 | 3,000+ Videos  | ✅ |  ✅| 
 
+## Installation
 
+Diffusion TV is a PWA or Progressive Web App. Meaning it will act and look like a native mobile application once saved to your home screen. Saving to home screen is simple:
+
+iOS:
+1. Open application in Safari
+2. Select the Share icon
+3. Select "Save to Home Screen"
+
+Andriod:
+1. Open application in Chrome
+2. Open Settings
+3. Select "Save to Home"
+
+   
 ## Support the Project with Stars 🤩 
 
 I am running this project out of pocket at the moment. Costs are daily transcoding, storage and serving images and videos, and CDNs for this content. If you appreciate what I'm doing start me ⭐ on GitHub, send feedback and share with friends. Thank you!
