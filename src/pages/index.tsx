@@ -19,21 +19,19 @@ const IndexPage: React.FC = () => {
 
     if (isClient) {
         if (isBrowser) {
-
             mixpanel.track('Visiting From: Browser View')
-            return <Home />;
-            // return (
-            //     <div className="flex flex-col items-center justify-center h-screen bg-black">
-            //         <Image
-            //             src="/qr.png"
-            //             alt="QR Code"
-            //             width={512}
-            //             height={512}
-            //             layout="fixed"
-            //         />
-            //         <p className="text-white mt-4 text-3xl">Mobile Exclusive 📱</p>
-            //     </div>
-            // );
+            return (
+                <div className="flex flex-col items-center justify-center h-screen bg-black">
+                    <Image
+                        src="/qr.png"
+                        alt="QR Code"
+                        width={512}
+                        height={512}
+                        layout="fixed"
+                    />
+                    <p className="text-white mt-4 text-3xl">Scan for Mobile Link or Open on Phone</p>
+                </div>
+            );
         }
         else if (!isStandalone) {
             mixpanel.track('Visiting From: Mobile Not Standalone')
