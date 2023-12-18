@@ -166,11 +166,11 @@ export default function User() {
                         <ArrowLeft size={24} />
                     </button>
                 </div>
-                <div className="flex-none">
-                    <button className="btn btn-ghost">
+                {/* <div className="flex-none">
+                    <button className="btn btn-ghost" onClick={onShare}>
                         <ShareFat size={24} />
                     </button>
-                </div>
+                </div> */}
             </div>
 
             {/* User's Picture and Name */}

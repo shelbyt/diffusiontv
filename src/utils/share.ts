@@ -1,7 +1,7 @@
 export const onShare = async () => {
-    const title = 'FlowTok by FlowMe'
+    const title = 'DiffusionTV'
     const url = window.document.location.href
-    const text = 'The AiGen Social Platform'
+    const text = 'Discover the Latest AI Gen Videos'
 
     if (navigator.share) {
         try {

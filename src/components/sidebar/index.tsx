@@ -1,11 +1,12 @@
 import React, { useState, FC, useEffect } from 'react';
-import { Warning, BookmarkSimple, ArrowFatUp } from "@phosphor-icons/react";
+import { Warning, BookmarkSimple, ArrowFatUp, ShareFat } from "@phosphor-icons/react";
 import { useVideoFeed } from '../../state/VideoFeedProvider';
 import useUserUUID from '../../hooks/useUserUUID';
 import { usePopup } from '../../state/PopupContext';
 import { formatNumber } from '../../utils/formatNumber';
 import { setPendingAction } from '../../state/localStorageHelpers';
 import { withTracking } from '../../utils/mixpanel';
+import { onShare } from '../../utils/share';
 
 
 interface ISidebarProps { video: any }
@@ -59,6 +60,11 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
 
     const toggleDrawer = (e: React.MouseEvent<SVGSVGElement>) => {
         setDrawerOpen(!drawerOpen);
+        e.stopPropagation();
+    };
+
+    const toggleShare = (e: React.MouseEvent<SVGSVGElement>) => {
+        onShare();
         e.stopPropagation();
     };
 
@@ -264,8 +270,17 @@ const Sidebar: FC<ISidebarProps> = ({ video, viewer }: ISidebarProps): JSX.Eleme
 
                 </div>
             </div>
-            <Warning
+
+            <ShareFat
                 size={30}
+                weight="fill"
+                className="cursor-pointer hover:text-green-500 text-white"
+                stroke='black'
+                strokeWidth={15}
+                onClick={withTracking(toggleShare, "sidebar: share opened")}
+            />
+            <Warning
+                size={20}
                 weight="fill"
                 className="cursor-pointer hover:text-red-500 text-white"
                 stroke='black'
